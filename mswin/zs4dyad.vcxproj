@@ -57,7 +57,7 @@
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>../../OSS/boost;../../OSS/process;../include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>../include</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -75,7 +75,7 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <PreprocessorDefinitions>WIN32;NDEBUG;_CONSOLE;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>../../OSS/boost;../../OSS/process;../include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>../include</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -119,29 +119,6 @@
     <ClCompile Include="..\zs4dyad\zs4dyad.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\include\jsonobject.h" />
-    <ClInclude Include="..\include\zs4.h" />
-    <ClInclude Include="..\include\zs4array.h" />
-    <ClInclude Include="..\include\zs4bits.h" />
-    <ClInclude Include="..\include\zs4config.h" />
-    <ClInclude Include="..\include\zs4file.h" />
-    <ClInclude Include="..\include\zs4fs.h" />
-    <ClInclude Include="..\include\zs4jsonparser.h">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</ExcludedFromBuild>
-    </ClInclude>
-    <ClInclude Include="..\include\zs4machine.h" />
-    <ClInclude Include="..\include\zs4macros.h" />
-    <ClInclude Include="..\include\zs4object.h" />
-    <ClInclude Include="..\include\zs4pipe.h" />
-    <ClInclude Include="..\include\zs4ring.h" />
-    <ClInclude Include="..\include\zs4stat.h" />
-    <ClInclude Include="..\include\zs4stream.h" />
-    <ClInclude Include="..\include\zs4streamhandler.h" />
-    <ClInclude Include="..\include\zs4streamserver.h" />
-    <ClInclude Include="..\include\zs4string.h" />
-    <ClInclude Include="..\include\zs4thread.h" />
-    <ClInclude Include="..\include\zs4types.h" />
     <ClInclude Include="..\zs4dyad\dyad.h" />
     <ClInclude Include="..\zs4dyad\zs4dyad.h" />
   </ItemGroup>

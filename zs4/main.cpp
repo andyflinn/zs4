@@ -1,5 +1,3 @@
-#include "zs4dyad.h"
-
 #include <zs4bits.h>
 #include <zs4jsonparser.h>
 #include <jsonobject.h>
@@ -25,10 +23,6 @@ int main(int argc, char **argv)
 	zs4jsonParser<zs4StringBuffer> json;
 	const json_value * jv = json.parseFile("session.json");
 	
-	zs4dyad * dyad = new zs4dyad();
-
-	dyad->Run();
-
 	getchar();
 	return 0;
 }
