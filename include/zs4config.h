@@ -12,7 +12,7 @@
 #include <sys/types.h>
 #include <sys/stat.h>
 
-#include <direct.h>
+//#include <direct.h>
 #include <errno.h>
 
 #ifdef _MSC_VER
