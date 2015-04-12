@@ -50,7 +50,7 @@
       </Compiler>
       <Linker Options="" Required="yes"/>
       <ResourceCompiler Options="" Required="no"/>
-      <General OutputFile="../../bin/linux/$(ConfigurationName)/lib$(ProjectName).a" IntermediateDirectory="../../int/linux/$(ConfigurationName)/$(ProjectName)/" Command="" CommandArguments="" UseSeparateDebugArgs="no" DebugArguments="" WorkingDirectory="$(IntermediateDirectory)" PauseExecWhenProcTerminates="yes"/>
+      <General OutputFile="../../bin/linux/$(ConfigurationName)/lib$(ProjectName).a" IntermediateDirectory="../../int/linux/$(ConfigurationName)/$(ProjectName)/" Command="" CommandArguments="./" UseSeparateDebugArgs="no" DebugArguments="" WorkingDirectory="$(IntermediateDirectory)" PauseExecWhenProcTerminates="yes"/>
       <Environment EnvVarSetName="&lt;Use Defaults&gt;" DbgSetName="&lt;Use Defaults&gt;">
         <![CDATA[]]>
       </Environment>
