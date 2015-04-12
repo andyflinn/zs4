@@ -93,7 +93,7 @@ public:
 			return 1;
 
 
-		return stricmp(&str[len_str - len_end], end);
+		return ::stricmp(&str[len_str - len_end], end);
 	}
 
 	static inline int strend(const char * str, const char * end)
@@ -105,7 +105,7 @@ public:
 			return 1;
 
 
-		return strcmp(&str[len_str - len_end], end);
+		return ::strcmp(&str[len_str - len_end], end);
 	}
 };
 
