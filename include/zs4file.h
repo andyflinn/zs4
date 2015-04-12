@@ -20,11 +20,11 @@ public:
 		close();
 
 		if (zs4SUCCESS != info.GetInfo(name))
-			return zs4FAILURE;
+			return zs4FILEINFOERROR;
 
 		stream = fopen(name,"rb");
 		if	( stream== NULL )
-			return zs4FAILURE;
+			return zs4FILEOPENERROR;
 
 		read_able = info.size;
 		open_for_write = false;
@@ -35,7 +35,7 @@ public:
 		close();
 		stream = fopen(name, "w+");
 		if	( stream == NULL )
-			return zs4FAILURE;
+			return zs4FILEOPENERROR;
 
 		write_able = ZS4_TEXTBUFFER_SIZE;
 		info.GetInfo(name);
@@ -126,6 +126,19 @@ public:
 
 		*s = info.size;
 		return zs4SUCCESS;
+	}
+
+	inline virtual zs4error copyTo(zs4stream*to){
+		return copy(this, to);
+	}
+
+	inline static zs4error load(const char * filename, zs4stream*to){
+		zs4file file;
+		zs4error err = file.openRead(filename);
+		if (zs4SUCCESS != err)
+			return err;
+
+		return file.copyTo(to);
 	}
 
 protected:

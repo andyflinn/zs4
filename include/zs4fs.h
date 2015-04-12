@@ -13,7 +13,7 @@
 #define ZS4_FS_H
 
 #include "zs4stat.h"
-#include "zs4json.h"
+//#include "zs4json.h"
 
 #ifndef ZS4_MAX_DIR_SIZE
 #define ZS4_MAX_DIR_SIZE (1024)

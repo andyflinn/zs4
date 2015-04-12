@@ -74,35 +74,13 @@ public:
 		return c;
 	}
 
-	inline static int charCompareHow(char c1, char c2, bool insensitive)
-	{
-		if (insensitive)
-			return charCompareInsensitive(c1, c2);
-
-		return charCompare(c1, c2);
-	}
-
 	inline static int charCompare(char c1, char c2)
 	{
 		return c1 - c2;
 	}
 
-	inline static int charCompareInsensitive(char c1, char c2)
-	{
-		return charMakeUpper(c1) - charMakeUpper(c2);
-	}
-
 	inline static zs4error strcharswap(char org, char * str, char nu){
 		while (*str != 0) { if (*str == org) { *str = nu; } str++; }
-		return zs4SUCCESS;
-	}
-
-	inline static zs4error strPlatformizePath(char * str){
-#ifdef BACKSLASHES
-		strcharswap('/', str, PATH_SEPARATOR_CHAR);
-#else
-		strcharswap('\\', str, PATH_SEPARATOR_CHAR);
-#endif
 		return zs4SUCCESS;
 	}
 
@@ -129,8 +107,6 @@ public:
 
 		return strcmp(&str[len_str - len_end], end);
 	}
-
-
 };
 
 

@@ -1,0 +1,126 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="Header Files">
+      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
+      <Extensions>h;hh;hpp;hxx;hm;inl;inc;xsd</Extensions>
+    </Filter>
+    <Filter Include="Resource Files">
+      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
+      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
+    </Filter>
+    <Filter Include="examples">
+      <UniqueIdentifier>{60fb1ea5-f403-4ee6-b9b1-3ab5e8f6ab32}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="include">
+      <UniqueIdentifier>{ab67f9ee-4f40-4ed4-ae80-06fa0594f469}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <Text Include="ReadMe.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\doc\example\daytime.c">
+      <Filter>examples</Filter>
+    </ClCompile>
+    <ClCompile Include="..\doc\example\echoserv.c">
+      <Filter>examples</Filter>
+    </ClCompile>
+    <ClCompile Include="..\doc\example\httpget.c">
+      <Filter>examples</Filter>
+    </ClCompile>
+    <ClCompile Include="..\doc\example\httpserv.c">
+      <Filter>examples</Filter>
+    </ClCompile>
+    <ClCompile Include="..\doc\example\httpserv2.c">
+      <Filter>examples</Filter>
+    </ClCompile>
+    <ClCompile Include="..\doc\example\ircbot.c">
+      <Filter>examples</Filter>
+    </ClCompile>
+    <ClCompile Include="..\zs4dyad\dyad.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\zs4dyad\main.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\zs4dyad\zs4dyad.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\zs4dyad\dyad.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\zs4dyad\zs4dyad.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\jsonobject.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\zs4.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\zs4array.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\zs4bits.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\zs4config.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\zs4file.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\zs4fs.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\zs4jsonparser.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\zs4machine.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\zs4macros.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\zs4object.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\zs4pipe.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\zs4ring.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\zs4stat.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\zs4stream.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\zs4streamhandler.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\zs4streamserver.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\zs4string.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\zs4thread.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\zs4types.h">
+      <Filter>include</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\zs4dyad\test.json" />
+  </ItemGroup>
+</Project>

@@ -22,8 +22,6 @@
 #	define WIN32_LEAN_AND_MEAN
 #	include <windows.h>
 
-//#	include <tchar.h>
-//#	include <WinBase.h>
 #	define snprintf _snprintf
 #	define chdir _chdir
 

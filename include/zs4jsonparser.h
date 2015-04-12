@@ -160,7 +160,7 @@ public:
 
 } json_value;
 
-#include <zs4string.h>
+#include <zs4file.h>
 
 #define JSON_ERROR_BUF_SIZE (128)
 ZS4_STRINGBUFFER(json_error, JSON_ERROR_BUF_SIZE);
@@ -180,8 +180,8 @@ public:
 	inline virtual ~zs4jsonParser(void){
 	}
 
-	inline json_value * Value(void){ return JObj; }
-	inline json_value * Parse(const char * json){
+	inline json_value * value(void){ return JObj; }
+	inline json_value * parse(const char * json){
 
 		JObj = NULL;
 		parser_error.clear();
@@ -202,7 +202,12 @@ public:
 
 		return NULL;
 	}
-
+	inline json_value * parseFile(const char * fnam){
+		zs4stringtype buf;
+		if (zs4SUCCESS != zs4file::load(fnam, &buf))
+			return NULL;
+		return parse(buf.str);
+	}
 private:
 	inline static unsigned char hex_value(json_char c)
 	{

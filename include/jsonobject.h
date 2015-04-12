@@ -1,5 +1,5 @@
 /* ******************************************************************
-   Copyright (C) 1996-2001  Thugs at Bay Inc, All Rights Reserved.
+   Copyright (C) 1996-2015  Thugs at Bay Inc, All Rights Reserved.
 
    This program is NOT free software; you can NOT redistribute it.
 
@@ -13,7 +13,7 @@
 #define ZS4_JSON_OBJECT
 
 #include <zs4array.h>
-#include <zs4json.h>
+#include <zs4jsonparser.h>
 
 #ifndef JSON_MAX_CHILDREN
 #define JSON_MAX_CHILDREN (16)
@@ -74,9 +74,6 @@ public:
 	inline virtual zs4error load(json_value * in){
 		return zs4FAILURE;
 	}
-
-protected:
-
 };
 
 template <class parsertype>
