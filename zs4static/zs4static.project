@@ -1,7 +1,38 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <CodeLite_Project Name="zs4static" InternalType="Library">
+  <Plugins>
+    <Plugin Name="qmake">
+      <![CDATA[00010001N0005Debug000000000000]]>
+    </Plugin>
+  </Plugins>
   <Description/>
   <Dependencies/>
+  <VirtualDirectory Name="src">
+    <File Name="zs4ssl.cpp"/>
+    <File Name="zs4ssl.h"/>
+  </VirtualDirectory>
+  <VirtualDirectory Name="include">
+    <File Name="../include/jsonobject.h"/>
+    <File Name="../include/zs4.h"/>
+    <File Name="../include/zs4array.h"/>
+    <File Name="../include/zs4bits.h"/>
+    <File Name="../include/zs4config.h"/>
+    <File Name="../include/zs4file.h"/>
+    <File Name="../include/zs4fs.h"/>
+    <File Name="../include/zs4jsonparser.h"/>
+    <File Name="../include/zs4machine.h"/>
+    <File Name="../include/zs4macros.h"/>
+    <File Name="../include/zs4object.h"/>
+    <File Name="../include/zs4pipe.h"/>
+    <File Name="../include/zs4ring.h"/>
+    <File Name="../include/zs4stat.h"/>
+    <File Name="../include/zs4stream.h"/>
+    <File Name="../include/zs4streamhandler.h"/>
+    <File Name="../include/zs4streamserver.h"/>
+    <File Name="../include/zs4string.h"/>
+    <File Name="../include/zs4thread.h"/>
+    <File Name="../include/zs4types.h"/>
+  </VirtualDirectory>
   <Settings Type="Static Library">
     <GlobalSettings>
       <Compiler Options="" C_Options="">
@@ -12,13 +43,14 @@
       </Linker>
       <ResourceCompiler Options=""/>
     </GlobalSettings>
-    <Configuration Name="Debug" CompilerType="gnu g++" DebuggerType="GNU gdb debugger" Type="" BuildCmpWithGlobalSettings="append" BuildLnkWithGlobalSettings="append" BuildResWithGlobalSettings="append">
+    <Configuration Name="Debug" CompilerType="gnu gcc" DebuggerType="GNU gdb debugger" Type="Static Library" BuildCmpWithGlobalSettings="append" BuildLnkWithGlobalSettings="append" BuildResWithGlobalSettings="append">
       <Compiler Options="-g" C_Options="-g" Required="yes" PreCompiledHeader="" PCHInCommandLine="no" UseDifferentPCHFlags="no" PCHFlags="">
         <IncludePath Value="."/>
+        <IncludePath Value="../include/"/>
       </Compiler>
       <Linker Options="" Required="yes"/>
       <ResourceCompiler Options="" Required="no"/>
-      <General OutputFile="$(IntermediateDirectory)/lib$(ProjectName).a" IntermediateDirectory="./Debug" Command="" CommandArguments="" UseSeparateDebugArgs="no" DebugArguments="" WorkingDirectory="$(IntermediateDirectory)" PauseExecWhenProcTerminates="yes"/>
+      <General OutputFile="../../bin/linux/$(ConfigurationName)/lib$(ProjectName).a" IntermediateDirectory="../../int/linux/$(ConfigurationName)/$(ProjectName)/" Command="" CommandArguments="" UseSeparateDebugArgs="no" DebugArguments="" WorkingDirectory="$(IntermediateDirectory)" PauseExecWhenProcTerminates="yes"/>
       <Environment EnvVarSetName="&lt;Use Defaults&gt;" DbgSetName="&lt;Use Defaults&gt;">
         <![CDATA[]]>
       </Environment>
@@ -89,6 +121,4 @@
       </Completion>
     </Configuration>
   </Settings>
-  <VirtualDirectory Name="src"/>
-  <VirtualDirectory Name="include"/>
 </CodeLite_Project>
