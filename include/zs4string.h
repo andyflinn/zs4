@@ -295,7 +295,7 @@ public:
 		register zs4string * c1 = ((zs4string**)v1)[0];
 		register zs4string * c2 = ((zs4string**)v2)[0];
 
-		return stricmp(c1->str, c2->str);
+		return ::stricmp(c1->str, c2->str);
 	}
 
 	inline static int compareValueDescend(const void * v1, const void * v2)
