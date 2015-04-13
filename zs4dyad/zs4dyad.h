@@ -54,8 +54,8 @@ public:
 	}
 
 	inline static void on_data(dyad_Event*e){
-		zs4streamserver<dyadsocket, zs4streamhandler<dyadTransferBuffer>>::zs4streamseverprocess * c = 
-			(zs4streamserver<dyadsocket, zs4streamhandler<dyadTransferBuffer>>::zs4streamseverprocess*)e->udata;
+		zs4streamserver<dyadsocket, zs4streamhandler<dyadTransferBuffer> >::zs4streamseverprocess * c = 
+			(zs4streamserver<dyadsocket, zs4streamhandler<dyadTransferBuffer> >::zs4streamseverprocess*)e->udata;
 		if ( c && c->stream.s )
 		{
 			if (e->size != c->stream.req.writeBlock(e->data, e->size))
@@ -75,8 +75,8 @@ public:
 	}
 
 	inline static void on_ready(dyad_Event*e){
-		zs4streamserver<dyadsocket, zs4streamhandler<dyadTransferBuffer>>::zs4streamseverprocess * c =
-			(zs4streamserver<dyadsocket, zs4streamhandler<dyadTransferBuffer>>::zs4streamseverprocess*)e->udata;
+		zs4streamserver<dyadsocket, zs4streamhandler<dyadTransferBuffer> >::zs4streamseverprocess * c =
+			(zs4streamserver<dyadsocket, zs4streamhandler<dyadTransferBuffer> >::zs4streamseverprocess*)e->udata;
 		if (c && c->stream.s)
 		{
 			size_t trans = c->stream.rep.readable();
@@ -86,16 +86,16 @@ public:
 	}
 
 	inline static void on_tick(dyad_Event*e){
-		zs4streamserver<dyadsocket, zs4streamhandler<dyadTransferBuffer>>::zs4streamseverprocess * c =
-			(zs4streamserver<dyadsocket, zs4streamhandler<dyadTransferBuffer>>::zs4streamseverprocess*)e->udata;
+		zs4streamserver<dyadsocket, zs4streamhandler<dyadTransferBuffer> >::zs4streamseverprocess * c =
+			(zs4streamserver<dyadsocket, zs4streamhandler<dyadTransferBuffer> >::zs4streamseverprocess*)e->udata;
 		if (c && c->stream.s)
 		{
 		}
 	}
 
 	inline static void on_close(dyad_Event*e){
-		zs4streamserver<dyadsocket, zs4streamhandler<dyadTransferBuffer>>::zs4streamseverprocess * c =
-			(zs4streamserver<dyadsocket, zs4streamhandler<dyadTransferBuffer>>::zs4streamseverprocess*)e->udata;
+		zs4streamserver<dyadsocket, zs4streamhandler<dyadTransferBuffer> >::zs4streamseverprocess * c =
+			(zs4streamserver<dyadsocket, zs4streamhandler<dyadTransferBuffer> >::zs4streamseverprocess*)e->udata;
 		if (c && c->stream.s)
 		{
 			c->stream.s = NULL;
@@ -104,8 +104,8 @@ public:
 	}
 
 	inline static void on_error(dyad_Event*e){
-		zs4streamserver<dyadsocket, zs4streamhandler<dyadTransferBuffer>>::zs4streamseverprocess * c =
-			(zs4streamserver<dyadsocket, zs4streamhandler<dyadTransferBuffer>>::zs4streamseverprocess*)e->udata;
+		zs4streamserver<dyadsocket, zs4streamhandler<dyadTransferBuffer> >::zs4streamseverprocess * c =
+			(zs4streamserver<dyadsocket, zs4streamhandler<dyadTransferBuffer> >::zs4streamseverprocess*)e->udata;
 		if (c && c->stream.s)
 		{
 			c->stream.s = NULL;
@@ -117,7 +117,7 @@ public:
 	dyad_Stream * s;
 };
 
-class zs4dyad : public zs4streamserver<dyadsocket, zs4streamhandler<dyadTransferBuffer>>
+class zs4dyad : public zs4streamserver<dyadsocket, zs4streamhandler<dyadTransferBuffer> >
 {
 public:
 

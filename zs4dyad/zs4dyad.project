@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<CodeLite_Project Name="zs4static" InternalType="Library">
+<CodeLite_Project Name="zs4dyad" InternalType="Console">
   <Plugins>
     <Plugin Name="qmake">
       <![CDATA[00020001N0005Debug0000000000000001N0007Release000000000000]]>
@@ -8,32 +8,9 @@
   <Description/>
   <Dependencies/>
   <VirtualDirectory Name="src">
-    <File Name="zs4ssl.cpp"/>
-    <File Name="zs4ssl.h"/>
+    <File Name="main.cpp"/>
   </VirtualDirectory>
-  <VirtualDirectory Name="include">
-    <File Name="../include/jsonobject.h"/>
-    <File Name="../include/zs4.h"/>
-    <File Name="../include/zs4array.h"/>
-    <File Name="../include/zs4bits.h"/>
-    <File Name="../include/zs4config.h"/>
-    <File Name="../include/zs4file.h"/>
-    <File Name="../include/zs4fs.h"/>
-    <File Name="../include/zs4jsonparser.h"/>
-    <File Name="../include/zs4machine.h"/>
-    <File Name="../include/zs4macros.h"/>
-    <File Name="../include/zs4object.h"/>
-    <File Name="../include/zs4pipe.h"/>
-    <File Name="../include/zs4ring.h"/>
-    <File Name="../include/zs4stat.h"/>
-    <File Name="../include/zs4stream.h"/>
-    <File Name="../include/zs4streamhandler.h"/>
-    <File Name="../include/zs4streamserver.h"/>
-    <File Name="../include/zs4string.h"/>
-    <File Name="../include/zs4thread.h"/>
-    <File Name="../include/zs4types.h"/>
-  </VirtualDirectory>
-  <Settings Type="Static Library">
+  <Settings Type="Executable">
     <GlobalSettings>
       <Compiler Options="" C_Options="">
         <IncludePath Value="."/>
@@ -43,14 +20,17 @@
       </Linker>
       <ResourceCompiler Options=""/>
     </GlobalSettings>
-    <Configuration Name="Debug" CompilerType="gnu g++" DebuggerType="GNU gdb debugger" Type="Static Library" BuildCmpWithGlobalSettings="append" BuildLnkWithGlobalSettings="append" BuildResWithGlobalSettings="append">
-      <Compiler Options="-g" C_Options="-g" Required="yes" PreCompiledHeader="" PCHInCommandLine="no" UseDifferentPCHFlags="no" PCHFlags="">
+    <Configuration Name="Debug" CompilerType="gnu g++" DebuggerType="GNU gdb debugger" Type="Executable" BuildCmpWithGlobalSettings="append" BuildLnkWithGlobalSettings="append" BuildResWithGlobalSettings="append">
+      <Compiler Options="-g;-O0;-Wall" C_Options="-g;-O0;-Wall" Required="yes" PreCompiledHeader="" PCHInCommandLine="no" UseDifferentPCHFlags="no" PCHFlags="">
         <IncludePath Value="."/>
         <IncludePath Value="../include/"/>
       </Compiler>
-      <Linker Options="" Required="yes"/>
+      <Linker Options="" Required="yes">
+        <Library Value="m"/>
+        <Library Value="c"/>
+      </Linker>
       <ResourceCompiler Options="" Required="no"/>
-      <General OutputFile="../../bin/linux/$(ConfigurationName)/lib$(ProjectName).a" IntermediateDirectory="../../int/linux/$(ConfigurationName)/$(ProjectName)/" Command="" CommandArguments="./" UseSeparateDebugArgs="no" DebugArguments="" WorkingDirectory="$(IntermediateDirectory)" PauseExecWhenProcTerminates="yes"/>
+      <General OutputFile="../../bin/linux/$(ConfigurationName)/$(ProjectName)" IntermediateDirectory="../../int/linux/$(ConfigurationName)/$(ProjectName)/" Command="./$(ProjectName)" CommandArguments="" UseSeparateDebugArgs="no" DebugArguments="" WorkingDirectory="$(IntermediateDirectory)" PauseExecWhenProcTerminates="yes"/>
       <Environment EnvVarSetName="&lt;Use Defaults&gt;" DbgSetName="&lt;Use Defaults&gt;">
         <![CDATA[]]>
       </Environment>
@@ -68,7 +48,7 @@
         <PreprocessFileCommand/>
         <SingleFileCommand/>
         <MakefileGenerationCommand/>
-        <ThirdPartyToolName/>
+        <ThirdPartyToolName>None</ThirdPartyToolName>
         <WorkingDirectory/>
       </CustomBuild>
       <AdditionalRules>
@@ -82,14 +62,17 @@
         <SearchPaths/>
       </Completion>
     </Configuration>
-    <Configuration Name="Release" CompilerType="gnu g++" DebuggerType="GNU gdb debugger" Type="Static Library" BuildCmpWithGlobalSettings="append" BuildLnkWithGlobalSettings="append" BuildResWithGlobalSettings="append">
-      <Compiler Options="" C_Options="" Required="yes" PreCompiledHeader="" PCHInCommandLine="no" UseDifferentPCHFlags="no" PCHFlags="">
+    <Configuration Name="Release" CompilerType="gnu g++" DebuggerType="GNU gdb debugger" Type="Executable" BuildCmpWithGlobalSettings="append" BuildLnkWithGlobalSettings="append" BuildResWithGlobalSettings="append">
+      <Compiler Options="-O2;-Wall" C_Options="-O2;-Wall" Required="yes" PreCompiledHeader="" PCHInCommandLine="no" UseDifferentPCHFlags="no" PCHFlags="">
         <IncludePath Value="."/>
         <IncludePath Value="../include/"/>
       </Compiler>
-      <Linker Options="" Required="yes"/>
+      <Linker Options="" Required="yes">
+        <Library Value="m"/>
+        <Library Value="c"/>
+      </Linker>
       <ResourceCompiler Options="" Required="no"/>
-      <General OutputFile="../../bin/linux/$(ConfigurationName)/lib$(ProjectName).a" IntermediateDirectory="../../int/linux/$(ConfigurationName)/$(ProjectName)/" Command="" CommandArguments="" UseSeparateDebugArgs="no" DebugArguments="" WorkingDirectory="$(IntermediateDirectory)" PauseExecWhenProcTerminates="yes"/>
+      <General OutputFile="../../bin/linux/$(ConfigurationName)/$(ProjectName)" IntermediateDirectory="../../int/linux/$(ConfigurationName)/$(ProjectName)/" Command="./$(ProjectName)" CommandArguments="" UseSeparateDebugArgs="no" DebugArguments="" WorkingDirectory="$(IntermediateDirectory)" PauseExecWhenProcTerminates="yes"/>
       <Environment EnvVarSetName="&lt;Use Defaults&gt;" DbgSetName="&lt;Use Defaults&gt;">
         <![CDATA[]]>
       </Environment>
@@ -107,7 +90,7 @@
         <PreprocessFileCommand/>
         <SingleFileCommand/>
         <MakefileGenerationCommand/>
-        <ThirdPartyToolName/>
+        <ThirdPartyToolName>None</ThirdPartyToolName>
         <WorkingDirectory/>
       </CustomBuild>
       <AdditionalRules>

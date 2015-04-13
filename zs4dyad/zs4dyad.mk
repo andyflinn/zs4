@@ -3,10 +3,10 @@
 ## any manual changes will be erased      
 ##
 ## Debug
-ProjectName            :=zs4
+ProjectName            :=zs4dyad
 ConfigurationName      :=Debug
 WorkspacePath          := "/home/countinn/zs4"
-ProjectPath            := "/home/countinn/zs4/zs4"
+ProjectPath            := "/home/countinn/zs4/zs4dyad"
 IntermediateDirectory  :=../../int/linux/$(ConfigurationName)/$(ProjectName)/
 OutDir                 := $(IntermediateDirectory)
 CurrentFileName        :=
@@ -32,7 +32,7 @@ Preprocessors          :=
 ObjectSwitch           :=-o 
 ArchiveOutputSwitch    := 
 PreprocessOnlySwitch   :=-E 
-ObjectsFileList        :="zs4.txt"
+ObjectsFileList        :="zs4dyad.txt"
 PCHCompileFlags        :=
 MakeDirCommand         :=mkdir -p
 LinkOptions            :=  
@@ -86,7 +86,7 @@ PreBuild:
 ## Objects
 ##
 $(IntermediateDirectory)/main$(ObjectSuffix): main.cpp $(IntermediateDirectory)/main$(DependSuffix)
-	$(CXX) $(IncludePCH) $(SourceSwitch) "/home/countinn/zs4/zs4/main.cpp" $(CXXFLAGS) $(ObjectSwitch)$(IntermediateDirectory)/main$(ObjectSuffix) $(IncludePath)
+	$(CXX) $(IncludePCH) $(SourceSwitch) "/home/countinn/zs4/zs4dyad/main.cpp" $(CXXFLAGS) $(ObjectSwitch)$(IntermediateDirectory)/main$(ObjectSuffix) $(IncludePath)
 $(IntermediateDirectory)/main$(DependSuffix): main.cpp
 	@$(CXX) $(CXXFLAGS) $(IncludePCH) $(IncludePath) -MG -MP -MT$(IntermediateDirectory)/main$(ObjectSuffix) -MF$(IntermediateDirectory)/main$(DependSuffix) -MM "main.cpp"
 
@@ -103,6 +103,6 @@ clean:
 	$(RM) $(IntermediateDirectory)/main$(DependSuffix)
 	$(RM) $(IntermediateDirectory)/main$(PreprocessSuffix)
 	$(RM) $(OutputFile)
-	$(RM) "../.build-debug/zs4"
+	$(RM) "../.build-debug/zs4dyad"
 
 

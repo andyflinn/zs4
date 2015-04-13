@@ -518,7 +518,7 @@ private:
 
 						if (top->type == json_array)
 							flags = (flags & ~(flag_need_comma | flag_seek_value)) | flag_next;
-						else if (!state.settings.settings & json_relaxed_commas)
+						else if (!(state.settings.settings & json_relaxed_commas))
 						{
 							sprintf(error, "%d:%d: Unexpected ]", cur_line, e_off);
 							goto e_failed;
@@ -679,7 +679,7 @@ private:
 
 						case '"':
 
-							if (flags & flag_need_comma && (!state.settings.settings & json_relaxed_commas))
+							if (flags & flag_need_comma && (!(state.settings.settings & json_relaxed_commas)))
 							{
 								sprintf(error, "%d:%d: Expected , before \"", cur_line, e_off);
 								goto e_failed;

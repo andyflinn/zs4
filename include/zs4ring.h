@@ -23,9 +23,9 @@ public:
 		if (!readable())
 			return 0;
 
-		*c = str[read_index];
+		*c = this->str[read_index];
 
-		read_index = ((read_index + 1) % bufsize);
+		read_index = ((read_index + 1) % this->bufsize);
 
 		return 1;
 	}
@@ -46,9 +46,9 @@ public:
 		if (!writeable())
 			return 0;
 
-		str[write_index] = c;
+		this->str[write_index] = c;
 
-		write_index = ((write_index + 1) % bufsize);
+		write_index = ((write_index + 1) % this->bufsize);
 
 		return 1;
 	}
@@ -72,11 +72,11 @@ public:
 		if (write_index > read_index)
 			return (write_index - read_index);
 
-		return (write_index + bufsize - read_index);
+		return (write_index + this->bufsize - read_index);
 	}
 
 	inline virtual size_t writeable(void){
-		return ((bufsize - 1) - readable());
+		return ((this->bufsize - 1) - readable());
 	}
 
 	inline virtual void reset(void){
@@ -84,7 +84,7 @@ public:
 	}
 
 	inline virtual zs4error close(void){
-		stream_state = CLOSED;
+		this->stream_state = this->CLOSED;
 		reset();
 		return zs4FAILURE;
 	}
