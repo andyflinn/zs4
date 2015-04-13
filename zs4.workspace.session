@@ -5,26 +5,26 @@
   <TabInfoArray Name="TabInfoArray">
     <TabInfo>
       <wxString Value="/home/countinn/zs4/include/zs4config.h" Name="FileName"/>
-      <int Value="36" Name="FirstVisibleLine"/>
+      <int Value="20" Name="FirstVisibleLine"/>
       <int Value="21" Name="CurrentLine"/>
       <wxArrayString Name="Bookmarks"/>
     </TabInfo>
     <TabInfo>
       <wxString Value="/home/countinn/zs4/zs4static/zs4ssl.cpp" Name="FileName"/>
-      <int Value="0" Name="FirstVisibleLine"/>
+      <int Value="4" Name="FirstVisibleLine"/>
       <int Value="2" Name="CurrentLine"/>
       <wxArrayString Name="Bookmarks"/>
     </TabInfo>
     <TabInfo>
       <wxString Value="/home/countinn/zs4/include/zs4string.h" Name="FileName"/>
-      <int Value="281" Name="FirstVisibleLine"/>
+      <int Value="299" Name="FirstVisibleLine"/>
       <int Value="297" Name="CurrentLine"/>
       <wxArrayString Name="Bookmarks"/>
     </TabInfo>
     <TabInfo>
       <wxString Value="/home/countinn/zs4/include/zs4jsonparser.h" Name="FileName"/>
-      <int Value="165" Name="FirstVisibleLine"/>
-      <int Value="175" Name="CurrentLine"/>
+      <int Value="199" Name="FirstVisibleLine"/>
+      <int Value="200" Name="CurrentLine"/>
       <wxArrayString Name="Bookmarks"/>
     </TabInfo>
   </TabInfoArray>

@@ -185,10 +185,10 @@ public:
 
 		JObj = NULL;
 		parser_error.clear();
-		clear();
+		this->clear();
 
 		json_settings settings; memset(&settings, 0, sizeof (json_settings));
-		settings.max_memory = bufsize;
+		settings.max_memory = this->bufsize;
 
 		if (json_value * nuJv = json_parse_ex(&settings, json))
 		{
@@ -196,9 +196,9 @@ public:
 			return nuJv;
 		}
 
-		clear();
+		this->clear();
 		if (parser_error.check())
-			set(parser_error.str);
+			this->set(parser_error.str);
 
 		return NULL;
 	}
@@ -254,7 +254,7 @@ private:
 			{
 			case json_array:
 
-				if (!(value->u.array.values = (json_value **)zs4alloc
+				if (!(value->u.array.values = (json_value **)this->zs4alloc
 					((value->u.array.length + 1) * sizeof (json_value *))))
 				{
 					return 0;
@@ -267,7 +267,7 @@ private:
 
 				values_size = sizeof (*value->u.object.values) * value->u.object.length;
 
-				if (!((*(void **)&value->u.object.values) = zs4alloc
+				if (!((*(void **)&value->u.object.values) = this->zs4alloc
 					(values_size + ((unsigned long)value->u.object.values))))
 				{
 					return 0;
@@ -280,7 +280,7 @@ private:
 
 			case json_string:
 
-				if (!(value->u.string.ptr = (json_char *)zs4alloc
+				if (!(value->u.string.ptr = (json_char *)this->zs4alloc
 					((value->u.string.length + 1) * sizeof (json_char))))
 				{
 					return 0;
@@ -296,7 +296,7 @@ private:
 			return 1;
 		}
 
-		value = (json_value *)zs4alloc(sizeof (json_value));
+		value = (json_value *)this->zs4alloc(sizeof (json_value));
 
 		if (!value)
 			return 0;
