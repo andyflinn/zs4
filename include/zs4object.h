@@ -81,6 +81,36 @@ public:
 		}
 	}
 
+	static inline int strncmp(const char * str1, const char * str2, size_t n)
+	{
+		char c1, c2, *s1 = (char *)str1, *s2 = (char *)str2;
+		for (size_t i = 0; i < n; i++)
+		{
+			c1 = *s1++;
+			c2 = *s2++;
+			if (c1 == 0 && c2 == 0) return 0;
+			if (c1 != c2) return c1 - c2;
+		}
+
+		return 0;
+	}
+
+	static inline int strnicmp(const char * str1, const char * str2, size_t n)
+	{
+		char c1, c2, *s1 = (char *)str1, *s2 = (char *)str2;
+		for (size_t i = 0; i < n; i++)
+		{
+			c1 = *s1++;
+			c2 = *s2++;
+			if (c1 == 0 && c2 == 0) return 0;
+			c1 = charMakeLower(c1);
+			c2 = charMakeLower(c2);
+			if (c1 != c2) return c1 - c2;
+		}
+
+		return 0;
+	}
+
 	inline static int strcharcount(const char * str, char c)	{
 		if (str == 0)
 			return 0;
