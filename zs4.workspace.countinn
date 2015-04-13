@@ -2,8 +2,8 @@
 <Workspace>
   <WorkspaceParserPaths/>
   <Environment Name="&lt;Use Defaults&gt;"/>
+  <WorkspaceParserMacros/>
   <SubversionPath>
     <![CDATA[/home/countinn/zs4]]>
   </SubversionPath>
-  <WorkspaceParserMacros/>
 </Workspace>
