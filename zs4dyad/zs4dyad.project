@@ -9,6 +9,10 @@
   <Dependencies/>
   <VirtualDirectory Name="src">
     <File Name="main.cpp"/>
+    <File Name="dyad.c"/>
+    <File Name="dyad.h"/>
+    <File Name="zs4dyad.cpp"/>
+    <File Name="zs4dyad.h"/>
   </VirtualDirectory>
   <Settings Type="Executable">
     <GlobalSettings>

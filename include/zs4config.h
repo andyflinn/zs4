@@ -51,6 +51,10 @@
 
 #else // sum kinda posix
 
+	
+#include <unistd.h>
+#include <dirent.h>
+
 #	ifndef PATH_SEPARATOR_CHAR 
 #		define PATH_SEPARATOR_CHAR '/'
 #	endif

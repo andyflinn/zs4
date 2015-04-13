@@ -58,7 +58,7 @@ CFLAGS   :=  -g -O0 -Wall $(Preprocessors)
 ## User defined environment variables
 ##
 CodeLiteDir:=/usr/share/codelite
-Objects0=$(IntermediateDirectory)/main$(ObjectSuffix) 
+Objects0=$(IntermediateDirectory)/main$(ObjectSuffix) $(IntermediateDirectory)/dyad$(ObjectSuffix) $(IntermediateDirectory)/zs4dyad$(ObjectSuffix) 
 
 
 
@@ -93,6 +93,22 @@ $(IntermediateDirectory)/main$(DependSuffix): main.cpp
 $(IntermediateDirectory)/main$(PreprocessSuffix): main.cpp
 	@$(CXX) $(CXXFLAGS) $(IncludePCH) $(IncludePath) $(PreprocessOnlySwitch) $(OutputSwitch) $(IntermediateDirectory)/main$(PreprocessSuffix) "main.cpp"
 
+$(IntermediateDirectory)/dyad$(ObjectSuffix): dyad.c $(IntermediateDirectory)/dyad$(DependSuffix)
+	$(CC) $(SourceSwitch) "/home/countinn/zs4/zs4dyad/dyad.c" $(CFLAGS) $(ObjectSwitch)$(IntermediateDirectory)/dyad$(ObjectSuffix) $(IncludePath)
+$(IntermediateDirectory)/dyad$(DependSuffix): dyad.c
+	@$(CC) $(CFLAGS) $(IncludePath) -MG -MP -MT$(IntermediateDirectory)/dyad$(ObjectSuffix) -MF$(IntermediateDirectory)/dyad$(DependSuffix) -MM "dyad.c"
+
+$(IntermediateDirectory)/dyad$(PreprocessSuffix): dyad.c
+	@$(CC) $(CFLAGS) $(IncludePath) $(PreprocessOnlySwitch) $(OutputSwitch) $(IntermediateDirectory)/dyad$(PreprocessSuffix) "dyad.c"
+
+$(IntermediateDirectory)/zs4dyad$(ObjectSuffix): zs4dyad.cpp $(IntermediateDirectory)/zs4dyad$(DependSuffix)
+	$(CXX) $(IncludePCH) $(SourceSwitch) "/home/countinn/zs4/zs4dyad/zs4dyad.cpp" $(CXXFLAGS) $(ObjectSwitch)$(IntermediateDirectory)/zs4dyad$(ObjectSuffix) $(IncludePath)
+$(IntermediateDirectory)/zs4dyad$(DependSuffix): zs4dyad.cpp
+	@$(CXX) $(CXXFLAGS) $(IncludePCH) $(IncludePath) -MG -MP -MT$(IntermediateDirectory)/zs4dyad$(ObjectSuffix) -MF$(IntermediateDirectory)/zs4dyad$(DependSuffix) -MM "zs4dyad.cpp"
+
+$(IntermediateDirectory)/zs4dyad$(PreprocessSuffix): zs4dyad.cpp
+	@$(CXX) $(CXXFLAGS) $(IncludePCH) $(IncludePath) $(PreprocessOnlySwitch) $(OutputSwitch) $(IntermediateDirectory)/zs4dyad$(PreprocessSuffix) "zs4dyad.cpp"
+
 
 -include $(IntermediateDirectory)/*$(DependSuffix)
 ##
@@ -102,6 +118,12 @@ clean:
 	$(RM) $(IntermediateDirectory)/main$(ObjectSuffix)
 	$(RM) $(IntermediateDirectory)/main$(DependSuffix)
 	$(RM) $(IntermediateDirectory)/main$(PreprocessSuffix)
+	$(RM) $(IntermediateDirectory)/dyad$(ObjectSuffix)
+	$(RM) $(IntermediateDirectory)/dyad$(DependSuffix)
+	$(RM) $(IntermediateDirectory)/dyad$(PreprocessSuffix)
+	$(RM) $(IntermediateDirectory)/zs4dyad$(ObjectSuffix)
+	$(RM) $(IntermediateDirectory)/zs4dyad$(DependSuffix)
+	$(RM) $(IntermediateDirectory)/zs4dyad$(PreprocessSuffix)
 	$(RM) $(OutputFile)
 	$(RM) "../.build-debug/zs4dyad"
 

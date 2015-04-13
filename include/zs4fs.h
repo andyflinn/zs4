@@ -13,7 +13,6 @@
 #define ZS4_FS_H
 
 #include "zs4stat.h"
-//#include "zs4json.h"
 
 #ifndef ZS4_MAX_DIR_SIZE
 #define ZS4_MAX_DIR_SIZE (1024)
@@ -26,12 +25,12 @@
 class zs4fs : public zs4object
 {
 public:
-	zs4fs::zs4fs()
+	inline zs4fs()
 	{
 		count = 0;
 	}
 
-	zs4fs::~zs4fs()
+	inline virtual ~zs4fs()
 	{
 	}
 
@@ -84,15 +83,13 @@ public:
 
 		char * f = (char*)dirnam, *t = pdir;
 
-		int ret = 1;
-
 		while (*f != 0)
 		{
-			char sav = *f;
+			//char sav = *f;
 			*t++ = *f++; *t = 0;
 			if ((*f == '/') || (*f == 0))
 			{
-				ret = mkdir(pdir);
+				mkdir(pdir, S_IRWXU | S_IRWXG | S_IROTH | S_IXOTH);
 			}
 		}
 
@@ -183,12 +180,9 @@ public:
 
 	size_t List(const char * name, zs4string * out);
 
-#ifdef _MSC_VER
 	inline size_t List(const char * name, bool hidden_files)
 	{
 			count = 0;
-
-			WIN32_FIND_DATA data;
 
 			if (IsFile(name))
 				return 0;
@@ -198,57 +192,54 @@ public:
 
 			zs4stat * nu;
 
+#ifdef _MSC_VER
+			WIN32_FIND_DATA data;
+
 			zs4StringBufferWide win_name;
 
 			if (!MultiByteToWideChar(CP_OEMCP, 0, name, -1, (LPWSTR)win_name.str, ZS4_STRINGBUFFER_SIZE))
 				return 0;
 
 			HANDLE h = FindFirstFile((LPWSTR)win_name.str, &data);
-			if ( h != INVALID_HANDLE_VALUE)
+			if ( h == INVALID_HANDLE_VALUE)
+				return 0;
+
+			zs4StringBuffer byte;
+
+			WideCharToMultiByte(CP_OEMCP, 0, data.cFileName, -1, byte.str, ZS4_STRINGBUFFER_SIZE, NULL, NULL);
+
+			if ((NULL == (nu = nuStat())) )//|| zs4SUCCESS != nu->GetInfo(byte.str))
 			{
-				zs4StringBuffer byte;
-
-				WideCharToMultiByte(CP_OEMCP, 0, data.cFileName, -1, byte.str, ZS4_STRINGBUFFER_SIZE, NULL, NULL);
-
-				if ((NULL == (nu = nuStat())) )//|| zs4SUCCESS != nu->GetInfo(byte.str))
-				{
-					FindClose(h);
-					return count;
-				}
-				else
-				{
-					while (FindNextFile(h, &data))
-					{
-						WideCharToMultiByte(CP_OEMCP, 0, data.cFileName, -1, byte.str, ZS4_STRINGBUFFER_SIZE, NULL, NULL);
-
-						if ((NULL == (nu = nuStat())) || zs4SUCCESS != nu->GetInfo(byte.str))
-						{
-							return count;
-						}
-					}
-				}
 				FindClose(h);
+				return count;
 			}
+			else
+			{
+				while (FindNextFile(h, &data))
+				{
+					WideCharToMultiByte(CP_OEMCP, 0, data.cFileName, -1, byte.str, ZS4_STRINGBUFFER_SIZE, NULL, NULL);
+
+					if ((NULL == (nu = nuStat())) || zs4SUCCESS != nu->GetInfo(byte.str))
+					{
+						FindClose(h);
+						return count;
+					}
+					
+					
+					count++;
+				}
+			}
+			FindClose(h);
 
 			return count;
-	}
 #else
-	inline size_t List(const char * name, bool hidden_files)
-	{
-		if (IsFile(name))
-			return 0;
-
-		if (!IsDir(name))
-			return 0;
-
-		int count = 0;
 
 		DIR * dir = opendir(name);
 		if (dir != NULL)
 		{
 			struct dirent * de = 0;
 
-			while (de = readdir(dir))
+			while (NULL!=(de = readdir(dir)))
 			{
 				if ((de->d_name && de->d_name[0])
 					&& (strcmp(de->d_name, "."))
@@ -258,17 +249,12 @@ public:
 					if (!hidden_files && de->d_name[0] == '.')
 						continue;
 
-					tab_filebuf * nu = new tab_filebuf();
-					if (nu == 0)
-						break;
-
-					if (list->AddEnd(nu))
+					if ((NULL == (nu = nuStat())) || zs4SUCCESS != nu->GetInfo(de->d_name))
 					{
-						delete nu;
-						break;
+						closedir(dir);
+						return count;
 					}
 
-					nu->Set(de->d_name);
 					count++;
 				}
 			}
