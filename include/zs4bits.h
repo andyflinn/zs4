@@ -12,13 +12,14 @@
 #ifndef ZS4_BITS_H
 #define ZS4_BITS_H
 
-#include <zs4object.h>
+#include <sys/types.h>
 
 template <class inttype, class enumtype>
-class zs4bits : public zs4object
+class zs4bits
 {
 public:
 	inttype data;
+	
 	inline zs4bits()
 	{
 		clrAll();
@@ -81,7 +82,7 @@ public:
 		data &= (~(1 << idx));
 	}
 
-#define enum_bit(n) inline void set_ ## n(void){set(n);} inline void clr_ ## n(void){clr(n);} inline void put_ ## n(bool t){put(n,t);} inline bool get_ ## n(void){return get(n);}
+#define enum_bit(i,n) inline void set_ ## n(void){set(i);} inline void clr_ ## n(void){clr(i);} inline void put_ ## n(bool t){put(i,t);} inline bool get_ ## n(void){return get(i);}
 };
 
 #endif

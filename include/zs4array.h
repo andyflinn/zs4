@@ -18,7 +18,7 @@ public:
 	}
 
 	inline zs4type** add(zs4type*obj){
-		if (zs4type ** ret = zs4alloc(sizeof(zs4type*)))
+		if (zs4type ** ret = this->zs4alloc(sizeof(zs4type*)))
 		{
 			*ret = obj;
 			return ret;
@@ -26,8 +26,8 @@ public:
 		return NULL;
 	}
 
-	inline zs4type**array(void){ return (zs4type**)str; }
-	inline size_t count(void){ return (len/sizeof(zs4type*)); }
+	inline zs4type**array(void){ return (zs4type**)this->str; }
+	inline size_t count(void){ return (this->len/sizeof(zs4type*)); }
 };
 
 #endif

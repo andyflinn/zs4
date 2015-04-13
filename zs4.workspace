@@ -1,12 +1,15 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <CodeLite_Workspace Name="zs4" Database="./zs4.tags">
-  <Project Name="zs4static" Path="zs4static/zs4static.project" Active="Yes"/>
+  <Project Name="zs4static" Path="zs4static/zs4static.project" Active="No"/>
+  <Project Name="zs4" Path="zs4/zs4.project" Active="Yes"/>
   <BuildMatrix>
     <WorkspaceConfiguration Name="Debug" Selected="yes">
       <Project Name="zs4static" ConfigName="Debug"/>
+      <Project Name="zs4" ConfigName="Debug"/>
     </WorkspaceConfiguration>
     <WorkspaceConfiguration Name="Release" Selected="yes">
       <Project Name="zs4static" ConfigName="Release"/>
+      <Project Name="zs4" ConfigName="Release"/>
     </WorkspaceConfiguration>
   </BuildMatrix>
 </CodeLite_Workspace>

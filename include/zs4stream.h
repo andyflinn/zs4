@@ -243,7 +243,8 @@ public:
 
 		for (int i = 0; i < len; i++)
 		{
-			if (err = writeHex(str[i]))
+			err = writeHex(str[i]);
+			if (err!=zs4SUCCESS)
 				return err;
 		}
 
@@ -264,8 +265,9 @@ public:
 
 	inline zs4error writeHex(char c)
 	{
-		int hi = (c >> 4) & 0x0f;
-		if (zs4SUCCESS != write(HEX_CHARS()[(c >> 4) & 0x0f]))
+		int hi = c >> 4;
+		hi &= 0x0f;
+		if (zs4SUCCESS != write(HEX_CHARS()[hi]))
 			return zs4FAILURE;
 
 		return write(HEX_CHARS()[c & 0x0f]);

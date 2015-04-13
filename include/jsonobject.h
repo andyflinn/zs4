@@ -192,7 +192,7 @@ public:
 	}
 	inline virtual zs4error save(zs4stream * out){
 		char buf[64];
-		snprintf(buf, sizeof(buf), "ll%d", value);
+		snprintf(buf, sizeof(buf), "%lld", value);
 		return out->write(buf);
 	}
 };
