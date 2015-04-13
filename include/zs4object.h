@@ -12,36 +12,6 @@ public:
 	inline zs4object(void){};
 	inline virtual ~zs4object(void){};
 
-	inline static int strcharcount(const char * str, char c)	{
-		if (str == 0)
-			return 0;
-
-		int ret = 0;
-
-		while (*str != 0)
-		{
-			if (c == *str)
-				ret++;
-			str++;
-		}
-
-		return ret;
-	}
-
-	inline static int strcharcount(const char * s, const char * chrs)	{
-		int ret = 0;
-		for (const char * cp = s; cp && *cp; cp++)
-		{
-			for (const char * p = chrs; p && *p; p++)
-			{
-				if (*cp == *p)
-					ret++;
-			}
-		}
-
-		return ret;
-	}
-
 	inline static bool charUpperable(char c)
 	{
 		if (c >= 'a' && c <= 'z')
@@ -77,6 +47,68 @@ public:
 	inline static int charCompare(char c1, char c2)
 	{
 		return c1 - c2;
+	}
+
+	inline static int strcmp(const char * str1, const char * str2)
+	{
+		for (;;)
+		{
+			if (*str1 == 0 && *str2 == 0)
+				return 0;
+
+			if (*str1 != *str2)
+				return *str1 - *str2;
+
+			str1++; str2++;
+		}
+	}
+
+	inline static int stricmp(const char * str1, const char * str2)
+	{
+		for (;;)
+		{
+			register char c1 = *str1++;
+			register char c2 = *str2++;
+
+			if (c1 == 0 && c2 == 0)
+				return 0;
+
+			c1 = charMakeLower(c1);
+			c2 = charMakeLower(c2);
+
+			if (c1 != c2)
+				return c1 - c2;
+		}
+	}
+
+	inline static int strcharcount(const char * str, char c)	{
+		if (str == 0)
+			return 0;
+
+		int ret = 0;
+
+		while (*str != 0)
+		{
+			if (c == *str)
+				ret++;
+			str++;
+		}
+
+		return ret;
+	}
+
+	inline static int strcharcount(const char * s, const char * chrs)	{
+		int ret = 0;
+		for (const char * cp = s; cp && *cp; cp++)
+		{
+			for (const char * p = chrs; p && *p; p++)
+			{
+				if (*cp == *p)
+					ret++;
+			}
+		}
+
+		return ret;
 	}
 
 	inline static zs4error strcharswap(char org, char * str, char nu){
