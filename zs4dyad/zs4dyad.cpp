@@ -1,6 +1,6 @@
 #include "zs4dyad.h"
 #include "dyad.h"
-#include "../include/zs4fs.h"
+#include <zs4fs.h>
 
 zs4dyad::zs4dyad(void)
 {

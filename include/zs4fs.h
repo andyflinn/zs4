@@ -89,7 +89,11 @@ public:
 			*t++ = *f++; *t = 0;
 			if ((*f == '/') || (*f == 0))
 			{
+#ifdef _MSC_VER
+				_mkdir(pdir);
+#else
 				mkdir(pdir, S_IRWXU | S_IRWXG | S_IROTH | S_IXOTH);
+#endif
 			}
 		}
 
@@ -231,7 +235,6 @@ public:
 			}
 			FindClose(h);
 
-			return count;
 #else
 
 		DIR * dir = opendir(name);
@@ -262,9 +265,9 @@ public:
 			closedir(dir);
 		}
 
+#endif
 		return count;
 	}
-#endif
 
 	inline zs4stat * nuStat(void)
 	{

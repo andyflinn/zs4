@@ -12,10 +12,10 @@
 #include <sys/types.h>
 #include <sys/stat.h>
 
-//#include <direct.h>
 #include <errno.h>
 
 #ifdef _MSC_VER
+#	include <direct.h>
 #	pragma warning (disable : 4996)
 #	pragma warning (disable : 4244)
 
