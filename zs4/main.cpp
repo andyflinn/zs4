@@ -6,6 +6,9 @@
 
 int main(int argc, char **argv)
 {
+	printf("sizeof(int) equals %d\n", (int)sizeof(int));
+	printf("sizeof(size_t) equals %d\n", (int)sizeof(size_t));
+	printf("sizeof(void*) equals %d\n", (int)sizeof(void*));
 	zs4stdout out;
 	
 	if (argc > 1)
@@ -14,7 +17,7 @@ int main(int argc, char **argv)
 		{
 			zs4fs fs;
 			out.write("getting list... ");
-			size_t count = fs.List("./",true);
+			size_t count = fs.List(".",true);
 			out.write((int)count);
 			out.write(" entries...\n");
 			if ( count > 0 )

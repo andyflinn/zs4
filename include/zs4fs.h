@@ -151,6 +151,7 @@ public:
 	static const bool TAB_FS_HAS_BACKSLASHES;
 
 	inline size_t List(const char * name, bool hidden_files){
+
 			count = 0;
 
 			if (IsFile(name))
@@ -177,7 +178,7 @@ public:
 
 			WideCharToMultiByte(CP_OEMCP, 0, (LPCWCH)data.cFileName, -1, byte.str, ZS4_STRINGBUFFER_SIZE, NULL, NULL);
 
-			if ((NULL == (nu = nuStat())) )//|| zs4SUCCESS != nu->GetInfo(byte.str))
+			if ((NULL == (nu = nuStat())) )
 			{
 				FindClose(h);
 				return count;
