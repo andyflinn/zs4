@@ -95,7 +95,7 @@ private:
 
 	// PLATFORM SPECIFIC MEMBERS
 	//////////////////////////////////////////////////////////////
-#ifdef	_MSC_VER
+#ifdef	_WIN32
 	inline static zs4error create(zs4thread * data, thread_function_t * f, ZS4_THREAD_HANDLE * th)
 	{
 		DWORD id;

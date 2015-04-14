@@ -14,7 +14,7 @@
 
 #include <errno.h>
 
-#ifdef _MSC_VER
+#ifdef _WIN32
 #	include <direct.h>
 #	pragma warning (disable : 4996)
 #	pragma warning (disable : 4244)

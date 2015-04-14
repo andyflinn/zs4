@@ -77,7 +77,7 @@ public:
 			*t++ = *f++; *t = 0;
 			if ((*f == '/') || (*f == 0))
 			{
-#ifdef _MSC_VER
+#ifdef _WIN32
 				_mkdir(pdir);
 #else
 				mkdir(pdir, S_IRWXU | S_IRWXG | S_IROTH | S_IXOTH);
@@ -161,7 +161,7 @@ public:
 
 			zs4stat * nu;
 
-#ifdef _MSC_VER
+#ifdef _WIN32
 			WIN32_FIND_DATA data;
 
 			zs4StringBufferWide win_name;
@@ -169,13 +169,13 @@ public:
 			if (!MultiByteToWideChar(CP_OEMCP, 0, name, -1, (LPWSTR)win_name.str, ZS4_STRINGBUFFER_SIZE))
 				return 0;
 
-			HANDLE h = FindFirstFile((LPWSTR)win_name.str, &data);
+			HANDLE h = FindFirstFile(win_name.str, &data);
 			if ( h == INVALID_HANDLE_VALUE)
 				return 0;
 
 			zs4StringBuffer byte;
 
-			WideCharToMultiByte(CP_OEMCP, 0, data.cFileName, -1, byte.str, ZS4_STRINGBUFFER_SIZE, NULL, NULL);
+			WideCharToMultiByte(CP_OEMCP, 0, (LPCWCH)data.cFileName, -1, byte.str, ZS4_STRINGBUFFER_SIZE, NULL, NULL);
 
 			if ((NULL == (nu = nuStat())) )//|| zs4SUCCESS != nu->GetInfo(byte.str))
 			{
@@ -186,7 +186,7 @@ public:
 			{
 				while (FindNextFile(h, &data))
 				{
-					WideCharToMultiByte(CP_OEMCP, 0, data.cFileName, -1, byte.str, ZS4_STRINGBUFFER_SIZE, NULL, NULL);
+					WideCharToMultiByte(CP_OEMCP, 0, (LPCWCH)data.cFileName, -1, byte.str, ZS4_STRINGBUFFER_SIZE, NULL, NULL);
 
 					if ((NULL == (nu = nuStat())) || zs4SUCCESS != nu->GetInfo(byte.str))
 					{
