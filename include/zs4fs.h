@@ -25,17 +25,13 @@
 class zs4fs : public zs4object
 {
 public:
-	inline zs4fs()
-	{
+	inline zs4fs(){
 		count = 0;
 	}
-
-	inline virtual ~zs4fs()
-	{
+	inline virtual ~zs4fs(){
 	}
 
-	inline static bool IsFile(const char * path)
-	{
+	inline static bool IsFile(const char * path){
 		struct stat ino;
 
 		if (stat(path, &ino))
@@ -46,9 +42,7 @@ public:
 
 		return false;
 	}
-
-	inline static bool IsDir(const char * path)
-	{
+	inline static bool IsDir(const char * path){
 		struct stat ino;
 
 		if (stat(path, &ino))
@@ -59,23 +53,17 @@ public:
 
 		return false;
 	}
-
-	inline static zs4error ChangeDirectory(const char * nu)
-	{
+	inline static zs4error ChangeDirectory(const char * nu){
 		return (zs4error)chdir(nu);
 	}
-
-	inline static zs4error GetCurDir(zs4string * cd)
-	{
+	inline static zs4error GetCurDir(zs4string * cd){
 		char * buffer;
 		char buf[1024]; buf[0] = 0;
 		char *getcwd(char *buf, size_t size);
 		buffer = getcwd(buf, 1024);
 		return cd->set(buffer);
 	}
-
-	inline static zs4error MkDir(const char * name)
-	{
+	inline static zs4error MkDir(const char * name){
 		char dirnam[TAB_FS_MAX_PATH_LENGTH];
 		char pdir[TAB_FS_MAX_PATH_LENGTH];
 
@@ -104,57 +92,39 @@ public:
 
 		return zs4SUCCESS;
 	}
-
-	inline static zs4error RmFile(const char * name)
-	{
+	inline static zs4error RmFile(const char * name){
 		if (!unlink(name)) return zs4SUCCESS;
 		return zs4FAILURE;
 	}
-
-	inline static zs4error RmDir(const char * name)
-	{
+	inline static zs4error RmDir(const char * name){
 		if (!rmdir(name)) return zs4SUCCESS;
 		return zs4FAILURE;
 	}
-
-	inline static zs4error GetInfo(const char * objectname, zs4stat * info)
-	{
+	inline static zs4error GetInfo(const char * objectname, zs4stat * info){
 		if (objectname == NULL || objectname[0] == 0 || info == NULL)
 			return zs4FAILURE;
 
 		return info->GetInfo(objectname);
 	}
-
-	inline void Sort(qsort_compare_foo* foo)
-	{
+	inline void Sort(qsort_compare_foo* foo){
 		if (count < 2)
 			return;
 
 		qsort(statArray, count, sizeof(zs4stat **), foo);
 	}
-
-	inline void SortNameAscend(void)
-	{
+	inline void SortNameAscend(void){
 		Sort(zs4string::compareValueAscend);
 	}
-
-	inline void SortNameDescend(void)
-	{
+	inline void SortNameDescend(void){
 		Sort(zs4string::compareValueDescend);
 	}
-
-	inline void SortLengthAscend(void)
-	{
+	inline void SortLengthAscend(void){
 		Sort(zs4string::compareLengthAscend);
 	}
-
-	inline void SortLengthDescend(void)
-	{
+	inline void SortLengthDescend(void){
 		Sort(zs4string::compareLengthDescend);
 	}
-
-	inline time_t Created(const char * fnam)
-	{
+	inline time_t Created(const char * fnam){
 		zs4stat info;
 
 		if ((!zs4fs::IsFile(fnam))
@@ -164,9 +134,7 @@ public:
 
 		return info.created;
 	}
-
-	inline time_t Modified(const char * fnam)
-	{
+	inline time_t Modified(const char * fnam){
 		zs4stat info;
 
 		if ((!zs4fs::IsFile(fnam))
@@ -182,10 +150,7 @@ public:
 	static const bool TAB_FS_IS_INSENSITIVE;
 	static const bool TAB_FS_HAS_BACKSLASHES;
 
-	size_t List(const char * name, zs4string * out);
-
-	inline size_t List(const char * name, bool hidden_files)
-	{
+	inline size_t List(const char * name, bool hidden_files){
 			count = 0;
 
 			if (IsFile(name))
@@ -228,9 +193,6 @@ public:
 						FindClose(h);
 						return count;
 					}
-					
-					
-					count++;
 				}
 			}
 			FindClose(h);
@@ -257,8 +219,6 @@ public:
 						closedir(dir);
 						return count;
 					}
-
-					count++;
 				}
 			}
 
@@ -268,14 +228,13 @@ public:
 #endif
 		return count;
 	}
-
-	inline zs4stat * nuStat(void)
-	{
+	inline zs4stat * nuStat(void)	{
 		if (count >= (ZS4_MAX_DIR_SIZE - 1))
 			return NULL;
 
 		statData[count].clear();
-		zs4stat * ret = statArray[count] = &statData[count];
+		zs4stat * ret = &statData[count];
+		statArray[count] = &statData[count];
 		count++;
 		return ret;
 	}

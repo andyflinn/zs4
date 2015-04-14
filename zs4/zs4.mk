@@ -13,7 +13,7 @@ CurrentFileName        :=
 CurrentFilePath        :=
 CurrentFileFullPath    :=
 User                   :=countinn
-Date                   :=04/13/2015
+Date                   :=04/14/2015
 CodeLitePath           :="/home/countinn/.codelite"
 LinkerName             :=g++
 SharedObjectLinkerName :=g++ -shared -fPIC
@@ -39,9 +39,9 @@ LinkOptions            :=
 IncludePath            :=  $(IncludeSwitch). $(IncludeSwitch). $(IncludeSwitch)../include/ 
 IncludePCH             := 
 RcIncludePath          := 
-Libs                   := $(LibrarySwitch)m $(LibrarySwitch)c 
-ArLibs                 :=  "m" "c" 
-LibPath                := $(LibraryPathSwitch). 
+Libs                   := $(LibrarySwitch)m $(LibrarySwitch)c $(LibrarySwitch)openssl $(LibrarySwitch)zs4static 
+ArLibs                 :=  "m" "c" "openssl" "zs4static" 
+LibPath                := $(LibraryPathSwitch). $(LibraryPathSwitch)../../bin/linux/$(ConfigurationName)/ 
 
 ##
 ## Common variables

@@ -39,9 +39,9 @@ LinkOptions            :=
 IncludePath            :=  $(IncludeSwitch). $(IncludeSwitch). $(IncludeSwitch)../include/ 
 IncludePCH             := 
 RcIncludePath          := 
-Libs                   := $(LibrarySwitch)m $(LibrarySwitch)c 
-ArLibs                 :=  "m" "c" 
-LibPath                := $(LibraryPathSwitch). 
+Libs                   := $(LibrarySwitch)m $(LibrarySwitch)c $(LibrarySwitch)openssl $(LibrarySwitch)zs4static 
+ArLibs                 :=  "m" "c" "openssl" "zs4static" 
+LibPath                := $(LibraryPathSwitch). $(LibraryPathSwitch)../../bin/linux/$(ConfigurationName)/ 
 
 ##
 ## Common variables

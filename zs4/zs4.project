@@ -26,15 +26,18 @@
         <IncludePath Value="../include/"/>
       </Compiler>
       <Linker Options="" Required="yes">
+        <LibraryPath Value="../../bin/linux/$(ConfigurationName)/"/>
         <Library Value="m"/>
         <Library Value="c"/>
+        <Library Value="openssl"/>
+        <Library Value="zs4static"/>
       </Linker>
       <ResourceCompiler Options="" Required="no"/>
-      <General OutputFile="../../bin/linux/$(ConfigurationName)/$(ProjectName)" IntermediateDirectory="../../int/linux/$(ConfigurationName)/$(ProjectName)/" Command="./$(ProjectName)" CommandArguments="" UseSeparateDebugArgs="no" DebugArguments="" WorkingDirectory="$(IntermediateDirectory)" PauseExecWhenProcTerminates="yes"/>
+      <General OutputFile="../../bin/linux/$(ConfigurationName)/$(ProjectName)" IntermediateDirectory="../../int/linux/$(ConfigurationName)/$(ProjectName)/" Command="../../bin/linux/$(ConfigurationName)/$(ProjectName)" CommandArguments="dir" UseSeparateDebugArgs="no" DebugArguments="" WorkingDirectory="../../bin/linux/$(ConfigurationName)/" PauseExecWhenProcTerminates="yes"/>
       <Environment EnvVarSetName="&lt;Use Defaults&gt;" DbgSetName="&lt;Use Defaults&gt;">
         <![CDATA[]]>
       </Environment>
-      <Debugger IsRemote="no" RemoteHostName="" RemoteHostPort="" DebuggerPath="">
+      <Debugger IsRemote="no" RemoteHostName="" RemoteHostPort="" DebuggerPath="../../bin/linux/Debug/zs4">
         <DebuggerSearchPaths/>
         <PostConnectCommands/>
         <StartupCommands/>
@@ -68,8 +71,11 @@
         <IncludePath Value="../include/"/>
       </Compiler>
       <Linker Options="" Required="yes">
+        <LibraryPath Value="../../bin/linux/$(ConfigurationName)/"/>
         <Library Value="m"/>
         <Library Value="c"/>
+        <Library Value="openssl"/>
+        <Library Value="zs4static"/>
       </Linker>
       <ResourceCompiler Options="" Required="no"/>
       <General OutputFile="../../bin/linux/$(ConfigurationName)/$(ProjectName)" IntermediateDirectory="../../int/linux/$(ConfigurationName)/$(ProjectName)/" Command="./$(ProjectName)" CommandArguments="" UseSeparateDebugArgs="no" DebugArguments="" WorkingDirectory="$(IntermediateDirectory)" PauseExecWhenProcTerminates="yes"/>

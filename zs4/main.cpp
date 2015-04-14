@@ -1,28 +1,39 @@
 #include <zs4bits.h>
 #include <zs4jsonparser.h>
 #include <jsonobject.h>
+#include <zs4fs.h>
+#include <zs4file.h>
 
 int main(int argc, char **argv)
 {
-	const char * arg = NULL;
+	zs4stdout out;
+	
 	if (argc > 1)
 	{
-		arg = argv[1];
-		zs4StringBuffer wk;
-
-		const char ** arr = NULL;
-		if (size_t count = wk.tokenize(arg,"/\\",&arr))
+		if (!strcmp("dir",argv[1]))
 		{
-			for (size_t i = 0; i < count; i++)
+			zs4fs fs;
+			out.write("getting list... ");
+			size_t count = fs.List("./",true);
+			out.write((int)count);
+			out.write(" entries...\n");
+			if ( count > 0 )
 			{
-				printf("tok %3d: \"%s\"\n", (int)i, arr[i]);
+				for (size_t i = 0 ; i < count; i++){
+					out.write((int)(1+i));
+					out.write(". \"");
+					out.write(fs.statArray[i]->zs4string::str);
+					out.write("\"\n");
+				}
+			}
+			else
+			{
+				out.write("no directory entries...");
 			}
 		}
 	}
 
-	zs4jsonParser<zs4StringBuffer> json;
-	const json_value * jv = json.parseFile("session.json");
-	
+
 	getchar();
 	return 0;
 }
