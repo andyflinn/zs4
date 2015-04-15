@@ -33,15 +33,15 @@
     <ClCompile Include="..\zs4static\zs4node_login.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\zs4static\zs4ssl.cpp">
+    <ClCompile Include="..\zs4static\zs4boost.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\zs4static\zs4boost.cpp">
+    <ClCompile Include="..\zs4static\zs4crypt.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\zs4static\zs4ssl.h">
+    <ClInclude Include="..\zs4static\zs4crypt.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
