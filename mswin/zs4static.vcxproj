@@ -90,7 +90,7 @@
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>WIN32;_DEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <AdditionalIncludeDirectories>../../OSS/boost;../../OSS/process;../include</AdditionalIncludeDirectories>
-      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
+      <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
       <ExceptionHandling>false</ExceptionHandling>
     </ClCompile>
     <Link>
@@ -106,7 +106,7 @@
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>WIN32;_DEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <AdditionalIncludeDirectories>../../OSS/boost;../../OSS/process;../include</AdditionalIncludeDirectories>
-      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
+      <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
       <ExceptionHandling>false</ExceptionHandling>
     </ClCompile>
     <Link>
@@ -161,6 +161,7 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
     </ClCompile>
+    <ClCompile Include="..\zs4static\zs4fs.cpp" />
     <ClCompile Include="..\zs4static\zs4node.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
@@ -205,6 +206,27 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\include\jsonobject.h" />
+    <ClInclude Include="..\include\zs4.h" />
+    <ClInclude Include="..\include\zs4array.h" />
+    <ClInclude Include="..\include\zs4bits.h" />
+    <ClInclude Include="..\include\zs4config.h" />
+    <ClInclude Include="..\include\zs4file.h" />
+    <ClInclude Include="..\include\zs4fs.h" />
+    <ClInclude Include="..\include\zs4jsonparser.h" />
+    <ClInclude Include="..\include\zs4machine.h" />
+    <ClInclude Include="..\include\zs4macros.h" />
+    <ClInclude Include="..\include\zs4object.h" />
+    <ClInclude Include="..\include\zs4pipe.h" />
+    <ClInclude Include="..\include\zs4ring.h" />
+    <ClInclude Include="..\include\zs4stat.h" />
+    <ClInclude Include="..\include\zs4stream.h" />
+    <ClInclude Include="..\include\zs4streamhandler.h" />
+    <ClInclude Include="..\include\zs4streamserver.h" />
+    <ClInclude Include="..\include\zs4string.h" />
+    <ClInclude Include="..\include\zs4thread.h" />
+    <ClInclude Include="..\include\zs4types.h" />
+    <ClInclude Include="..\zs4static\tinydir.h" />
     <ClInclude Include="..\zs4static\zs4crypt.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
