@@ -29,8 +29,8 @@
         <LibraryPath Value="../../bin/linux/$(ConfigurationName)/"/>
         <Library Value="m"/>
         <Library Value="c"/>
-        <Library Value="openssl"/>
         <Library Value="zs4static"/>
+        <Library Value="crypt"/>
       </Linker>
       <ResourceCompiler Options="" Required="no"/>
       <General OutputFile="../../bin/linux/$(ConfigurationName)/$(ProjectName)" IntermediateDirectory="../../int/linux/$(ConfigurationName)/$(ProjectName)/" Command="../../bin/linux/$(ConfigurationName)/$(ProjectName)" CommandArguments="dir" UseSeparateDebugArgs="no" DebugArguments="" WorkingDirectory="../../bin/linux/$(ConfigurationName)/" PauseExecWhenProcTerminates="yes"/>
@@ -74,8 +74,8 @@
         <LibraryPath Value="../../bin/linux/$(ConfigurationName)/"/>
         <Library Value="m"/>
         <Library Value="c"/>
-        <Library Value="openssl"/>
         <Library Value="zs4static"/>
+        <Library Value="crypt"/>
       </Linker>
       <ResourceCompiler Options="" Required="no"/>
       <General OutputFile="../../bin/linux/$(ConfigurationName)/$(ProjectName)" IntermediateDirectory="../../int/linux/$(ConfigurationName)/$(ProjectName)/" Command="./$(ProjectName)" CommandArguments="" UseSeparateDebugArgs="no" DebugArguments="" WorkingDirectory="$(IntermediateDirectory)" PauseExecWhenProcTerminates="yes"/>

@@ -27,7 +27,7 @@ public:
 			return zs4FAILURE;
 
 		dyad_end(s);
-		dyad_removeAllListeners(s, NULL);
+		dyad_removeAllListeners(s, 0);
 		dyad_close(s);
 		s = NULL;
 		
@@ -58,7 +58,7 @@ public:
 			(zs4streamserver<dyadsocket, zs4streamhandler<dyadTransferBuffer> >::zs4streamseverprocess*)e->udata;
 		if ( c && c->stream.s )
 		{
-			if (e->size != c->stream.req.writeBlock(e->data, e->size))
+			if (e->size != (int)c->stream.req.writeBlock(e->data, e->size))
 			{
 				dyad_close(c->stream.s);
 				c->stream.s = NULL;

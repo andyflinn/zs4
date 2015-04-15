@@ -33,8 +33,8 @@
         <LibraryPath Value="../../bin/linux/$(ConfigurationName)/"/>
         <Library Value="m"/>
         <Library Value="c"/>
-        <Library Value="openssl"/>
         <Library Value="zs4static"/>
+        <Library Value="crypt"/>
       </Linker>
       <ResourceCompiler Options="" Required="no"/>
       <General OutputFile="../../bin/linux/$(ConfigurationName)/$(ProjectName)" IntermediateDirectory="../../int/linux/$(ConfigurationName)/$(ProjectName)/" Command="./$(ProjectName)" CommandArguments="" UseSeparateDebugArgs="no" DebugArguments="" WorkingDirectory="$(IntermediateDirectory)" PauseExecWhenProcTerminates="yes"/>
@@ -69,7 +69,7 @@
         <SearchPaths/>
       </Completion>
     </Configuration>
-    <Configuration Name="Release" CompilerType="gnu g++" DebuggerType="GNU gdb debugger" Type="Executable" BuildCmpWithGlobalSettings="append" BuildLnkWithGlobalSettings="append" BuildResWithGlobalSettings="append">
+    <Configuration Name="Release" CompilerType="gnu g++" DebuggerType="GNU gdb debugger" Type="Static Library" BuildCmpWithGlobalSettings="append" BuildLnkWithGlobalSettings="append" BuildResWithGlobalSettings="append">
       <Compiler Options="-O2;-Wall" C_Options="-O2;-Wall" Required="yes" PreCompiledHeader="" PCHInCommandLine="no" UseDifferentPCHFlags="no" PCHFlags="">
         <IncludePath Value="."/>
         <IncludePath Value="../include/"/>
@@ -78,8 +78,8 @@
         <LibraryPath Value="../../bin/linux/$(ConfigurationName)/"/>
         <Library Value="m"/>
         <Library Value="c"/>
-        <Library Value="openssl"/>
         <Library Value="zs4static"/>
+        <Library Value="crypt"/>
       </Linker>
       <ResourceCompiler Options="" Required="no"/>
       <General OutputFile="../../bin/linux/$(ConfigurationName)/$(ProjectName)" IntermediateDirectory="../../int/linux/$(ConfigurationName)/$(ProjectName)/" Command="./$(ProjectName)" CommandArguments="" UseSeparateDebugArgs="no" DebugArguments="" WorkingDirectory="$(IntermediateDirectory)" PauseExecWhenProcTerminates="yes"/>

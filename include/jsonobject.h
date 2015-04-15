@@ -191,9 +191,7 @@ public:
 		return zs4SUCCESS;
 	}
 	inline virtual zs4error save(zs4stream * out){
-		char buf[64];
-		snprintf(buf, sizeof(buf), "%lld", value);
-		return out->write(buf);
+		return out->writeInt64(value);
 	}
 };
 
@@ -216,9 +214,7 @@ public:
 		return zs4SUCCESS;
 	}
 	inline virtual zs4error save(zs4stream * out){
-		char buf[128];
-		snprintf(buf, sizeof(buf), "%g", value);
-		return out->write(buf);
+		return out->write(value);
 	}
 };
 

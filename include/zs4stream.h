@@ -151,6 +151,12 @@ public:
 		return write(buf);
 	}
 	
+	inline virtual zs4error writeInt64(long long i, const char * fmt = "%lld"){
+		char buf[128];
+		snprintf(buf,sizeof(buf),fmt,i);
+		return write(buf);
+	}
+	
 	inline virtual zs4error write(double d, const char * fmt = "%g"){
 		char buf[128];
 		snprintf(buf,sizeof(buf),fmt,d);

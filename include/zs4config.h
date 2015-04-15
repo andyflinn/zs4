@@ -14,6 +14,9 @@
 
 #include <errno.h>
 
+#include <iostream>
+#include <string>
+
 #ifdef _WIN32
 #	include <direct.h>
 #	pragma warning (disable : 4996)
