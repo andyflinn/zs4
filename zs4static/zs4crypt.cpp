@@ -117,12 +117,12 @@ zs4error tab_zs4_crypt::StringToSha512(const char * str, zs4StringBuffer * hash)
 const char * tab_zs4_crypt::RandomBytes(int len, zs4StringBuffer * rand)
 {
 	static zs4StringBuffer internal_private_buffer;
-	if (rand == NULL)rand = &internal_private_buffer;
+	if (rand == nullptr)rand = &internal_private_buffer;
 
 	static zs4StringBuffer buf;
 
 	if (1 != RAND_bytes((unsigned char *)buf.str, len))
-		return NULL;
+		return nullptr;
 
 	rand->clear();
 	for (int i = 0; i < len; i++)

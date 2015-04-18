@@ -1,7 +1,7 @@
 #ifndef ZS4_STRING_H
 #define ZS4_STRING_H 
 
-#include "zs4stream.h"
+#include <zs4stream.h>
 
 #ifndef ZS4_STRINGBUFFER_SIZE
 #define ZS4_STRINGBUFFER_SIZE (256)
@@ -15,16 +15,28 @@ class zs4string : public zs4stream
 {
 public:
 	inline zs4string(){
-		str = NULL;
+		str = nullptr;
 		len = pos = bufsize = 0;
 	}
-
 	inline virtual ~zs4string(){
+	}
+
+	inline void operator = (zs4string&zs){ str = zs.str; len = zs.len; pos = zs.pos; bufsize = zs.bufsize; }
+	inline zs4error halfs(zs4string & a, zs4string & b){
+		if (str == nullptr || bufsize < 2)
+			return zs4FAILURE;
+
+		size_t halfsize = bufsize / 2;
+		a.str = str;
+		b.str = &str[halfsize];
+		a.bufsize = b.bufsize = halfsize;
+
+		return zs4SUCCESS;
 	}
 
 	inline zs4error clear(void){
 		len = pos = 0;
-		if (str != NULL)
+		if (str != nullptr)
 		{
 			str[0] = 0;
 			return zs4SUCCESS;
@@ -32,17 +44,15 @@ public:
 
 		return zs4FAILURE;
 	}
-
 	inline bool check(void) const{
 		if (str && str[0] && len)
 			return true;
 
 		return false;
 	}
-
 	inline zs4error construct( char * s, size_t bs, size_t l ){
 		if	(	( bs < 1 )
-			||	( s == NULL )
+			||	( s == nullptr )
 			||	( l < 0 )
 			||	( l > bs )
 			)
@@ -55,14 +65,12 @@ public:
 			
 		return zs4SUCCESS; 
 	}
-
 	inline zs4error construct( char * s, size_t bs ){
-		if	( s == NULL )
+		if	( s == nullptr )
 			return zs4FAILURE; 
 
 		return construct( s, bs, strlen(s) );
 	}
-
 	inline virtual size_t writeChar(char c){
 		if (pos >= (bufsize-1)) 
 			return zs4BUFFEROVERFLOW;
@@ -79,7 +87,6 @@ public:
 
 		return zs4SUCCESS;
 	}
-
 	inline virtual size_t writeBlock(const void * block, size_t size){
 		if	( size == 0 )
 			return zs4SUCCESS;
@@ -98,7 +105,6 @@ public:
 
 		return size;
 	}
-
 	inline virtual size_t readChar(char * c){
 		if ( pos >= len || pos >= bufsize ) 
 			return zs4FAILURE; 
@@ -107,7 +113,6 @@ public:
 		
 		return zs4SUCCESS;
 	}
-
 	inline virtual size_t readBlock(void * block, size_t size){
 	
 		char * dst = (char*) block;
@@ -130,7 +135,6 @@ public:
 
 		return ret;
 	}
-	
 	inline virtual zs4error seek( size_t offset, int origin ){ 
 		size_t adj = len;
 		if	( origin == SEEK_SET ) { adj = 0; }
@@ -148,43 +152,35 @@ public:
 		}
 		pos = offset; return zs4SUCCESS;
 	}
-	
 	inline virtual zs4error set(const char*v){
 		clear();
 		return write(v);
 	}
-
 	inline virtual zs4error set(char c){
 		clear();
 		return write(c);
 	}
-
 	inline virtual zs4error set(int i, const char * fmt = "%d"){
 		clear();
 		return write(i,fmt);
 	}
-	
 	inline virtual zs4error set(double d, const char * fmt = "%g"){
 		clear();
 		return write(d,fmt);
 	}
-	
 	inline virtual zs4error set(zs4string * val){
 		return set(val->str);
 	};
-
 	inline virtual zs4error tell( size_t * pPos ){ 
 		*pPos = pos; 
 		return zs4SUCCESS; 
 	}
-	
 	inline virtual zs4error set(zs4stream*from){
 		clear();
 		return write(from);
 	}
-
 	inline virtual zs4error setTrim(const char * str){
-		if (str == NULL)
+		if (str == nullptr)
 			return zs4FAILURE;
 
 		while (str && *str && isspace(*str)) str++;
@@ -204,11 +200,10 @@ public:
 			
 		return zs4FAILURE;
 	}
-
 	inline virtual zs4error trim(void){
 		char * s = str; size_t lead = 0;
 		
-		if (s == NULL)
+		if (s == nullptr)
 			return zs4FAILURE;
 
 		while (s && *s && isspace(*s)) {lead++; s++; }
@@ -230,7 +225,6 @@ public:
 
 		return zs4SUCCESS;
 	}
-
 	inline virtual zs4error lastChar(char ec){
 		char w[2];
 		w[0] = ec;
@@ -247,8 +241,7 @@ public:
 		return write(w);
 	}
 
-	inline static int compareNumberStringAscend(const void * v1, const void * v2)
-	{
+	inline static int compareNumberStringAscend(const void * v1, const void * v2){
 		register zs4string * fb1 = ((zs4string**)v1)[0];
 		register zs4string * fb2 = ((zs4string**)v2)[0];
 
@@ -284,46 +277,36 @@ public:
 			p1++; p2++;
 		}
 	}
-
-	inline static int compareNumberStringDescend(const void * v1, const void * v2)
-	{
+	inline static int compareNumberStringDescend(const void * v1, const void * v2){
 		return -compareNumberStringAscend(v1, v2);
 	}
-
-	inline static int compareValueAscend(const void * v1, const void * v2)
-	{
+	inline static int compareValueAscend(const void * v1, const void * v2){
 		register zs4string * c1 = ((zs4string**)v1)[0];
 		register zs4string * c2 = ((zs4string**)v2)[0];
 
 		return stricmp(c1->str, c2->str);
 	}
-
-	inline static int compareValueDescend(const void * v1, const void * v2)
-	{
+	inline static int compareValueDescend(const void * v1, const void * v2){
 		return -compareValueAscend(v1, v2);
 	}
-
-	inline static int compareLengthAscend(const void * v1, const void * v2)
-	{
+	inline static int compareLengthAscend(const void * v1, const void * v2){
 		register zs4string * c1 = ((zs4string**)v1)[0];
 		register zs4string * c2 = ((zs4string**)v2)[0];
 
 		return (int)((int)strlen(c1->str) - (int)strlen(c2->str));
 	}
-
-	inline static int compareLengthDescend(const void * v1, const void * v2)
-	{
+	inline static int compareLengthDescend(const void * v1, const void * v2){
 		return -compareLengthAscend(v1, v2);
 	}
 
 	inline size_t tokenize(const char * s, const char * sep, const char *** arr){
 
 		size_t count = 0;
-		if ( (s == NULL) || (*s == 0) || (sep == NULL) || (*sep == 0) || (arr == NULL) )
+		if ( (s == nullptr) || (*s == 0) || (sep == nullptr) || (*sep == 0) || (arr == nullptr) )
 			return count;
 
 		clear();
-		const char * dummy = NULL;
+		const char * dummy = nullptr;
 
 		// count separators
 		int sep_count = strcharcount(s,sep)+1;
@@ -363,11 +346,9 @@ public:
 
 		return count;
 	}
-
-	inline virtual char * zs4alloc(size_t size)
-	{
+	inline virtual char * zs4alloc(size_t size){
 		if (size > (bufsize - len))
-			return NULL;
+			return nullptr;
 
 		char * mem = &str[len];
 		len += size;
@@ -385,8 +366,7 @@ public:
 
 ZS4_STRINGBUFFER(zs4StringBuffer, ZS4_STRINGBUFFER_SIZE);
 ZS4_STRINGBUFFER(zs4TextBuffer, ZS4_TEXTBUFFER_SIZE);
-
-ZS4_STRINGBUFFER(zs4StringBufferWide, (ZS4_STRINGBUFFER_SIZE*2));
+ZS4_STRINGBUFFER(zs4PointerBuffer, sizeof(void*));
 
 #endif
 

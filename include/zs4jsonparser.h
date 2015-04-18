@@ -31,7 +31,7 @@ typedef unsigned short json_uchar;
 
 typedef struct
 {
-	unsigned long max_memory;
+	unsigned long long max_memory;
 	int settings;
 } json_settings;
 
@@ -162,11 +162,15 @@ public:
 
 #include <zs4file.h>
 
+#ifndef JSON_PARSER_BUF_SIZE
+#		define JSON_PARSER_BUF_SIZE (1024*256)
+#endif
+ZS4_STRINGBUFFER(json_parser_buffer, JSON_PARSER_BUF_SIZE);
+
 #define JSON_ERROR_BUF_SIZE (128)
 ZS4_STRINGBUFFER(json_error, JSON_ERROR_BUF_SIZE);
 
-template <class zs4stringtype>
-class zs4jsonParser : public zs4stringtype
+class zs4jsonParser : public json_parser_buffer
 {
 	json_error parser_error;
 	json_value * JObj;
@@ -174,7 +178,7 @@ class zs4jsonParser : public zs4stringtype
 
 public:
 	inline zs4jsonParser(void){
-		JObj = NULL;
+		JObj = nullptr;
 	}
 
 	inline virtual ~zs4jsonParser(void){
@@ -183,7 +187,7 @@ public:
 	inline json_value * value(void){ return JObj; }
 	inline json_value * parse(const char * json){
 
-		JObj = NULL;
+		JObj = nullptr;
 		parser_error.clear();
 		this->clear();
 
@@ -200,12 +204,12 @@ public:
 		if (parser_error.check())
 			this->set(parser_error.str);
 
-		return NULL;
+		return nullptr;
 	}
 	inline json_value * parseFile(const char * fnam){
-		zs4stringtype buf;
+		json_parser_buffer buf;
 		if (zs4SUCCESS != zs4file::load(fnam, &buf))
-			return NULL;
+			return nullptr;
 		return parse(buf.str);
 	}
 private:

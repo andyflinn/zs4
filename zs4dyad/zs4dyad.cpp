@@ -21,7 +21,7 @@ void zs4dyad::Run(const char * path)
 {
 	if (path&&path[0])
 	{
-		if (!zs4fs::IsDir(path)||chdir(path))
+		if (!zs4fs::isDir(path)||chdir(path))
 			exit(-1);
 	}
 

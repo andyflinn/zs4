@@ -1,18 +1,7 @@
-/* ******************************************************************
-   Copyright (C) 1996-2001  Thugs at Bay Inc, All Rights Reserved.
-
-   This program is NOT free software; you can NOT redistribute it.
-
-   Thugs at Bay Contact information:
-   email: info@thugsatbay.com or
-   phone: 416 534 3562
-
-** *************************************************************** */
-
 #ifndef ZS4_FS_H
 #define ZS4_FS_H
 
-#include "zs4stat.h"
+#include <zs4file.h>
 
 #ifndef ZS4_MAX_DIR_SIZE
 #define ZS4_MAX_DIR_SIZE (1024)
@@ -21,6 +10,9 @@
 #ifndef TAB_FS_MAX_PATH_LENGTH
 #define TAB_FS_MAX_PATH_LENGTH (4096)
 #endif
+
+#define ZS4_STDIN (*zs4fs::in())
+#define ZS4_STDOUT (*zs4fs::out())
 
 class zs4fs : public zs4object
 {
@@ -31,7 +23,7 @@ public:
 	inline virtual ~zs4fs(){
 	}
 
-	inline static bool IsFile(const char * path){
+	inline static bool isFile(const char * path){
 		struct stat ino;
 
 		if (stat(path, &ino))
@@ -42,7 +34,7 @@ public:
 
 		return false;
 	}
-	inline static bool IsDir(const char * path){
+	inline static bool isDir(const char * path){
 		struct stat ino;
 
 		if (stat(path, &ino))
@@ -53,17 +45,17 @@ public:
 
 		return false;
 	}
-	inline static zs4error ChangeDirectory(const char * nu){
+	inline static zs4error cd(const char * nu){
 		return (zs4error)chdir(nu);
 	}
-	inline static zs4error GetCurDir(zs4string * cd){
+	inline static zs4error pwd(zs4string * cd){
 		char * buffer;
 		char buf[1024]; buf[0] = 0;
 		char *getcwd(char *buf, size_t size);
 		buffer = getcwd(buf, 1024);
 		return cd->set(buffer);
 	}
-	inline static zs4error MkDir(const char * name){
+	inline static zs4error mkDir(const char * name){
 		char dirnam[TAB_FS_MAX_PATH_LENGTH];
 		char pdir[TAB_FS_MAX_PATH_LENGTH];
 
@@ -85,76 +77,74 @@ public:
 			}
 		}
 
-		if (!IsDir(name))
+		if (!isDir(name))
 		{
 			return zs4FAILURE;
 		}
 
 		return zs4SUCCESS;
 	}
-	inline static zs4error RmFile(const char * name){
+	inline static zs4error rmFile(const char * name){
 		if (!unlink(name)) return zs4SUCCESS;
 		return zs4FAILURE;
 	}
-	inline static zs4error RmDir(const char * name){
+	inline static zs4error rmDir(const char * name){
 		if (!rmdir(name)) return zs4SUCCESS;
 		return zs4FAILURE;
 	}
-	inline static zs4error GetInfo(const char * objectname, zs4stat * info){
-		if (objectname == NULL || objectname[0] == 0 || info == NULL)
+	inline static zs4error info(const char * objectname, zs4stat * info){
+		if (objectname == nullptr || objectname[0] == 0 || info == nullptr)
 			return zs4FAILURE;
 
-		return info->GetInfo(objectname);
+		return info->info(objectname);
 	}
-	inline void Sort(qsort_compare_foo* foo){
+	inline static zs4stream * in(void){ static zs4stdin in; return &in; }
+	inline static zs4stream * out(void){ static zs4stdout out; return &out; }
+
+	inline void sort(qsort_compare_foo* foo){
 		if (count < 2)
 			return;
 
 		qsort(statArray, count, sizeof(zs4stat **), foo);
 	}
-	inline void SortNameAscend(void){
-		Sort(zs4string::compareValueAscend);
+	inline void sortNameAscend(void){
+		sort(zs4string::compareValueAscend);
 	}
-	inline void SortNameDescend(void){
-		Sort(zs4string::compareValueDescend);
+	inline void sortNameDescend(void){
+		sort(zs4string::compareValueDescend);
 	}
-	inline void SortLengthAscend(void){
-		Sort(zs4string::compareLengthAscend);
+	inline void sortLengthAscend(void){
+		sort(zs4string::compareLengthAscend);
 	}
-	inline void SortLengthDescend(void){
-		Sort(zs4string::compareLengthDescend);
+	inline void sortLengthDescend(void){
+		sort(zs4string::compareLengthDescend);
 	}
-	inline time_t Created(const char * fnam){
+	inline time_t created(const char * fnam){
 		zs4stat info;
 
-		if ((!zs4fs::IsFile(fnam))
-			|| (zs4SUCCESS != zs4fs::GetInfo(fnam, &info))
+		if ((!zs4fs::isFile(fnam))
+			|| (zs4SUCCESS != zs4fs::info(fnam, &info))
 			)
 			return 0;
 
 		return info.created;
 	}
-	inline time_t Modified(const char * fnam){
+	inline time_t modified(const char * fnam){
 		zs4stat info;
 
-		if ((!zs4fs::IsFile(fnam))
-			|| (zs4SUCCESS != zs4fs::GetInfo(fnam, &info))
+		if ((!zs4fs::isFile(fnam))
+			|| (zs4SUCCESS != zs4fs::info(fnam, &info))
 			)
 			return 0;
 
 		return info.modified;
 	}
 
-	static const int MAX_PATH_LENGTH;
-	static const int DEFAULT_RECURSE_LIMIT;
-	static const bool TAB_FS_IS_INSENSITIVE;
-	static const bool TAB_FS_HAS_BACKSLASHES;
-
-	size_t List(const char * name, bool hidden_files);
+	size_t list(const char * name, bool hidden_files);
 
 	inline zs4stat * nuStat(void)	{
 		if (count >= (ZS4_MAX_DIR_SIZE - 1))
-			return NULL;
+			return nullptr;
 
 		statData[count].clear();
 		zs4stat * ret = &statData[count];

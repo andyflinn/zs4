@@ -12,7 +12,7 @@
 #ifndef ZS4_STAT_H
 #define ZS4_STAT_H
 
-#include "zs4string.h"
+#include <zs4string.h>
 
 class zs4stat : public zs4StringBuffer
 {
@@ -78,7 +78,7 @@ public:
 		return -CompareFileSizeAscend(v1, v2);
 	}
 
-	inline zs4error GetInfo(const char * objectname)
+	inline zs4error info(const char * objectname)
 	{
 		zs4error err = zs4SUCCESS;
 

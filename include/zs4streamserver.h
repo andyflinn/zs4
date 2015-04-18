@@ -46,8 +46,8 @@ public:
 
 	inline zs4streamseverprocess * allocProcess(void)
 	{
-		zs4streamseverprocess * ret = NULL;
-		for (int i = 0; i < ZS4_STREAMSERVER_MAX_STREAMS && ret == NULL; i++)
+		zs4streamseverprocess * ret = nullptr;
+		for (int i = 0; i < ZS4_STREAMSERVER_MAX_STREAMS && ret == nullptr; i++)
 		{
 			if (process[allocPosition].stream.stateGet() == zs4stream::CLOSED)
 			{
@@ -57,7 +57,7 @@ public:
 			allocPosition %= ZS4_STREAMSERVER_MAX_STREAMS;
 		}
 
-		if (ret != NULL)
+		if (ret != nullptr)
 		{
 			ret->stream.stateSet(zs4stream::ACTIVE);
 			ret->stream.reset();

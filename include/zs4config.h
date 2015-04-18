@@ -14,9 +14,6 @@
 
 #include <errno.h>
 
-#include <iostream>
-#include <string>
-
 #ifdef _WIN32
 #	include <direct.h>
 #	pragma warning (disable : 4996)
@@ -72,9 +69,24 @@
 
 #endif
 
+/*	MACROS activated by debug compilation
+permit you to override the basic capacity of this server;
+
+*/
+
+#if defined (_DEBUG) || defined (DEBUG)
+
+#	define DBG_GETCHAR 	getchar()
+
+#else
+
+#	define DBG_GETCHAR
+
+#endif
+
 /*	Here's some configuration numbers which
-	permit you to override the basic capacity of this server;
-	
+permit you to override the basic capacity of this server;
+
 */
 #ifndef ZS4_DEFAULT_PORT
 #define ZS4_DEFAULT_PORT (8000)

@@ -12,30 +12,41 @@
 #ifndef ZS4_BITS_H
 #define ZS4_BITS_H
 
-#include <sys/types.h>
-
 template <class inttype, class enumtype>
 class zs4bits
 {
+	inttype value;
+	inttype * dta;
 public:
-	inttype data;
-	
-	inline zs4bits()
-	{
-		clrAll();
+
+	inline zs4bits(inttype * init = nullptr){
+		if (init != nullptr)
+		{
+			dta = init;
+		}
+		else
+		{
+			dta = &value;
+
+		}
 	}
-	inline virtual ~zs4bits()
-	{
+	inline virtual ~zs4bits(){
 	}
-	inline void clrAll(void)
-	{
-		data = 0;
+
+	inline void init(inttype * init){
+		dta = init;
 	}
-	inline inttype getAll(void){
-		return data;
+	inline void clrAll(void){
+		*dta = 0;
+	}
+	inline inttype getAll(void)const{
+		return *dta;
 	}
 	inline void setAll(void){
-		data |= (~0);
+		*dta |= (~0);
+	}
+	inline void setAll(inttype v){
+		*dta = v;
 	}
 	inline const size_t bytes(void) const {
 		return (sizeof(inttype));
@@ -43,9 +54,11 @@ public:
 	inline const size_t bits(void) const {
 		return (bytes() * 8);
 	}
+	inline static const inttype mask(enumtype idx){
+		return (inttype)((inttype)1 << idx);
+	}
 
-	inline void put(enumtype idx, bool true_or_false)
-	{
+	inline void put(enumtype idx, bool true_or_false){
 		if (idx >= (int)bits() || idx < 0)
 			return;
 
@@ -54,35 +67,36 @@ public:
 		else
 			clr(idx);
 	}
-
-	inline bool get(enumtype idx) const
-	{
+	inline bool get(enumtype idx) const {
 		if (idx >= (int)bits() || idx < 0)
 			return false;
 
-		if (data & (1 << idx))
+		if (*dta & mask(idx))
 			return true;
 
 		return false;
 	}
-
-	inline void set(enumtype idx)
-	{
+	inline void set(enumtype idx){
 		if (idx >= (int)bits() || idx < 0)
 			return;
 
-		data |= (1 << idx);
+		*dta |= mask(idx);
 	}
-
-	inline void clr(enumtype idx)
-	{
+	inline void clr(enumtype idx){
 		if (idx >= (int)bits() || idx < 0)
 			return;
 
-		data &= (~(1 << idx));
+		*dta &= (~mask(idx));
 	}
 
-#define enum_bit(i,n) inline void set_ ## n(void){set(i);} inline void clr_ ## n(void){clr(i);} inline void put_ ## n(bool t){put(i,t);} inline bool get_ ## n(void){return get(i);}
+#define enum_bit(it,et,i,n) \
+inline void n ## _alone(void){set((et)i);} \
+inline void n ## _set(void){set((et)i);} \
+inline void n ## _clr(void){clr((et)i);} \
+inline void n ## _put(bool t){put((et)i,t);} \
+inline bool n ## _get(void)const{return get((et)i);} \
+inline static it n ## _mask(void){return mask((et)i);} \
+inline static const char * n ## _str(void){static const char * s = #n; return s;}
 };
 
 #endif

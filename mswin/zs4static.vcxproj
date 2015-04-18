@@ -206,7 +206,9 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\include\jsonobject.h" />
+    <ClInclude Include="..\include\zs4event.h" />
+    <ClInclude Include="..\include\zs4function.h" />
+    <ClInclude Include="..\include\zs4json.h" />
     <ClInclude Include="..\include\zs4.h" />
     <ClInclude Include="..\include\zs4array.h" />
     <ClInclude Include="..\include\zs4bits.h" />

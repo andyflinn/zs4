@@ -4,13 +4,13 @@
 //#include "tab_fs.h"
 
 
-const char * zs4node::rootFolder = NULL;
+const char * zs4node::rootFolder = nullptr;
 const char * zs4node::urlRoot = ZS4_ROOT_ID;
 const char * zs4node::urlPublic = ZS4_PUBLIC_ID;
-const char * zs4node::urlUser = NULL;
+const char * zs4node::urlUser = nullptr;
 bool zs4node::urlPublicInitialized = false;
-zs4node * zs4node::objectUser = NULL;
-tab_zs4_http * zs4node::server = NULL;
+zs4node * zs4node::objectUser = nullptr;
+tab_zs4_http * zs4node::server = nullptr;
 
 //zs4stream buf zs4node::session;
 
@@ -26,7 +26,7 @@ zs4node::zs4node(void)
 	featureAdd(&html);
 	featureAdd(&login);
 
-	objectParent = NULL;
+	objectParent = nullptr;
 	connLoaded = false;
 	connCount = 0;
 };
@@ -68,7 +68,7 @@ bool zs4node::zs4::isItem(void)
 {
 	const json_value * obj_item = getBoolean(object->Object(), ZS4"."ZS4_LINK"."ZS4_ITEM);
 
-	if (obj_item != NULL && obj_item->u.boolean)
+	if (obj_item != nullptr && obj_item->u.boolean)
 		return true;
 
 	return false;
@@ -78,7 +78,7 @@ int zs4node::zs4::countProperties(void)
 	int returnValue = 0;
 
 	const json_value * o = object->Object();
-	if (NULL == o || o->type != json_object)
+	if (nullptr == o || o->type != json_object)
 		return returnValue;
 
 	for (unsigned int i = 0; i < o->u.object.length; i++)
@@ -132,7 +132,7 @@ zs4error zs4node::zs4::get(zs4stream * out)
 	for (int i = 0; i < object->featureCount; i++)
 	{
 		featPath.set(ZS4"."); featPath.write(object->feat[i]->name());
-		if (NULL == getValue(object->Object(), featPath.str))
+		if (nullptr == getValue(object->Object(), featPath.str))
 			continue;
 
 		featPath.set("get."ZS4"."); featPath.write(object->feat[i]->name());
@@ -188,15 +188,15 @@ bool zs4node::zs4::set(const json_value * in, zs4stream * out, const char * var,
 		zs4JsonString featVar; featVar.set("zs4."); featVar.write(object->feat[i]->name());
 
 		// evaluate if this feature should be added
-		if (feat == NULL)
+		if (feat == nullptr)
 		{
 			bool initFeat = settingRootObject;
-			if (userOwnsObject() && objectUser != NULL&&getObject(objectUser->Object(), featVar.str))
+			if (userOwnsObject() && objectUser != nullptr&&getObject(objectUser->Object(), featVar.str))
 			{
 				//ZS4_DEBUG_STRING("contemplating add feature", featVar.str)
-				if (var != NULL
+				if (var != nullptr
 					&&	!strcmp(var, featVar.str)
-					&&	val != NULL
+					&&	val != nullptr
 					&&	val->type == json_object
 					&&	val->u.object.length == 0
 					)
@@ -214,7 +214,7 @@ bool zs4node::zs4::set(const json_value * in, zs4stream * out, const char * var,
 				 init.Parse("{}");
 				 feat = init.Object();
 			}
-			if (feat == NULL)
+			if (feat == nullptr)
 			{
 				//ZS4_DEBUG_STRING("feature not found", object->feat[i]->name())
 					continue;
@@ -226,9 +226,9 @@ bool zs4node::zs4::set(const json_value * in, zs4stream * out, const char * var,
 		if (userOwnsObject())
 		{
 			//ZS4_DEBUG_STRING("contemplating remove feature", featVar.str)
-			if (var != NULL
+			if (var != nullptr
 				&&	!strcmp(var, featVar.str)
-				&& val == NULL
+				&& val == nullptr
 				)
 			{
 				//ZS4_DEBUG_STRING("removed feature", featVar.str)
@@ -298,7 +298,7 @@ bool zs4node::setFilter(const json_value * in, zs4stream * out, const char * pat
 	//ZS4_DEBUG(false);
 
 	changeStruct * cv = (changeStruct*)ctx;
-	if (cv == NULL)
+	if (cv == nullptr)
 		return false;
 
 	zs4node * object = (zs4node*)cv->json;
@@ -328,7 +328,7 @@ const json_value * zs4node::set(const char * path, const json_value * value)
 {
 	// ZS4_DEBUG(false);
 
-	if (path == NULL || path[0] == 0)
+	if (path == nullptr || path[0] == 0)
 		return JObj;
 
 	changeStruct ctx = { this, path, value, false };
@@ -351,7 +351,7 @@ bool zs4node::getFilter(const json_value * in, zs4stream * out, const char * pat
 	// ZS4_DEBUG(false);
 
 	changeStruct * cv = (changeStruct*)ctx;
-	if (cv == NULL)
+	if (cv == nullptr)
 		return false;
 
 	zs4node * object = (zs4node*)cv->json;
@@ -366,7 +366,7 @@ bool zs4node::getFilter(const json_value * in, zs4stream * out, const char * pat
 		|| object->feature.userOwnsObject()
 		)
 	{
-		if (in == NULL
+		if (in == nullptr
 			&&path[0]==0
 			&&object->child.load()
 			&&object->connLoad()
@@ -404,8 +404,8 @@ zs4error zs4node::InitializeDiskObject(zs4JsonText * result, const char * url)
 	}
 	
 	zs4JsonString dir; url2DirName(url,&dir);
-	if (!zs4fs::IsDir(dir.str))
-		zs4fs::MkDir(dir.str);
+	if (!zs4fs::isDir(dir.str))
+		zs4fs::mkDir(dir.str);
 
 	zs4file file;
 	if (zs4SUCCESS != file.openWrite(filnam.str))
@@ -428,7 +428,7 @@ zs4error zs4node::InitializeDiskObject(zs4JsonText * result, const char * url)
 
 bool zs4node::Execute(const char ** patt, const json_value * in, zs4stream * out)
 {
-	if ((rootFolder == NULL)
+	if ((rootFolder == nullptr)
 		|| (rootFolder[0] == 0)
 		)
 	{
@@ -443,10 +443,10 @@ bool zs4node::Execute(const char ** patt, const json_value * in, zs4stream * out
 
 	zs4JsonText json;
 	zs4JsonString this_filename;
-	if (NULL == Object())
+	if (nullptr == Object())
 	{
 		ParseFile(url2FileName(urlObject, &this_filename));
-		if (NULL == Object())
+		if (nullptr == Object())
 		{
 			if (strcmp(urlObject, ZS4_ROOT_ID))
 				return (zs4SUCCESS == out->write(ZS4_ERROR("not.found")));
@@ -454,7 +454,7 @@ bool zs4node::Execute(const char ** patt, const json_value * in, zs4stream * out
 			if (zs4SUCCESS != InitializeDiskObject(&json, "/"))
 				return (zs4SUCCESS == out->write(ZS4_ERROR("root.file")));
 
-			if (NULL == Parse(json.str))
+			if (nullptr == Parse(json.str))
 				return (zs4SUCCESS == out->write(ZS4_ERROR("root.parse")));
 		}
 	}
@@ -464,7 +464,7 @@ bool zs4node::Execute(const char ** patt, const json_value * in, zs4stream * out
 	// now we need to set up the user ID
 
 	// Configure User
-	if (urlUser == NULL || urlUser[0] == 0 || urlUser == urlPublic)
+	if (urlUser == nullptr || urlUser[0] == 0 || urlUser == urlPublic)
 	{
 		if (	!strcmp(urlObject, ZS4_ROOT_ID)
 			&&	!login.configured()
@@ -486,7 +486,7 @@ bool zs4node::Execute(const char ** patt, const json_value * in, zs4stream * out
 			}
 		}
 
-		if (urlUser == NULL || urlUser[0] == 0)
+		if (urlUser == nullptr || urlUser[0] == 0)
 		{
 			if (!urlPublicInitialized
 				&& zs4SUCCESS != InitializeDiskObject(&json, urlPublic)
@@ -501,7 +501,7 @@ bool zs4node::Execute(const char ** patt, const json_value * in, zs4stream * out
 		}
 	}
 
-	if (patt == NULL || patt[0] == NULL || patt[0][0] == 0)
+	if (patt == nullptr || patt[0] == nullptr || patt[0][0] == 0)
 	{
 		return exec(in, out);
 	}
@@ -526,18 +526,18 @@ int zs4node::connLoad(void)
 	size_t count = fs.List(url2DirName(urlObject),true);
 	for (size_t i = 0; i < count; i++)
 	{
-		if (!fs.IsDir(fs.statArray[i]->str))
+		if (!fs.isDir(fs.statArray[i]->str))
 			continue;
 
 		zs4FileName.set(fs.statArray[i]->str);
 		zs4FileName.write(ZS4_DOT_EXT);
 
-		if (!fs.IsFile(zs4FileName.str))
+		if (!fs.isFile(zs4FileName.str))
 			continue;
 
-		const char ** path = NULL;
+		const char ** path = nullptr;
 		tokenCount = token.tokenize(fs.statArray[i]->str, "/\\", &path);
-		if (path == NULL || tokenCount < 2)
+		if (path == nullptr || tokenCount < 2)
 			continue;
 
 		connLoad(path[tokenCount - 1]);
@@ -554,7 +554,7 @@ zs4node * zs4node::connCreate(const char * name)
 
 	connLoad();
 	if (connCount >= ZS4_MAX_CONNECTIONS)
-		return NULL;
+		return nullptr;
 
 	zs4JsonString nurl;
 	zs4JsonText nuobj;
@@ -570,10 +570,10 @@ zs4node * zs4node::connDelete(const char * name)
 {
 	// ZS4_DEBUG(false);
 	zs4node * exists = connLoad(name);
-	if (exists == NULL)
+	if (exists == nullptr)
 	{
 		// ZS4_DEBUG_STRING(name,"not found");
-		return NULL;
+		return nullptr;
 	}
 
 	zs4JsonString delurl, deldir;
@@ -589,7 +589,7 @@ zs4node * zs4node::connDelete(const char * name)
 
 	// ZS4_DEBUG_STRING("deleting", delurl.str);
 	const char * dir = url2DirName(delurl.str, &deldir);
-	if (dir != NULL && deldir.check() && zs4fs::IsDir(deldir.str))
+	if (dir != nullptr && deldir.check() && zs4fs::isDir(deldir.str))
 	{
 		//zs4fs::ClearDir(deldir.str);
 		zs4fs::RmDir(deldir.str);
@@ -601,7 +601,7 @@ zs4node * zs4node::connDelete(const char * name)
 			if (found)conn[i] = conn[i + 1];
 		}
 
-		return NULL;
+		return nullptr;
 	}
 
 	return exists;
@@ -623,13 +623,13 @@ zs4node * zs4node::connFind(const char * name)
 			return conn[i];
 	}
 
-	return NULL;
+	return nullptr;
 }
 
 zs4node * zs4node::connLoad(const char * name)
 {
 	if (!isName(name) || connCount >= ZS4_MAX_CONNECTIONS)
-		return NULL;
+		return nullptr;
 
 	for (int i = 0; i < connCount; i++)
 	{
@@ -641,18 +641,18 @@ zs4node * zs4node::connLoad(const char * name)
 	url.set(urlObject); url.write(name); url.write("/");
 
 	zs4node * nu = new zs4node();
-	if (nu == NULL)
-		return NULL;
+	if (nu == nullptr)
+		return nullptr;
 
 	zs4JsonString fnam;
 	const char * f = url2FileName(url.str, &fnam);
-	if (f==NULL
-		|| !zs4fs::IsFile(f)
-		|| NULL == nu->ParseFile(f)
+	if (f==nullptr
+		|| !zs4fs::isFile(f)
+		|| nullptr == nu->ParseFile(f)
 		)
 	{
 		delete nu;
-		return NULL;
+		return nullptr;
 	}
 
 	nu->connName.set(name);
@@ -670,7 +670,7 @@ bool zs4node::get(zs4stream * out)
 {
 	// ZS4_DEBUG(false);
 
-	changeStruct ctx = { this, NULL, NULL, false };
+	changeStruct ctx = { this, nullptr, nullptr, false };
 	zs4JsonText buf;
 
 	filterObject(JObj, &buf);
@@ -692,7 +692,7 @@ bool zs4node::exec(const json_value * in, zs4stream * out)
 
 	connLoad();
 
-	if (in != NULL)
+	if (in != nullptr)
 	{
 		error.clear();
 
@@ -763,7 +763,7 @@ zs4error zs4node::save(const json_value * json)
 const char * zs4node::url2FileName(const char * url, zs4JsonString * result)
 {
 	static zs4JsonString buf;
-	if (result == NULL)result = &buf;
+	if (result == nullptr)result = &buf;
 
 	url2DirName(url, result);
 	result->write(ZS4_DOT_EXT);
@@ -774,7 +774,7 @@ const char * zs4node::url2FileName(const char * url, zs4JsonString * result)
 const char * zs4node::url2DirName(const char * url, zs4JsonString * result)
 {
 	static zs4JsonString buf;
-	if (result == NULL)result = &buf;
+	if (result == nullptr)result = &buf;
 
 	zs4JsonString work;
 	work.set(url);
@@ -793,11 +793,11 @@ const char * zs4node::url2VarName(const char * url, zs4JsonString * result)
 {
 
 	static zs4JsonString buf;
-	if (result == NULL)result = &buf;
+	if (result == nullptr)result = &buf;
 	result->clear();
 
 	zs4JsonString wk; size_t count = 0;
-	const char ** arr = NULL;
+	const char ** arr = nullptr;
 	count = wk.tokenize(url, "/\\", &arr);
 	for (size_t i = 0; i < count; i++)
 	{
@@ -809,7 +809,7 @@ const char * zs4node::url2VarName(const char * url, zs4JsonString * result)
 
 zs4error zs4node::WriteErrorMessage(const char * errmsg)
 {
-	if (errmsg == NULL || errmsg[0] == 0)
+	if (errmsg == nullptr || errmsg[0] == 0)
 	{
 		error.clear();
 		return zs4SUCCESS;
@@ -824,18 +824,18 @@ zs4error zs4node::WriteErrorMessage(const char * errmsg)
 const json_value * zs4node::resolveValue(const char * path)
 {
 	const json_value * ret = getValue(Object(), path);
-	if (ret != NULL)
+	if (ret != nullptr)
 		return ret;
 
-	zs4JsonString wk; const char ** tok = NULL;
+	zs4JsonString wk; const char ** tok = nullptr;
 	size_t pc = wk.tokenize(path, ".", &tok);
 
-	if (tok == NULL || pc <= 0)
-		return NULL;
+	if (tok == nullptr || pc <= 0)
+		return nullptr;
 
 	zs4node * conn = connLoad(tok[0]);
-	if (conn == NULL)
-		return NULL;
+	if (conn == nullptr)
+		return nullptr;
 
 	if (pc == 1)
 		return conn->Object();

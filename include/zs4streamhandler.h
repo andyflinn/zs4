@@ -46,7 +46,7 @@ public:
 	size_t requestLength;
 
 	inline zs4streamhandler(){
-		pipe = NULL;
+		pipe = nullptr;
 		buffer.clear();
 	}
 
@@ -105,7 +105,7 @@ public:
 		{
 		case NOT_FOUND:
 		{
-			if (pipe == NULL)
+			if (pipe == nullptr)
 				return zs4FAILURE;
 
 			body.set("<html><body>Not Found</body></html>");
@@ -126,7 +126,7 @@ public:
 		case DEFAULT_HTML:
 		default:
 		{
-			if (pipe == NULL)
+			if (pipe == nullptr)
 				return zs4FAILURE;
 
 			body.set("<html><body></body></html>");
@@ -161,7 +161,7 @@ public:
 
 	inline virtual void onLine(void)
 	{
-		if (pipe == NULL)
+		if (pipe == nullptr)
 			return;
 
 		buffer.trim();

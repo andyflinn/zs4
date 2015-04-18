@@ -11,46 +11,35 @@ class zs4object {
 public:
 	inline zs4object(void){};
 	inline virtual ~zs4object(void){};
-
-	inline static bool charUpperable(char c)
-	{
+	inline static bool charUpperable(char c)	{
 		if (c >= 'a' && c <= 'z')
 			return true;
 
 		return false;
 	}
-
-	inline static bool charLowerable(char c)
-	{
+	inline static bool charLowerable(char c){
 		if (c >= 'A' && c <= 'Z')
 			return true;
 
 		return false;
 	}
-
-	inline static char charMakeUpper(char c)
-	{
+	inline static char charMakeUpper(char c){
 		if (charUpperable(c))
 			return (c - 0x020);
 
 		return c;
 	}
-
-	inline static char charMakeLower(char c)
-	{
+	inline static char charMakeLower(char c){
 		if (charLowerable(c))
 			return (c + 0x020);
 
 		return c;
 	}
-
-	inline static int charCompare(char c1, char c2)
-	{
+	inline static int charCompare(char c1, char c2){
 		return c1 - c2;
 	}
 
-	inline static int strcmp(const char * str1, const char * str2)
-	{
+	inline static int strcmp(const char * str1, const char * str2){
 		for (;;)
 		{
 			if (*str1 == 0 && *str2 == 0)
@@ -62,9 +51,7 @@ public:
 			str1++; str2++;
 		}
 	}
-
-	inline static int stricmp(const char * str1, const char * str2)
-	{
+	inline static int stricmp(const char * str1, const char * str2){
 		for (;;)
 		{
 			register char c1 = *str1++;
@@ -80,9 +67,7 @@ public:
 				return c1 - c2;
 		}
 	}
-
-	static inline int strncmp(const char * str1, const char * str2, size_t n)
-	{
+	static inline int strncmp(const char * str1, const char * str2, size_t n){
 		char c1, c2, *s1 = (char *)str1, *s2 = (char *)str2;
 		for (size_t i = 0; i < n; i++)
 		{
@@ -95,8 +80,7 @@ public:
 		return 0;
 	}
 
-	static inline int strnicmp(const char * str1, const char * str2, size_t n)
-	{
+	static inline int strnicmp(const char * str1, const char * str2, size_t n){
 		char c1, c2, *s1 = (char *)str1, *s2 = (char *)str2;
 		for (size_t i = 0; i < n; i++)
 		{
@@ -110,8 +94,7 @@ public:
 
 		return 0;
 	}
-
-	inline static int strcharcount(const char * str, char c)	{
+	inline static int strcharcount(const char * str, char c){
 		if (str == 0)
 			return 0;
 
@@ -126,8 +109,7 @@ public:
 
 		return ret;
 	}
-
-	inline static int strcharcount(const char * s, const char * chrs)	{
+	inline static int strcharcount(const char * s, const char * chrs){
 		int ret = 0;
 		for (const char * cp = s; cp && *cp; cp++)
 		{
@@ -140,14 +122,11 @@ public:
 
 		return ret;
 	}
-
 	inline static zs4error strcharswap(char org, char * str, char nu){
 		while (*str != 0) { if (*str == org) { *str = nu; } str++; }
 		return zs4SUCCESS;
 	}
-
-	static inline int striend(const char * str, const char * end)
-	{
+	static inline int striend(const char * str, const char * end){
 		size_t len_str = strlen(str);
 		size_t len_end = strlen(end);
 
@@ -157,9 +136,7 @@ public:
 
 		return stricmp(&str[len_str - len_end], end);
 	}
-
-	static inline int strend(const char * str, const char * end)
-	{
+	static inline int strend(const char * str, const char * end){
 		size_t len_str = strlen(str);
 		size_t len_end = strlen(end);
 

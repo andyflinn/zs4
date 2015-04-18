@@ -3,7 +3,7 @@
 
 #include <zs4string.h>
 
-class tab_zs4_crypt // : public zs4StringBuffer
+class tab_zs4_crypt
 {
 public:
 	tab_zs4_crypt();
@@ -17,7 +17,7 @@ public:
 	static zs4error StringToSha384(const char * str, zs4StringBuffer * hash);
 	static zs4error StringToSha512(const char * str, zs4StringBuffer * hash);
 
-	static const char * RandomBytes(int len, zs4StringBuffer * buffer = NULL);
+	static const char * RandomBytes(int len, zs4StringBuffer * buffer = nullptr);
 };
 
 #endif

@@ -1,20 +1,17 @@
 #ifndef ZS4_QUEUE
 #define ZS4_QUEUE
 
-#include "zs4string.h"
+#include <zs4string.h>
 
-#ifndef ZS4_QUEUE_SIZE_DEFAULT
-#define ZS4_QUEUE_SIZE_DEFAULT 256
-#endif
+ZS4_STRINGBUFFER(zs4ringBuffer, 2);
 
-template <class zs4stringtype>
-class zs4ring : public zs4stringtype
+class zs4ring
 {
 public:
+	zs4string buffer;
 	inline zs4ring(void){
 		reset();
 	}
-
 	virtual inline ~zs4ring(void){
 
 	}
@@ -23,13 +20,12 @@ public:
 		if (!readable())
 			return 0;
 
-		*c = this->str[read_index];
+		*c = buffer.str[read_index];
 
-		read_index = ((read_index + 1) % this->bufsize);
+		read_index = ((read_index + 1) % buffer.bufsize);
 
 		return 1;
 	}
-
 	inline virtual size_t readBlock(void * block, size_t size){
 		if (readable() < size)
 			return 0;
@@ -41,18 +37,16 @@ public:
 
 		return size;
 	}
-
 	inline virtual size_t writeChar(char c){
 		if (!writeable())
 			return 0;
 
-		this->str[write_index] = c;
+		buffer.str[write_index] = c;
 
-		write_index = ((write_index + 1) % this->bufsize);
+		write_index = ((write_index + 1) % buffer.bufsize);
 
 		return 1;
 	}
-
 	inline virtual size_t writeBlock(const void * block, size_t size){
 		if (writeable() < size)
 			return 0;
@@ -64,7 +58,6 @@ public:
 
 		return size;
 	}
-
 	inline virtual size_t readable(void){
 		if (write_index == read_index)
 			return 0;
@@ -72,25 +65,23 @@ public:
 		if (write_index > read_index)
 			return (write_index - read_index);
 
-		return (write_index + this->bufsize - read_index);
+		return (write_index + buffer.bufsize - read_index);
 	}
-
 	inline virtual size_t writeable(void){
-		return ((this->bufsize - 1) - readable());
+		return ((buffer.bufsize - 1) - readable());
 	}
-
 	inline virtual void reset(void){
 		read_index = write_index = 0;
 	}
-
 	inline virtual zs4error close(void){
-		this->stream_state = this->CLOSED;
+		buffer.stream_state = buffer.CLOSED;
 		reset();
 		return zs4FAILURE;
 	}
 
-private:
+	inline void operator = (zs4string&buf){ buffer = buf; }
 
+private:
 	size_t read_index;
 	size_t write_index;
 };

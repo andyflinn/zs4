@@ -8,7 +8,7 @@ class zs4file : public zs4stream
 {
 public:
 	inline zs4file(void){
-		stream=NULL;
+		stream=nullptr;
 		close();
 	};
 		
@@ -19,11 +19,11 @@ public:
 	inline zs4error openRead(const char * name){
 		close();
 
-		if (zs4SUCCESS != info.GetInfo(name))
+		if (zs4SUCCESS != info.info(name))
 			return zs4FILEINFOERROR;
 
 		stream = fopen(name,"rb");
-		if	( stream== NULL )
+		if	( stream== nullptr )
 			return zs4FILEOPENERROR;
 
 		read_able = info.size;
@@ -34,30 +34,30 @@ public:
 	inline zs4error openWrite(const char * name){
 		close();
 		stream = fopen(name, "w+");
-		if	( stream == NULL )
+		if	( stream == nullptr )
 			return zs4FILEOPENERROR;
 
 		write_able = ZS4_TEXTBUFFER_SIZE;
-		info.GetInfo(name);
+		info.info(name);
 		open_for_write = true;
 		return zs4SUCCESS;
 	}
 
 	inline virtual size_t readable(void){
-		if (stream == NULL) return 0;
+		if (stream == nullptr) return 0;
 		return read_able;
 	}
 
 	inline virtual size_t writeable(void){
-		if (stream == NULL) return 0;
+		if (stream == nullptr) return 0;
 		return write_able;
 	}
 
 	inline zs4error close(void){
-		if (stream!=NULL)
+		if (stream!=nullptr)
 		{
 			fclose(stream);
-			stream = NULL;
+			stream = nullptr;
 		}
 		read_able = write_able = 0;
 		info.clear();
@@ -67,7 +67,7 @@ public:
 
 	inline virtual size_t readBlock(void * block, size_t size){
 		
-		if (stream == NULL)
+		if (stream == nullptr)
 			return 0;
 			
 		size_t ret = ::fread(block,1,size,stream);
@@ -80,21 +80,21 @@ public:
 
 	inline virtual size_t writeBlock(const void * block, size_t size){
 		
-		if (stream == NULL)
+		if (stream == nullptr)
 			return 0;
 			
 		return ::fwrite(block,1,size,stream); 
 	}
 
 	inline virtual zs4error seek(size_t offset, int origin){
-		if	( stream == NULL )
+		if	( stream == nullptr )
 			return zs4FAILURE;
 
 		return (zs4error) ::fseek((FILE*)stream,(long)offset,(int) origin);
 	}
 
 	inline virtual zs4error tell(size_t * pPos){
-		if	( stream == NULL || pPos == NULL )
+		if	( stream == nullptr || pPos == nullptr )
 			return zs4FAILURE;
 
 		*pPos = ::ftell((FILE*)stream);
@@ -103,7 +103,7 @@ public:
 	}
 
 	inline virtual zs4error size(size_t * s){
-		if (NULL == stream)
+		if (nullptr == stream)
 		{
 			*s = 0;
 			return zs4FAILURE;
@@ -113,7 +113,7 @@ public:
 		{
 			zs4StringBuffer n;
 			n.set(info.str);
-			if (zs4SUCCESS != info.GetInfo(n.str))
+			if (zs4SUCCESS != info.info(n.str))
 			{
 				*s = 0;
 				info.set(n.str);
@@ -156,7 +156,7 @@ public:
 	};
 		
 	inline virtual ~zs4stdin(void){
-		stream=NULL;
+		stream=nullptr;
 	};
 };
 
@@ -168,7 +168,7 @@ public:
 	};
 		
 	inline virtual ~zs4stdout(void){
-		stream=NULL;
+		stream=nullptr;
 	};
 };
 

@@ -40,7 +40,7 @@ class zs4thread : public zs4object
 	typedef zs4error(thread_function_t)(zs4thread *);
 public:
 
-	inline zs4thread(size_t count = 0, zs4pipe ** connarr = NULL)
+	inline zs4thread(size_t count = 0, zs4pipe ** connarr = nullptr)
 	{
 		state = BOOTING;
 		join = running = false;
@@ -100,14 +100,14 @@ private:
 	{
 		DWORD id;
 		HANDLE h = CreateThread(
-			NULL,
+			nullptr,
 			0,
 			(LPTHREAD_START_ROUTINE)f, // thread function
 			data, // thread arguments
 			0,
 			&id);
 
-		if (h == NULL)
+		if (h == nullptr)
 			return zs4FAILURE;
 
 		*th = (ZS4_THREAD_HANDLE)h;

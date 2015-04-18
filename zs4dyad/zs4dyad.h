@@ -15,7 +15,7 @@ class dyadsocket : public zs4pipe<dyadTransferBuffer>
 {
 public:
 	inline dyadsocket(void){
-		s = NULL;
+		s = nullptr;
 	}
 	inline virtual ~dyadsocket(void)
 	{
@@ -23,20 +23,20 @@ public:
 	}
 
 	inline virtual zs4error close(void){
-		if (s == NULL)
+		if (s == nullptr)
 			return zs4FAILURE;
 
 		dyad_end(s);
 		dyad_removeAllListeners(s, 0);
 		dyad_close(s);
-		s = NULL;
+		s = nullptr;
 		
 		zs4stream::close();
 		return zs4FAILURE;
 	}
 
 	inline virtual size_t writeBlock(const void * block, size_t size){
-		if (s == NULL)
+		if (s == nullptr)
 			return 0;
 
 		dyad_write(s, (void*)block, size);
@@ -45,7 +45,7 @@ public:
 	}
 
 	inline virtual size_t writeChar(char c){
-		if (s == NULL)
+		if (s == nullptr)
 			return 0;
 
 		dyad_write(s, &c, 1);
@@ -58,17 +58,17 @@ public:
 			(zs4streamserver<dyadsocket, zs4streamhandler<dyadTransferBuffer> >::zs4streamseverprocess*)e->udata;
 		if ( c && c->stream.s )
 		{
-			if (e->size != (int)c->stream.req.writeBlock(e->data, e->size))
+			if (e->size != (int)c->stream.req->writeBlock(e->data, e->size))
 			{
 				dyad_close(c->stream.s);
-				c->stream.s = NULL;
+				c->stream.s = nullptr;
 			}
 			else
 			{
 				if (zs4SUCCESS != c->handler.handle())
 				{
 					dyad_close(c->stream.s);
-					c->stream.s = NULL;
+					c->stream.s = nullptr;
 				}
 			}
 		}
@@ -79,9 +79,9 @@ public:
 			(zs4streamserver<dyadsocket, zs4streamhandler<dyadTransferBuffer> >::zs4streamseverprocess*)e->udata;
 		if (c && c->stream.s)
 		{
-			size_t trans = c->stream.rep.readable();
+			size_t trans = c->stream.rep->readable();
 			if (trans > 0)
-				c->stream.write(&c->stream.rep, trans);
+				c->stream.write(c->stream.rep, trans);
 		}
 	}
 
@@ -98,7 +98,7 @@ public:
 			(zs4streamserver<dyadsocket, zs4streamhandler<dyadTransferBuffer> >::zs4streamseverprocess*)e->udata;
 		if (c && c->stream.s)
 		{
-			c->stream.s = NULL;
+			c->stream.s = nullptr;
 			c->stream.close();
 		}
 	}
@@ -108,7 +108,7 @@ public:
 			(zs4streamserver<dyadsocket, zs4streamhandler<dyadTransferBuffer> >::zs4streamseverprocess*)e->udata;
 		if (c && c->stream.s)
 		{
-			c->stream.s = NULL;
+			c->stream.s = nullptr;
 			c->stream.close();
 		}
 	}
@@ -124,7 +124,7 @@ public:
 	zs4dyad(void);
 	virtual ~zs4dyad(void);
 
-	virtual void Run(const char * path=NULL);
+	virtual void Run(const char * path=nullptr);
 
 	static void on_Error(dyad_Event*e);
 	static void on_Accept(dyad_Event*e);

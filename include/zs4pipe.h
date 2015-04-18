@@ -1,12 +1,16 @@
 #ifndef ZS4_PIPE
 #define ZS4_PIPE
 
-#include "zs4ring.h"
+#include <zs4ring.h>
 
-template <class zs4stringtype>
+ZS4_STRINGBUFFER(zs4pipeBuffer, 4);
+
 class zs4pipe : public zs4stream
 {
 public:
+	zs4ring req;
+	zs4ring rep;
+
 	inline zs4pipe(void){
 		reset();
 	}
@@ -25,8 +29,8 @@ public:
 		return zs4FAILURE;
 	}
 
-	zs4ring<zs4stringtype> req;
-	zs4ring<zs4stringtype> rep;
+	inline void operator = (zs4string&buf){ buf.halfs(req.buffer,rep.buffer); }
+
 };
 
 #endif

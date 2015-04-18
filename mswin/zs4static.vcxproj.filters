@@ -53,9 +53,6 @@
     <ClInclude Include="..\zs4static\tinydir.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\include\jsonobject.h">
-      <Filter>include</Filter>
-    </ClInclude>
     <ClInclude Include="..\include\zs4.h">
       <Filter>include</Filter>
     </ClInclude>
@@ -111,6 +108,15 @@
       <Filter>include</Filter>
     </ClInclude>
     <ClInclude Include="..\include\zs4types.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\zs4json.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\zs4event.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\zs4function.h">
       <Filter>include</Filter>
     </ClInclude>
   </ItemGroup>

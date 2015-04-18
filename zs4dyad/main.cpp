@@ -1,18 +1,16 @@
 #include "zs4dyad.h"
 
-#include <zs4bits.h>
-#include <zs4jsonparser.h>
-#include <jsonobject.h>
+#include <zs4json.h>
 
 int main(int argc, char **argv)
 {
-	const char * arg = NULL;
+	const char * arg = nullptr;
 	if (argc > 1)
 	{
 		arg = argv[1];
 		zs4StringBuffer wk;
 
-		const char ** arr = NULL;
+		const char ** arr = nullptr;
 		if (size_t count = wk.tokenize(arg,"/\\",&arr))
 		{
 			for (size_t i = 0; i < count; i++)
@@ -22,7 +20,7 @@ int main(int argc, char **argv)
 		}
 	}
 
-	zs4jsonParser<zs4StringBuffer> json;
+	zs4jsonParser json;
 	const json_value * jv = json.parseFile("session.json");
 	
 	zs4dyad * dyad = new zs4dyad();

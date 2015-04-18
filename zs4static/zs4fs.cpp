@@ -1,14 +1,14 @@
 #include "tinydir.h"
 #include <zs4fs.h>
 
-size_t zs4fs::List(const char * name, bool hidden_files){
+size_t zs4fs::list(const char * name, bool hidden_files){
 
 	count = 0;
 
-	if (IsFile(name))
+	if (isFile(name))
 		return 0;
 
-	if (!IsDir(name))
+	if (!isDir(name))
 		return 0;
 
 	zs4stat * nu;
@@ -23,10 +23,10 @@ size_t zs4fs::List(const char * name, bool hidden_files){
 		if (tinydir_readfile(&dir, &file) == -1)
 			break;
 
-		if (strcmp(file.name, ".") && strcmp(file.name, ".."))
+		if (strcmp(file.name, ".") && strcmp(file.name, "..") && strcmp(file.name, ".zs4"))
 		{
 
-			if ((NULL == (nu = nuStat())) || zs4SUCCESS != nu->GetInfo(file.name))
+			if ((nullptr == (nu = nuStat())) || zs4SUCCESS != nu->info(file.name))
 				break;
 		}
 		tinydir_next(&dir);
