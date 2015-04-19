@@ -29,8 +29,8 @@ public:
 		return zs4FAILURE;
 	}
 
-	inline void operator = (zs4string&buf){ buf.halfs(req.buffer,rep.buffer); }
-
+	inline void setPipeBuffer(zs4string&buf){ buf.halfs(req.buffer, rep.buffer); }
+	inline void operator = (zs4string&buf){ setPipeBuffer(buf); }
 };
 
 #endif

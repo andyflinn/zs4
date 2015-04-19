@@ -12,7 +12,7 @@ public:
 		flagCount
 	} flags;
 
-	inline zs4function(void){ type = tck; }
+	inline zs4function(void){ flags = 0; }
 	inline virtual ~zs4function(void){}
 	flags flags;
 };

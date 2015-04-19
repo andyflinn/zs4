@@ -15,7 +15,6 @@
 #include <zs4bits.h>
 #include <zs4array.h>
 #include <zs4jsonparser.h>
-#include <zs4event.h>
 #include <zs4pipe.h>
 
 #ifndef JSON_NAME_SIZE
@@ -54,9 +53,11 @@ public:
 
 class jsonValue : public zs4pipe
 {
+	zs4pipeBuffer pipeBuffer;
 public:
 	inline jsonValue()
 	{
+		setPipeBuffer(pipeBuffer);
 	}
 	inline virtual ~jsonValue()
 	{
@@ -64,7 +65,7 @@ public:
 
 	jsonName name;
 
-	inline virtual zs4error onConnect(zs4event * e){
+	inline virtual zs4error onConnect(void){
 		reset();
 		return zs4SUCCESS;
 	}

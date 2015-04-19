@@ -113,10 +113,10 @@
     <ClInclude Include="..\include\zs4json.h">
       <Filter>include</Filter>
     </ClInclude>
-    <ClInclude Include="..\include\zs4event.h">
+    <ClInclude Include="..\include\zs4function.h">
       <Filter>include</Filter>
     </ClInclude>
-    <ClInclude Include="..\include\zs4function.h">
+    <ClInclude Include="..\include\zs4time.h">
       <Filter>include</Filter>
     </ClInclude>
   </ItemGroup>
