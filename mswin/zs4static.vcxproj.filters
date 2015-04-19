@@ -42,9 +42,6 @@
     <ClCompile Include="..\zs4static\zs4crypt.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\zs4static\zs4fs.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\zs4static\zs4crypt.h">
@@ -117,6 +114,9 @@
       <Filter>include</Filter>
     </ClInclude>
     <ClInclude Include="..\include\zs4time.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\tinydir.h">
       <Filter>include</Filter>
     </ClInclude>
   </ItemGroup>

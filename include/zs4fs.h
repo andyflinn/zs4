@@ -2,6 +2,7 @@
 #define ZS4_FS_H
 
 #include <zs4file.h>
+#include <tinydir.h>
 
 #ifndef ZS4_MAX_DIR_SIZE
 #define ZS4_MAX_DIR_SIZE (1024)
@@ -139,8 +140,40 @@ public:
 
 		return info.modified;
 	}
+	inline size_t list(const char * name, bool hidden_files){
 
-	size_t list(const char * name, bool hidden_files);
+		count = 0;
+
+		if (isFile(name))
+			return 0;
+
+		if (!isDir(name))
+			return 0;
+
+		zs4stat * nu;
+
+		tinydir_dir dir;
+		if (tinydir_open(&dir, ".") == -1)
+			return count;
+
+		while (dir.has_next)
+		{
+			tinydir_file file;
+			if (tinydir_readfile(&dir, &file) == -1)
+				break;
+
+			if (strcmp(file.name, ".") && strcmp(file.name, "..") && strcmp(file.name, ".zs4"))
+			{
+
+				if ((nullptr == (nu = nuStat())) || zs4SUCCESS != nu->info(file.name))
+					break;
+			}
+			tinydir_next(&dir);
+		}
+
+		tinydir_close(&dir);
+		return count;
+	}
 
 	inline zs4stat * nuStat(void)	{
 		if (count >= (ZS4_MAX_DIR_SIZE - 1))
