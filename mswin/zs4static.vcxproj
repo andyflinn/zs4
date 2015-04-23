@@ -205,29 +205,6 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\include\tinydir.h" />
-    <ClInclude Include="..\include\zs4time.h" />
-    <ClInclude Include="..\include\zs4function.h" />
-    <ClInclude Include="..\include\zs4json.h" />
-    <ClInclude Include="..\include\zs4.h" />
-    <ClInclude Include="..\include\zs4array.h" />
-    <ClInclude Include="..\include\zs4bits.h" />
-    <ClInclude Include="..\include\zs4config.h" />
-    <ClInclude Include="..\include\zs4file.h" />
-    <ClInclude Include="..\include\zs4fs.h" />
-    <ClInclude Include="..\include\zs4jsonparser.h" />
-    <ClInclude Include="..\include\zs4machine.h" />
-    <ClInclude Include="..\include\zs4macros.h" />
-    <ClInclude Include="..\include\zs4object.h" />
-    <ClInclude Include="..\include\zs4pipe.h" />
-    <ClInclude Include="..\include\zs4ring.h" />
-    <ClInclude Include="..\include\zs4stat.h" />
-    <ClInclude Include="..\include\zs4stream.h" />
-    <ClInclude Include="..\include\zs4streamhandler.h" />
-    <ClInclude Include="..\include\zs4streamserver.h" />
-    <ClInclude Include="..\include\zs4string.h" />
-    <ClInclude Include="..\include\zs4thread.h" />
-    <ClInclude Include="..\include\zs4types.h" />
     <ClInclude Include="..\zs4static\tinydir.h" />
     <ClInclude Include="..\zs4static\zs4crypt.h" />
   </ItemGroup>

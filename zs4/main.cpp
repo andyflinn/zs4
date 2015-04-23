@@ -1,23 +1,16 @@
-#include <zs4machine.h>
+#include <zs4.h>
+
+#include <stdio.h>
+#include <zs4stream.h>
+
+#define P(n) printf("%s: %d\n",#n,(int)n())
 
 int main(int argc, char **argv)
 {
-	zs4pipe pipe;
-	zs4StringBuffer str;
-	pipe = str;
-	zs4machine machine;
+	zs4 z;
+	printf("sizeof(s) = %d\n", (int)sizeof(z));
 
-	if (argc == 1)
-	{
-		if (!zs4fs::isFile(DOT_ZS4))
-		{
-			ZS4_STDOUT.write("not a zs4 folder.\n");
-		}
-	}
-
-	machine.save(zs4fs::out());
-
-	DBG_GETCHAR;
-
+	getchar();
+	
 	return 0;
 }

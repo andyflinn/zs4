@@ -12,8 +12,8 @@
 #define TAB_FS_MAX_PATH_LENGTH (4096)
 #endif
 
-#define ZS4_STDIN (*zs4fs::in())
-#define ZS4_STDOUT (*zs4fs::out())
+#define ZS4_STDIN (zs4fs::in())
+#define ZS4_STDOUT (zs4fs::out())
 
 class zs4fs : public zs4object
 {
@@ -99,8 +99,8 @@ public:
 
 		return info->info(objectname);
 	}
-	inline static zs4stream * in(void){ static zs4stdin in; return &in; }
-	inline static zs4stream * out(void){ static zs4stdout out; return &out; }
+	inline static zs4stream & in(void){ static zs4stdin in; return in; }
+	inline static zs4stream & out(void){ static zs4stdout out; return out; }
 
 	inline void sort(qsort_compare_foo* foo){
 		if (count < 2)

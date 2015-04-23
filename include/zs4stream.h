@@ -20,17 +20,14 @@ public:
 	inline virtual zs4streamstate stateGet(void){
 		return stream_state;
 	}
-
 	inline virtual zs4streamstate stateSet(zs4streamstate ss){
 		zs4streamstate old = stream_state;
 		stream_state = ss;
 		return old;
 	}
-
 	inline static const char * HEX_CHARS(void){
 		static const char * hc = "0123456789abcdef"; return hc;
 	}
-
 	inline virtual size_t readBlock(void * block, size_t size){
 		size_t ret = 0;
 
@@ -46,14 +43,12 @@ public:
 		
 		return ret;
 	}
-
 	inline virtual size_t readChar(char * c){
 		if (0 == readBlock(c,1) )
 			return 0;
 
 		return 1;
 	}
-
 	inline virtual size_t writeBlock(const void * block, size_t size){
 		size_t ret = 0;
 
@@ -69,47 +64,37 @@ public:
 		
 		return ret;
 	}
-
 	inline virtual size_t writeChar(char c){
 		if (0 == writeBlock(&c,1) )
 			return 0;
 
 		return 1;
 	}
-
 	inline virtual size_t readable(void){
 		return 0;
 	}
-
 	inline virtual size_t writeable(void){
 		return 0;
 	}
-
 	inline virtual zs4error flush(void){
 		return zs4FAILURE;
 	}
-
 	inline virtual zs4error close(void){
 		stream_state = CLOSED;
 		return zs4FAILURE;
 	}
-
 	inline virtual zs4error rewind(void){
 		return seek(0,SEEK_SET); 
 	}
-
 	inline virtual zs4error seekEnd(void){ 
 		return seek(0,SEEK_END); 
 	}
-
 	inline virtual zs4error seek( size_t offset, int origin ){ 
 		return zs4FAILURE; 
 	}
-
 	inline virtual zs4error tell( size_t * pPos ){ 
 		return zs4FAILURE; 
 	}
-
 	inline virtual zs4error size(size_t * s){
 		zs4error err;
 		size_t pos = 0;
@@ -131,38 +116,32 @@ public:
 		
 		return zs4SUCCESS;
 	}
-
 	inline virtual zs4error write(const char * s){
 		size_t l = strlen(s);
 		if (l == writeBlock(s,l))
 			return zs4SUCCESS;
 		return zs4FAILURE; 
 	}
-	
 	inline virtual zs4error write(char c ){
 		if (writeChar(c))
 			return zs4SUCCESS;
 		return zs4FAILURE;
 	}
-	
 	inline virtual zs4error write(int i, const char * fmt = "%d"){
 		char buf[128];
 		snprintf(buf,sizeof(buf),fmt,i);
 		return write(buf);
 	}
-	
 	inline virtual zs4error writeInt64(long long i, const char * fmt = "%lld"){
 		char buf[128];
 		snprintf(buf,sizeof(buf),fmt,i);
 		return write(buf);
 	}
-	
 	inline virtual zs4error write(double d, const char * fmt = "%g"){
 		char buf[128];
 		snprintf(buf,sizeof(buf),fmt,d);
 		return write(buf);
 	}
-	
 	inline virtual zs4error write(zs4stream * from){
 		if	( from == 0 )
 			return zs4FAILURE;
@@ -181,7 +160,6 @@ public:
 
 		return write(from,size);
 	}
-
 	inline virtual zs4error write(zs4stream * from, size_t length )	{
 		char buf[4096];
 
@@ -205,7 +183,6 @@ public:
 
 		return zs4SUCCESS;
 	}
-
 	inline static zs4error copy( zs4stream * from, zs4stream * to ){
 		zs4error err = zs4FAILURE;
 
@@ -218,7 +195,6 @@ public:
 
 		return to->write(from,size);
 	}
-
 	inline zs4error writeJson(const char * out)
 	{
 		for (const char * str = out; str && *str; str++)
@@ -239,7 +215,6 @@ public:
 		}
 		return zs4SUCCESS;
 	}
-
 	inline zs4error writeHex(const char * str, int len)
 	{
 		if (len < 1)
@@ -256,7 +231,6 @@ public:
 
 		return zs4SUCCESS;
 	}
-
 	inline zs4error writeHex(const char * str)
 	{
 		if (str == 0 || str[0] == 0)
@@ -268,7 +242,6 @@ public:
 
 		return zs4SUCCESS;
 	}
-
 	inline zs4error writeHex(char c)
 	{
 		int hi = c >> 4;

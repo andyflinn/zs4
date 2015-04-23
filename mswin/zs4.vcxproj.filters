@@ -13,10 +13,87 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
+    <Filter Include="include">
+      <UniqueIdentifier>{82d3f9d3-2bac-4ad5-8d94-f22400c3c036}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\zs4\main.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\include\zs4time.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\zs4function.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\zs4json.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\zs4.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\zs4array.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\zs4config.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\zs4file.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\zs4fs.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\zs4jsonparser.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\zs4object.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\zs4pipe.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\zs4ring.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\zs4stat.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\zs4stream.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\zs4string.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\zs4thread.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\zs4types.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\tinydir.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\zs4server.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\zs4tree.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\zs4stack.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\zs4stdio.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\intbits.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\buffer.h">
+      <Filter>include</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

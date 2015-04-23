@@ -1,19 +1,6 @@
 #ifndef ZS4_JSONPARSER_H
 #define ZS4_JSONPARSER_H
 
-#ifndef json_char
-#define json_char char
-#endif
-
-#ifndef json_int_t
-#ifndef _WIN32
-#include <inttypes.h>
-#define json_int_t int64_t
-#else
-#define json_int_t __int64
-#endif
-#endif
-
 #ifdef _WIN32
 #ifndef _CRT_SECURE_NO_WARNINGS
 #define _CRT_SECURE_NO_WARNINGS
@@ -59,13 +46,13 @@ typedef struct _json_value
 	union
 	{
 		int boolean;
-		json_int_t integer;
+		zs4int integer;
 		double dbl;
 
 		struct
 		{
 			unsigned int length;
-			json_char * ptr; /* null terminated */
+			char * ptr; /* null terminated */
 
 		} string;
 
@@ -75,7 +62,7 @@ typedef struct _json_value
 
 			struct
 			{
-				json_char * name;
+				char * name;
 				struct _json_value * value;
 
 			} *values;
@@ -98,66 +85,6 @@ typedef struct _json_value
 
 	} _reserved;
 
-
-	/* Some C++ operator sugar */
-
-public:
-
-	inline _json_value()
-	{
-		memset(this, 0, sizeof (_json_value));
-	}
-
-	inline operator const char * () const
-	{
-		switch (type)
-		{
-		case json_string:
-			return u.string.ptr;
-
-		default:
-			return "";
-		};
-	}
-
-	inline operator json_int_t () const
-	{
-		switch (type)
-		{
-		case json_integer:
-			return u.integer;
-
-		case json_double:
-			return (json_int_t)u.dbl;
-
-		default:
-			return 0;
-		};
-	}
-
-	inline operator bool() const
-	{
-		if (type != json_boolean)
-			return false;
-
-		return u.boolean != 0;
-	}
-
-	inline operator double() const
-	{
-		switch (type)
-		{
-		case json_integer:
-			return (double)u.integer;
-
-		case json_double:
-			return u.dbl;
-
-		default:
-			return 0;
-		};
-	}
-
 } json_value;
 
 #include <zs4file.h>
@@ -172,9 +99,7 @@ ZS4_STRINGBUFFER(json_error, JSON_ERROR_BUF_SIZE);
 
 class zs4jsonParser : public json_parser_buffer
 {
-	json_error parser_error;
 	json_value * JObj;
-	const struct _json_value json_value_none;
 
 public:
 	inline zs4jsonParser(void){
@@ -188,7 +113,6 @@ public:
 	inline json_value * parse(const char * json){
 
 		JObj = nullptr;
-		parser_error.clear();
 		this->clear();
 
 		json_settings settings; memset(&settings, 0, sizeof (json_settings));
@@ -200,10 +124,6 @@ public:
 			return nuJv;
 		}
 
-		this->clear();
-		if (parser_error.check())
-			this->set(parser_error.str);
-
 		return nullptr;
 	}
 	inline json_value * parseFile(const char * fnam){
@@ -213,7 +133,7 @@ public:
 		return parse(buf.str);
 	}
 private:
-	inline static unsigned char hex_value(json_char c)
+	inline static unsigned char hex_value(char c)
 	{
 		if (c >= 'A' && c <= 'F')
 			return (c - 'A') + 10;
@@ -284,8 +204,8 @@ private:
 
 			case json_string:
 
-				if (!(value->u.string.ptr = (json_char *)this->zs4alloc
-					((value->u.string.length + 1) * sizeof (json_char))))
+				if (!(value->u.string.ptr = (char *)this->zs4alloc
+					((value->u.string.length + 1) * sizeof (char))))
 				{
 					return 0;
 				}
@@ -335,11 +255,11 @@ private:
 		flag_num_negative = 256, flag_num_zero = 512, flag_num_e = 1024,
 		flag_num_e_got_sign = 2048, flag_num_e_negative = 4096;
 
-	inline json_value * json_parse_ex(json_settings * settings, const json_char * json)
+	inline json_value * json_parse_ex(json_settings * settings, const char * json)
 	{
-		json_char error[128];
+		char error[128];
 		unsigned int cur_line;
-		const json_char * cur_line_begin, *i;
+		const char * cur_line_begin, *i;
 		json_value * top, *root, *alloc = 0;
 		json_state state;
 		long flags;
@@ -360,7 +280,7 @@ private:
 		{
 			json_uchar uchar;
 			unsigned char uc_b1, uc_b2, uc_b3, uc_b4;
-			json_char * string;
+			char * string;
 			unsigned int string_length;
 
 			top = root = 0;
@@ -371,7 +291,7 @@ private:
 
 			for (i = json;; ++i)
 			{
-				json_char b = *i;
+				char b = *i;
 
 				if (flags & flag_done)
 				{
@@ -384,7 +304,6 @@ private:
 						continue;
 
 					default:
-						sprintf(error, "%d:%d: Trailing garbage: `%c`", cur_line, e_off, b);
 						goto e_failed;
 					};
 				}
@@ -393,7 +312,6 @@ private:
 				{
 					if (!b)
 					{
-						sprintf(error, "Unexpected EOF in string (at %d:%d)", cur_line, e_off);
 						goto e_failed;
 					}
 
@@ -416,18 +334,17 @@ private:
 							if ((uc_b1 = hex_value(*++i)) == 0xFF || (uc_b2 = hex_value(*++i)) == 0xFF
 								|| (uc_b3 = hex_value(*++i)) == 0xFF || (uc_b4 = hex_value(*++i)) == 0xFF)
 							{
-								sprintf(error, "Invalid character value `%c` (at %d:%d)", b, cur_line, e_off);
 								goto e_failed;
 							}
 
 							uc_b1 = uc_b1 * 16 + uc_b2;
 							uc_b2 = uc_b3 * 16 + uc_b4;
 
-							uchar = ((json_char)uc_b1) * 256 + uc_b2;
+							uchar = ((char)uc_b1) * 256 + uc_b2;
 
-							if (sizeof (json_char) >= sizeof (json_uchar) || (uc_b1 == 0 && uc_b2 <= 0x7F))
+							if (sizeof (char) >= sizeof (json_uchar) || (uc_b1 == 0 && uc_b2 <= 0x7F))
 							{
-								string_add((json_char)uchar);
+								string_add((char)uchar);
 								break;
 							}
 
@@ -488,13 +405,13 @@ private:
 						case json_object:
 
 							if (state.first_pass)
-								(*(json_char **)&top->u.object.values) += string_length + 1;
+								(*(char **)&top->u.object.values) += string_length + 1;
 							else
 							{
 								top->u.object.values[top->u.object.length].name
-									= (json_char *)top->_reserved.object_mem;
+									= (char *)top->_reserved.object_mem;
 
-								(*(json_char **)&top->_reserved.object_mem) += string_length + 1;
+								(*(char **)&top->_reserved.object_mem) += string_length + 1;
 							}
 
 							flags |= flag_seek_value | flag_need_colon;
@@ -524,7 +441,6 @@ private:
 							flags = (flags & ~(flag_need_comma | flag_seek_value)) | flag_next;
 						else if (!(state.settings.settings & json_relaxed_commas))
 						{
-							sprintf(error, "%d:%d: Unexpected ]", cur_line, e_off);
 							goto e_failed;
 						}
 
@@ -541,7 +457,6 @@ private:
 							}
 							else
 							{
-								sprintf(error, "%d:%d: Expected , before %c", cur_line, e_off, b);
 								goto e_failed;
 							}
 						}
@@ -555,7 +470,6 @@ private:
 							}
 							else
 							{
-								sprintf(error, "%d:%d: Expected : before %c", cur_line, e_off, b);
 								goto e_failed;
 							}
 						}
@@ -664,7 +578,6 @@ private:
 							}
 							else
 							{
-								sprintf(error, "%d:%d: Unexpected %c when seeking value", cur_line, e_off, b);
 								goto e_failed;
 							}
 						};
@@ -685,13 +598,12 @@ private:
 
 							if (flags & flag_need_comma && (!(state.settings.settings & json_relaxed_commas)))
 							{
-								sprintf(error, "%d:%d: Expected , before \"", cur_line, e_off);
 								goto e_failed;
 							}
 
 							flags |= flag_string;
 
-							string = (json_char *)top->_reserved.object_mem;
+							string = (char *)top->_reserved.object_mem;
 							string_length = 0;
 
 							break;
@@ -711,7 +623,6 @@ private:
 
 						default:
 
-							sprintf(error, "%d:%d: Unexpected `%c` in object", cur_line, e_off, b);
 							goto e_failed;
 						};
 
@@ -730,7 +641,6 @@ private:
 								{
 									if (flags & flag_num_zero)
 									{
-										sprintf(error, "%d:%d: Unexpected `0` before `%c`", cur_line, e_off, b);
 										goto e_failed;
 									}
 
@@ -768,7 +678,6 @@ private:
 						{
 							if (!num_digits)
 							{
-								sprintf(error, "%d:%d: Expected digit before `.`", cur_line, e_off);
 								goto e_failed;
 							}
 
@@ -785,7 +694,6 @@ private:
 							{
 								if (!num_digits)
 								{
-									sprintf(error, "%d:%d: Expected digit after `.`", cur_line, e_off);
 									goto e_failed;
 								}
 
@@ -812,7 +720,6 @@ private:
 						{
 							if (!num_digits)
 							{
-								sprintf(error, "%d:%d: Expected digit after `e`", cur_line, e_off);
 								goto e_failed;
 							}
 
@@ -896,26 +803,9 @@ private:
 		return root;
 
 	e_unknown_value:
-
-		sprintf(error, "%d:%d: Unknown value", cur_line, e_off);
-		goto e_failed;
-
 	e_alloc_failure:
-
-		strcpy(error, "Buffer overrun");
-		goto e_failed;
-
 	e_overflow:
-
-		sprintf(error, "%d:%d: Too long (caught overflow)", cur_line, e_off);
-		goto e_failed;
-
 	e_failed:
-
-		if (*error)
-			parser_error.set(error);
-		else
-			parser_error.set("Unknown error");
 
 		if (state.first_pass)
 			alloc = root;

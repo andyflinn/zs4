@@ -1,9 +1,7 @@
-#ifndef ZS4_QUEUE
-#define ZS4_QUEUE
+#ifndef ZS4_RING
+#define ZS4_RING
 
 #include <zs4string.h>
-
-ZS4_STRINGBUFFER(zs4ringBuffer, 2);
 
 class zs4ring
 {

@@ -73,7 +73,7 @@ public:
 	}
 	inline virtual size_t writeChar(char c){
 		if (pos >= (bufsize-1)) 
-			return zs4BUFFEROVERFLOW;
+			return 0;
 
 		str[pos] = c;
 		
@@ -85,7 +85,7 @@ public:
 			str[pos] = 0;
 		}
 
-		return zs4SUCCESS;
+		return 1;
 	}
 	inline virtual size_t writeBlock(const void * block, size_t size){
 		if	( size == 0 )
@@ -134,6 +134,19 @@ public:
 		}
 
 		return ret;
+	}
+	inline virtual zs4error setLine(zs4stream & from, const char * sEnd = "\n"){
+		clear();
+		char c = 0;
+		while (strend(str, sEnd))
+		{
+			if (0 == from.readChar(&c))
+				return zs4FAILURE;
+			if (0 == writeChar(c))
+				return zs4FAILURE;
+		}
+
+		return zs4SUCCESS;
 	}
 	inline virtual zs4error seek( size_t offset, int origin ){ 
 		size_t adj = len;

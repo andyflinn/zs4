@@ -9,44 +9,38 @@
 
 ** *************************************************************** */
 
-#ifndef ZS4_BITS_H
-#define ZS4_BITS_H
+#ifndef ZS4_INTBITS_H
+#define ZS4_INTBITS_H
 
 template <class inttype, class enumtype>
-class zs4bits
+class intbits
 {
-	inttype value;
-	inttype * dta;
+	inttype _data;
+	inttype & dta = _data;
 public:
 
-	inline zs4bits(inttype * init = nullptr){
-		if (init != nullptr)
-		{
-			dta = init;
-		}
-		else
-		{
-			dta = &value;
-
-		}
+	inline intbits(void){
 	}
-	inline virtual ~zs4bits(){
+	inline virtual ~intbits(){
 	}
 
-	inline void init(inttype * init){
+	inline void init(inttype & init){
 		dta = init;
 	}
 	inline void clrAll(void){
-		*dta = 0;
+		dta = 0;
+	}
+	inline void clrMask(inttype v){
+		dta &= ~v;
 	}
 	inline inttype getAll(void)const{
-		return *dta;
+		return dta;
 	}
 	inline void setAll(void){
-		*dta |= (~0);
+		dta |= (~0);
 	}
-	inline void setAll(inttype v){
-		*dta = v;
+	inline void setMask(inttype v){
+		dta |= v;
 	}
 	inline const size_t bytes(void) const {
 		return (sizeof(inttype));
@@ -71,7 +65,7 @@ public:
 		if (idx >= (int)bits() || idx < 0)
 			return false;
 
-		if (*dta & mask(idx))
+		if (dta & mask(idx))
 			return true;
 
 		return false;
@@ -80,23 +74,24 @@ public:
 		if (idx >= (int)bits() || idx < 0)
 			return;
 
-		*dta |= mask(idx);
+		dta |= mask(idx);
 	}
 	inline void clr(enumtype idx){
 		if (idx >= (int)bits() || idx < 0)
 			return;
 
-		*dta &= (~mask(idx));
+		dta &= (~mask(idx));
 	}
 
-#define enum_bit(it,et,i,n) \
-inline void n ## _alone(void){set((et)i);} \
-inline void n ## _set(void){set((et)i);} \
-inline void n ## _clr(void){clr((et)i);} \
-inline void n ## _put(bool t){put((et)i,t);} \
-inline bool n ## _get(void)const{return get((et)i);} \
-inline static it n ## _mask(void){return mask((et)i);} \
-inline static const char * n ## _str(void){static const char * s = #n; return s;}
+#define enum_bit(it,et,i) \
+inline it i ## _alone(void){clrAll();setMask(i##_mask());return(i##_mask());} \
+inline void i ## _set(void){set((et)i);} \
+inline void i ## _clr(void){clr((et)i);} \
+inline void i ## _put(bool t){put((et)i,t);} \
+inline bool i ## _get(void)const{return get((et)i);} \
+inline static it i ## _mask(void){return mask((et)i);} \
+inline static et i ## _enum(void){return i;} \
+inline static const char * i ## _str(void){static const char * s = #i; return s;}
 };
 
 #endif

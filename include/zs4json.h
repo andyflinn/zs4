@@ -12,10 +12,9 @@
 #ifndef ZS4_JSON_OBJECT
 #define ZS4_JSON_OBJECT
 
-#include <zs4bits.h>
+#include <intbits.h>
 #include <zs4array.h>
 #include <zs4jsonparser.h>
-#include <zs4pipe.h>
 
 #ifndef JSON_NAME_SIZE
 #define JSON_NAME_SIZE (32)
@@ -51,13 +50,11 @@ public:
 	}
 };
 
-class jsonValue : public zs4pipe
+class jsonValue //: public zs4pipe
 {
-	zs4pipeBuffer pipeBuffer;
 public:
 	inline jsonValue()
 	{
-		setPipeBuffer(pipeBuffer);
 	}
 	inline virtual ~jsonValue()
 	{
@@ -65,25 +62,30 @@ public:
 
 	jsonName name;
 
-	inline virtual zs4error onConnect(void){
-		reset();
-		return zs4SUCCESS;
-	}
-
 	inline virtual zs4error init(void){
 		return zs4FAILURE;
 	}
-	inline virtual zs4error save(zs4stream * out) = 0;
+	inline virtual zs4error save(zs4stream & out) = 0;
 	inline virtual zs4error loadValue(const json_value * in) = 0;
 	inline virtual zs4error loadString(const char * in){
 		return zs4FAILURE;
 	}
+
+	inline virtual zs4error connect(void){
+		return onConnect();
+	}
+protected:
+	inline virtual zs4error onConnect(void){
+		return zs4SUCCESS;
+	}
+
 };
 
 class jsonObject : public jsonValue
 {
-public:
+protected:
 	zs4array<jsonValue> child;
+public:
 
 	inline jsonObject()
 	{
@@ -134,27 +136,28 @@ public:
 
 		return ret;
 	}
-	inline virtual zs4error save(zs4stream * out){
-		out->write('{');
+	inline virtual zs4error save(zs4stream & out){
+		out.write('{');
 		jsonValue ** arr = (jsonValue **)child.arr();
 		for (size_t i = 0; i < child.count(); i++)
 		{
-			if (i)out->write(',');
-			out->write('"');
-			out->write(arr[i]->name.get());
-			out->write('"');
+			if (i)out.write(',');
+			out.write('"');
+			out.write(arr[i]->name.get());
+			out.write('"');
 
-			out->write(':');
+			out.write(':');
 			arr[i]->save(out);
 		}
-		return out->write('}');
+		return out.write('}');
 	}
 
-	inline zs4error add(jsonValue*v, const char * name){
+	inline virtual zs4error add(jsonValue*v, const char * name){
 		if ((zs4SUCCESS == v->name.set(name)) && (nullptr != child.add(v)))
 			return zs4SUCCESS;
 		return zs4FAILURE;
 	}
+#	define member(n) add(&n,#n)
 };
 
 class jsonBool : public jsonValue
@@ -175,16 +178,16 @@ public:
 
 		return zs4SUCCESS;
 	}
-	inline virtual zs4error save(zs4stream * out){
-		if (value) return out->write("true");
-		else return out->write("false");
+	inline virtual zs4error save(zs4stream & out){
+		if (value) return out.write("true");
+		else return out.write("false");
 	}
 };
 
 class jsonInt : public jsonValue
 {
 public:
-	json_int_t value;
+	zs4int value;
 	inline jsonInt()	{
 		value = 0;
 	}
@@ -197,8 +200,8 @@ public:
 		value = in->u.integer;
 		return zs4SUCCESS;
 	}
-	inline virtual zs4error save(zs4stream * out){
-		return out->writeInt64(value);
+	inline virtual zs4error save(zs4stream & out){
+		return out.writeInt64(value);
 	}
 };
 
@@ -218,16 +221,9 @@ public:
 		value = in->u.dbl;
 		return zs4SUCCESS;
 	}
-	inline virtual zs4error save(zs4stream * out){
-		return out->write(value);
+	inline virtual zs4error save(zs4stream & out){
+		return out.write(value);
 	}
-};
-
-class jsonEvent
-{
-public:
-	inline jsonEvent(void){}
-	inline virtual ~jsonEvent(void){}
 };
 
 #endif

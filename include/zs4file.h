@@ -1,7 +1,8 @@
 #ifndef ZS4_FILE_H
 #define ZS4_FILE_H
 
-#include "zs4string.h"
+#include "zs4stream.h"
+
 #include "zs4stat.h"
 
 class zs4file : public zs4stream 
