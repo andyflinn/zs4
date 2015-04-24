@@ -1,6 +1,7 @@
 #ifndef ZS4_H
 #define ZS4_H
 
+#include <zs4types.h>
 #include <zs4config.h>
 
 class zs4
