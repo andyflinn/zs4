@@ -399,7 +399,6 @@ public:
 				{
 				case '\\': write("\\\\"); break;
 				case '"': write("\\\""); break;
-					//case '\'': Write("\\\'"); break;
 				case '/': write("\\/"); break;
 				case '\b': write("\\b"); break;
 				case '\f': write("\\f"); break;

@@ -8,8 +8,6 @@ typedef int (qsort_compare_foo)(const void *, const void *);
 
 class zs4object {
 public:
-//	inline zs4object(void){};
-//	inline virtual ~zs4object(void){};
 	inline static bool charUpperable(char c)	{
 		if (c >= 'a' && c <= 'z')
 			return true;

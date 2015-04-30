@@ -1,17 +1,18 @@
-#include <zs4.h>
+#include <stdio.h>
+#include <zs4types.h>
 
 #define P(n) printf("%s: %d\n",#n,(int)n())
 
 int main(int argc, char **argv)
 {
+	//typedef struct {char c[3];} medium;
+	//typedef unsigned char medium;
+	//device<medium, double>::machine & b = (*(new device<medium, double>::machine()));
+	
+	device<char,double>::stack b;
 
-	device<unsigned char> b;
 
-//	b = 0;
-
-	P(b.BITDEPTH);
-	P(b.addressbits);
-	P(b.databits);
+	printf("sizeof(b)=%d\n", (int)sizeof(device<char, double>::stack));
 
 	getchar();
 	
