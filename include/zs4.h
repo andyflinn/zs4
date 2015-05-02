@@ -26,20 +26,11 @@
 typedef int (qsort_compare_foo)(const void *, const void *);
 
 
-#define ZS4_PRECISION ((ZS4CHAR)sizeof(ZS4CHAR)*8)
-#define ZS4_MIN ((ZS4CHAR)0)
-#define ZS4_MAX ((ZS4CHAR)(~0))
-#define ZS4_SIGBIT ((ZS4CHAR)ZS4_PRECISION-1)
-#define ZS4_ARRAY_PRECISION ((ZS4LARGE)((ZS4LARGE)1<<(ZS4LARGE)ZS4_PRECISION))
-
 #define ZS4_PARSER_SIZE ((ZS4LARGE)((ZS4LARGE)256*(ZS4LARGE)256))
+
 class zs4
 {
 public:
-
-	// separate a bit collection into address and data bits
-	static const ZS4LARGE ADDRESS_PRECISION(void){ ZS4LARGE w = 1; while (((ZS4LARGE)1 << w)<ZS4_PRECISION)w++; return w; }
-	static const ZS4LARGE DATA_PRECISION(void){ return (ZS4_PRECISION - ADDRESS_PRECISION()); }
 
 	inline static ZS4CHAR cmp(ZS4CHAR c1, ZS4CHAR c2){
 		return c1 - c2;
@@ -137,12 +128,6 @@ public:
 		return cmp(&str[len_str - len_end], end);
 	}
 
-	inline static ZS4CHAR bitSet(ZS4CHAR d, ZS4CHAR i){ i %= ZS4_PRECISION; d |= (ZS4CHAR)((ZS4CHAR)1 << (ZS4CHAR)i); return d; }
-	inline static ZS4CHAR bitClear(ZS4CHAR d, ZS4CHAR i){ i %= ZS4_PRECISION; d &= (ZS4CHAR)((ZS4CHAR)~((ZS4CHAR)1 << (ZS4CHAR)i)); return d; }
-	inline static bool bitGet(ZS4CHAR d, ZS4CHAR i){ i %= ZS4_PRECISION; if (d & (ZS4CHAR)((ZS4CHAR)1 << (ZS4CHAR)i))return true; return false; }
-	inline static bool bitGetMS(ZS4CHAR d){ return bitGet(d, (ZS4_PRECISION - 1)); }
-	inline static bool bitGetLS(ZS4CHAR d){ return bitGet(d,0); }
-
 	template <class uint>
 	class symbol
 	{
@@ -172,17 +157,21 @@ public:
 	public:
 		uint data = 0;
 
-		//inline const ZS4LARGE PRECISION(){ return (ZS4LARGE)sizeof(uint); }
-		//inline const ZS4LARGE MAX(){ return (ZS4LARGE)((uint)~0); }
-		//inline const ZS4LARGE MIN(){ return (ZS4LARGE)((uint)0); }
-		//inline const ZS4LARGE SIGBIT(){ return (ZS4LARGE)(PRECISION() - 1); }
-		//inline const ZS4LARGE ARRAY_PRECISION(){ return ((ZS4LARGE)((ZS4LARGE)1 << (ZS4LARGE)ZS4_PRECISION())); }
-
 		static const ZS4LARGE PRECISION = (ZS4LARGE)sizeof(uint);
 		static const ZS4LARGE MAX = (ZS4LARGE)((uint)~0);
 		static const ZS4LARGE MIN = (ZS4LARGE)((uint)0);
 		static const ZS4LARGE SIGBIT = (ZS4LARGE)(PRECISION - 1);
 		static const ZS4LARGE ARRAY_PRECISION = ((ZS4LARGE)((ZS4LARGE)1 << (ZS4LARGE)PRECISION));
+
+		static const ZS4LARGE ADDRESS_PRECISION(void){ ZS4LARGE w = 1; while (((ZS4LARGE)1 << w)<PRECISION)w++; return w; }
+		static const ZS4LARGE DATA_PRECISION(void){ return (PRECISION - ADDRESS_PRECISION()); }
+
+		inline static ZS4CHAR bitSet(ZS4CHAR d, ZS4CHAR i){ i %= PRECISION; d |= (ZS4CHAR)((ZS4CHAR)1 << (ZS4CHAR)i); return d; }
+		inline static ZS4CHAR bitClear(ZS4CHAR d, ZS4CHAR i){ i %= PRECISION; d &= (ZS4CHAR)((ZS4CHAR)~((ZS4CHAR)1 << (ZS4CHAR)i)); return d; }
+		inline static bool bitGet(ZS4CHAR d, ZS4CHAR i){ i %= PRECISION; if (d & (ZS4CHAR)((ZS4CHAR)1 << (ZS4CHAR)i))return true; return false; }
+		inline static bool bitGetMS(ZS4CHAR d){ return bitGet(d, (PRECISION - 1)); }
+		inline static bool bitGetLS(ZS4CHAR d){ return bitGet(d, 0); }
+
 
 		inline bool reset(){ data = 0; }
 		inline signed cmp(uint c)const{
@@ -294,20 +283,29 @@ public:
 	typedef class character : public symbol < ZS4CHAR > {};
 	typedef class integer : public symbol < ZS4LARGE > {};
 
-	typedef class bit
+	template <class uint>
+	class bit
 	{
 	protected:
-		inline virtual ZS4CHAR ADDRESS(void)const{ return 0; };
-		inline virtual ZS4CHAR PRECISION(void)const{ return 1; }
+		uint _data = 0;
+		uint & data = data;
+
+		inline bit(void){
+		}
+		inline bit(uint & d){
+			data = d;
+		}
+		inline virtual uint ADDRESS(void)const{ return 0; };
+		inline virtual uint PRECISION(void)const{ return 1; }
 
 	public:
-		inline ZS4CHAR SIGBIT()const{ return (PRECISION() - 1); }
-		inline ZS4CHAR MAX()const{ return (~0); }
-		inline ZS4CHAR MIN()const{ return 0; }
-		inline ZS4CHAR MASK()const{ ZS4CHAR m = 0; for (ZS4CHAR i = 0; i < PRECISION(); i++){ m = bitSet(m, (i + ADDRESS())); }return m; }
+		inline uint SIGBIT()const{ return (symbol<uint>::PRECISION - 1); }
+		inline uint MAX()const{ return (~0); }
+		inline uint MIN()const{ return 0; }
+		inline uint MASK()const{ uint m = 0; for (uint i = 0; i < symbol<uint>::PRECISION; i++){ m = bitSet(m, (i + ADDRESS())); }return m; }
 
-		inline ZS4CHAR get(ZS4CHAR & u)const{ return ((u & MASK()) >> ADDRESS()); }
-		inline ZS4CHAR set(ZS4CHAR & u, ZS4CHAR v){ u |= (MASK()&(v << ADDRESS())); return u; }
+		inline symbol<uint> get(void)const{ return ((u & MASK()) >> ADDRESS()); }
+		inline symbol<uint> set(symbol<uint> v){ u |= (MASK()&(v << ADDRESS())); return u; }
 	};
 
 	typedef enum {
@@ -874,59 +872,69 @@ public:
 		fileinfo statData[ZS4_MAX_DIR_SIZE];
 	}fs;
 
-	typedef class null
+	template <class uint>
+	class null
 	{
-		ZS4CHAR data[ZS4_ARRAY_PRECISION];
+		uint data[symbol<uint>::PRECISION];
 	public:
 		inline null(void){ reset(); }
 		inline virtual const char * name(void){ static const char * n = "null"; return n; }
 
-		static const ZS4CHAR STATUS = ZS4_MAX;
+		inline virtual void reset(void){
+			for (ZS4LARGE i = 0; i < symbol<uint>::ARRAY_PRECISION; i++)
+				data[i] = (ZS4CHAR)0;
+		}
 
-		static const ZS4CHAR WRITE_INDEX = ZS4_MAX - 1;
-		static const ZS4CHAR READ_INDEX = ZS4_MAX - 2;
-		static const ZS4CHAR BUFFER_SIZE = ZS4_MAX - 3;
+		static const uint STATUS = symbol<uint>::MAX;
 
-		inline virtual ZS4CHAR read(ZS4CHAR & c){
+		typedef class statusbit : public bit<uint>
+		{
+		public:
+			inline statusbit(null & n){
+				bit::data = n.data[STATUS];
+			}
+		}status;
+
+		static const uint WRITE_INDEX = symbol<uint>::MAX - 1;
+		static const uint READ_INDEX = symbol<uint>::MAX - 2;
+		static const uint BUFFER_SIZE = symbol<uint>::MAX - 3;
+
+		inline virtual uint read(uint & c){
 			if (!readable())
 				return 0;
 
-			c = data[(ZS4CHAR)data[READ_INDEX]];
+			c = data[(uint)data[READ_INDEX]];
 
-			data[READ_INDEX] = (ZS4CHAR)(((ZS4CHAR)data[READ_INDEX] + 1) % BUFFER_SIZE);
+			data[READ_INDEX] = (uint)(((uint)data[READ_INDEX] + 1) % BUFFER_SIZE);
 
 			return 1;
 		}
-		inline virtual ZS4CHAR write(ZS4CHAR c){
+		inline virtual uint write(uint c){
 			if (!writeable())
 				return 0;
 
-			data[(ZS4CHAR)data[WRITE_INDEX]] = c;
+			data[(uint)data[WRITE_INDEX]] = c;
 
-			data[WRITE_INDEX] = (ZS4CHAR)(((ZS4CHAR)data[WRITE_INDEX] + 1) % BUFFER_SIZE);
+			data[WRITE_INDEX] = (uint)(((uint)data[WRITE_INDEX] + 1) % BUFFER_SIZE);
 
 			return 1;
 		}
-		inline virtual ZS4CHAR readable(void){
-			if ((ZS4CHAR)data[WRITE_INDEX] == (ZS4CHAR)data[READ_INDEX])
+		inline virtual uint readable(void){
+			if ((uint)data[WRITE_INDEX] == (uint)data[READ_INDEX])
 				return 0;
 
-			if ((ZS4CHAR)data[WRITE_INDEX] > (ZS4CHAR)data[READ_INDEX])
-				return ((ZS4CHAR)data[WRITE_INDEX] - (ZS4CHAR)data[READ_INDEX]);
+			if ((uint)data[WRITE_INDEX] > (uint)data[READ_INDEX])
+				return ((uint)data[WRITE_INDEX] - (uint)data[READ_INDEX]);
 
-			return ((ZS4CHAR)data[WRITE_INDEX] + BUFFER_SIZE - (ZS4CHAR)data[READ_INDEX]);
+			return ((uint)data[WRITE_INDEX] + BUFFER_SIZE - (uint)data[READ_INDEX]);
 		}
-		inline virtual ZS4CHAR writeable(void){
+		inline virtual uint writeable(void){
 			return ((BUFFER_SIZE - 1) - readable());
 		}
 		
-		inline virtual void reset(void){
-			for (ZS4LARGE i = 0; i < ZS4_ARRAY_PRECISION; i++)
-				data[i] = (ZS4CHAR)0;
-		}
-		inline ZS4CHAR * shell(ZS4CHAR * line, ZS4LARGE size)
+		inline uint * shell(uint * line, ZS4LARGE size)
 		{
-			for (ZS4CHAR u = 0; (u < size) && (line[u] != 0); u++){
+			for (uint u = 0; (u < size) && (line[u] != 0); u++){
 				if (!writeable())
 					return nullptr;
 				else
@@ -934,13 +942,13 @@ public:
 			}
 
 			line[0] = 0;
-			for (ZS4CHAR u = 0; (u < size - 1) && (readable()); u++){
+			for (uint u = 0; (u < size - 1) && (readable()); u++){
 				read(line[u]); line[u + 1] = 0;
 			}
 
 			return line;
 		}
-	}null;
+	};
 
 	typedef class json{
 	public:
@@ -1746,7 +1754,6 @@ public:
 
 
 	}json;
-
 
 };
 

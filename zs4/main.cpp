@@ -5,14 +5,14 @@
 
 int main(int argc, char **argv)
 {
-	ZS4CHAR data[ZS4_ARRAY_PRECISION];
-	zs4::null zs4;
+	zs4::null<ZS4CHAR> zs4;
+	ZS4CHAR data[zs4::symbol<ZS4CHAR>::ARRAY_PRECISION];
 
 	printf("sizeof(z) returns (%d)\n", (int)sizeof(zs4));
 	
 	while (gets((char*)data)){
 
-		zs4.shell(data, ZS4_ARRAY_PRECISION);
+		zs4.shell(data, sizeof(data));
 		puts((char*)data);
 	}
 	getchar();
