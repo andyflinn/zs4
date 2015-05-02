@@ -32,9 +32,6 @@
     <ClInclude Include="..\include\zs4json.h">
       <Filter>include</Filter>
     </ClInclude>
-    <ClInclude Include="..\include\zs4.h">
-      <Filter>include</Filter>
-    </ClInclude>
     <ClInclude Include="..\include\zs4array.h">
       <Filter>include</Filter>
     </ClInclude>
@@ -71,9 +68,6 @@
     <ClInclude Include="..\include\zs4thread.h">
       <Filter>include</Filter>
     </ClInclude>
-    <ClInclude Include="..\include\zs4types.h">
-      <Filter>include</Filter>
-    </ClInclude>
     <ClInclude Include="..\include\tinydir.h">
       <Filter>include</Filter>
     </ClInclude>
@@ -93,6 +87,12 @@
       <Filter>include</Filter>
     </ClInclude>
     <ClInclude Include="..\include\buffer.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\zs4_save.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\zs4.h">
       <Filter>include</Filter>
     </ClInclude>
   </ItemGroup>

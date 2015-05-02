@@ -46,7 +46,7 @@ typedef struct _json_value
 	union
 	{
 		int boolean;
-		zs4int integer;
+		long long integer;
 		double dbl;
 
 		struct
@@ -87,25 +87,15 @@ typedef struct _json_value
 
 } json_value;
 
-#include <zs4file.h>
-
-#ifndef JSON_PARSER_BUF_SIZE
-#		define JSON_PARSER_BUF_SIZE (1024*256)
-#endif
-ZS4_STRINGBUFFER(json_parser_buffer, JSON_PARSER_BUF_SIZE);
-
-#define JSON_ERROR_BUF_SIZE (128)
-ZS4_STRINGBUFFER(json_error, JSON_ERROR_BUF_SIZE);
-
-class zs4jsonParser : public json_parser_buffer
+class zs4jsonParser
 {
 	json_value * JObj;
+
 
 public:
 	inline zs4jsonParser(void){
 		JObj = nullptr;
 	}
-
 	inline virtual ~zs4jsonParser(void){
 	}
 

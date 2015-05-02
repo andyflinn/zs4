@@ -1,20 +1,21 @@
 #include <stdio.h>
-#include <zs4types.h>
+#include <zs4.h>
 
 #define P(n) printf("%s: %d\n",#n,(int)n())
 
 int main(int argc, char **argv)
 {
-	//typedef struct {char c[3];} medium;
-	//typedef unsigned char medium;
-	//device<medium, double>::machine & b = (*(new device<medium, double>::machine()));
+	ZS4CHAR data[ZS4_ARRAY_PRECISION];
+	zs4::null zs4;
+
+	printf("sizeof(z) returns (%d)\n", (int)sizeof(zs4));
 	
-	device<char,double>::stack b;
+	while (gets((char*)data)){
 
-
-	printf("sizeof(b)=%d\n", (int)sizeof(device<char, double>::stack));
-
+		zs4.shell(data, ZS4_ARRAY_PRECISION);
+		puts((char*)data);
+	}
 	getchar();
-	
+
 	return 0;
 }

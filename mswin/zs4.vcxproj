@@ -24,7 +24,7 @@
   <ItemGroup>
     <ClInclude Include="..\include\buffer.h" />
     <ClInclude Include="..\include\tinydir.h" />
-    <ClInclude Include="..\include\zs4.h" />
+    <ClInclude Include="..\include\zs4_save.h" />
     <ClInclude Include="..\include\zs4array.h" />
     <ClInclude Include="..\include\intbits.h" />
     <ClInclude Include="..\include\zs4config.h" />
@@ -45,7 +45,7 @@
     <ClInclude Include="..\include\zs4thread.h" />
     <ClInclude Include="..\include\zs4time.h" />
     <ClInclude Include="..\include\zs4tree.h" />
-    <ClInclude Include="..\include\zs4types.h" />
+    <ClInclude Include="..\include\zs4.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{3A91047C-A100-4303-811B-834F0A061CB0}</ProjectGuid>
