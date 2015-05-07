@@ -240,12 +240,12 @@
 				large *= base; count++;
 			}
 
+			zs4::event::numeric numeric;
 			ZS4LARGE accumulator;
-			zs4::symbol::numeric num;
 			while (count)
 			{
 				accumulator = 0;
-				while (remainder > large)
+				while (remainder >= large)
 				{
 					remainder-=large;
 					accumulator++;
@@ -253,7 +253,7 @@
 				}
 
 				if (NOT_ZERO){
-					if (SUCCESS != write((char)(num.data()[accumulator])))
+					if (SUCCESS != write((char)(numeric.data()[accumulator])))
 						return BUFFEROVERFLOW;
 				}
 
@@ -261,15 +261,21 @@
 				count--;
 			}
 
-			if (remainder)
+			if (remainder == base)
 			{
-				if (SUCCESS != write((char)(num.data()[remainder])))
+				if (SUCCESS != write((char)(numeric.data()[0])))
+					return BUFFEROVERFLOW;
+
+			}
+			else if (remainder)
+			{
+				if (SUCCESS != write((char)(numeric.data()[remainder])))
 					return BUFFEROVERFLOW;
 
 			}
 			else if (!NOT_ZERO)
 			{
-				if (SUCCESS != write((char)(num.data()[0])))
+				if (SUCCESS != write((char)(numeric.data()[0])))
 					return BUFFEROVERFLOW;
 			}
 			return SUCCESS;
@@ -1142,13 +1148,13 @@
 			static json_int atoi(const char * s, ZS4CHAR base = 10){
 				const json_int MAX = (~0);
 				json_int data;
-				zs4::symbol::numeric num;
 
 				bool negative = false;
 				if (*s == '-'){ s++; negative = true; }
 
+				zs4::event::numeric numeric;
 				for (ZS4CHAR i = 0; s[i] != 0 && s[i] != '\n'; i++){
-					ZS4LARGE lu = num.lookup((ZS4CHAR)s[i], base);
+					ZS4LARGE lu = numeric.lookup((ZS4CHAR)s[i], base);
 					if (lu >= (ZS4LARGE)MAX){
 						data = 0;
 						return data;
@@ -1235,36 +1241,6 @@
 			}
 		}string;
 
-		/*
-		typedef class object : public value
-		{
-			char * data;
-			size_t size;
-		public:
-			inline object(){
-				data=nullptr;
-				size = 0;
-			}
-			inline virtual ~object(){}
-			inline virtual e save(stream & out){
-				return out.writeJsonString(v);
-			}
-
-			inline virtual value & operator =(const char *in){
-				if (strlen(in)>(sizeof(v) - 1))
-					return(*this);
-				strcpy(v, in);
-				return(*this);
-			}
-			inline virtual value & operator =(const json_value * in){
-				if (in == nullptr || in->type != json_string || in->u.string.length > (sizeof(v) - 1))
-					return (*this);
-
-				strcpy(v, in->u.string.ptr);
-				return(*this);
-			}
-		}object;
-		*/
 	}json;
 
 

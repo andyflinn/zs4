@@ -3,8 +3,6 @@
 
 #include <zs4config.h>
 
-#define ZS4_PARSER_SIZE ((ZS4LARGE)((ZS4LARGE)256*(ZS4LARGE)256))
-
 typedef class zs4
 {
 public:
@@ -19,90 +17,121 @@ public:
 		FILEOPENERROR,
 		ERRORCOUNT
 	}e;
-	typedef class symbol {
+	typedef class event {
 	public:
-		typedef class type
+		typedef class set
 		{
 		protected:
-			inline virtual ZS4CHAR count(void) = 0;
-			inline virtual ZS4CHAR * data(void) = 0;
+			inline static const ZS4CHAR * ASCII(void){
+				static const ZS4CHAR ASCII[128] = {
+					0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08, 0x09, 0x0a, 0x0b, 0x0c, 0x0d, 0x0e, 0x0f,
+					0x10, 0x11, 0x12, 0x13, 0x14, 0x15, 0x16, 0x17, 0x18, 0x19, 0x1a, 0x1b, 0x1c, 0x1d, 0x1e, 0x1f,
+					0x20, 0x21, 0x22, 0x23, 0x24, 0x25, 0x26, 0x27, 0x28, 0x29, 0x2a, 0x2b, 0x2c, 0x2d, 0x2e, 0x2f,
+					0x30, 0x31, 0x32, 0x33, 0x34, 0x35, 0x36, 0x37, 0x38, 0x39, 0x3a, 0x3b, 0x3c, 0x3d, 0x3e, 0x3f,
+					0x40, 0x41, 0x42, 0x43, 0x44, 0x45, 0x46, 0x47, 0x48, 0x49, 0x4a, 0x4b, 0x4c, 0x4d, 0x4e, 0x4f,
+					0x50, 0x51, 0x52, 0x53, 0x54, 0x55, 0x56, 0x57, 0x58, 0x59, 0x5a, 0x5b, 0x5c, 0x5d, 0x5e, 0x5f,
+					0x60, 0x61, 0x62, 0x63, 0x64, 0x65, 0x66, 0x67, 0x68, 0x69, 0x6a, 0x6b, 0x6c, 0x6d, 0x6e, 0x6f,
+					0x70, 0x71, 0x72, 0x73, 0x74, 0x75, 0x76, 0x77, 0x78, 0x79, 0x7a, 0x7b, 0x7c, 0x7d, 0x7e, 0x7f,
+				};
+				return ASCII;
+			}
+			inline virtual const ZS4CHAR count(void) = 0;
+			inline virtual const ZS4CHAR * data(void) = 0;
 		public:
-			inline ZS4CHAR lookup(ZS4CHAR symbol, ZS4CHAR range = 10){
+			inline ZS4CHAR lookup(ZS4CHAR event, ZS4CHAR range = 10){
 
 				for (ZS4LARGE i = 0; (i < range) && (i < count()); i++){
-					if ((ZS4CHAR)data()[i] == (ZS4CHAR)symbol)
+					if ((ZS4CHAR)data()[i] == (ZS4CHAR)event)
 						return (ZS4CHAR)i;
 				}
 				return (ZS4CHAR)(~0);
 			}
-		}type;
+			inline ZS4CHAR bits(void){
+				ZS4CHAR m = 0x7f;
+				ZS4CHAR r = 7;
+				while (((m >> 1)&((ZS4CHAR)count())) >= count()){
+					m >>= 1; r--;
+				}
+				return r; 
+			}
+		}set;
 
-		typedef class name : public type
+		typedef class name : public set
 		{
 		public:
-			typedef enum {
-				a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p, q, r, s, t, u, v, w, x, y, z,
-				SIZE
-			} index;
-			inline virtual ZS4CHAR count(void){ return (ZS4CHAR)SIZE; }
-
-			inline virtual ZS4CHAR * data(void){
-				static ZS4CHAR data[SIZE] = {
-					'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z' };
-				return data;
+			inline virtual const ZS4CHAR count(void){ return 26; }
+			inline virtual const ZS4CHAR * data(void){
+				return &(ASCII())['a'];
 			}
 
 		}name;
 
-		typedef class numeric : public type
+		typedef class numeric : public set
 		{
 		public:
 			typedef enum {
 				n0, n1, n2, n3, n4, n5, n6, n7, n8, n9, a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p, q, r, s, t, u, v, w, x, y, z,
 				SIZE
 			} index;
-			inline virtual ZS4CHAR count(void){ return (ZS4CHAR)SIZE; }
-
-			inline virtual ZS4CHAR * data(void){
+			inline virtual const ZS4CHAR count(void){ return (ZS4CHAR)SIZE; }
+			inline virtual const ZS4CHAR * data(void){
 				static ZS4CHAR data[SIZE] = { '0', '1', '2', '3', '4', '5', '6', '7', '8', '9',
 					'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z' };
 				return data;
 			}
 		}numeric;
+		typedef class binary : public numeric
+		{
+		public:
+			inline virtual const ZS4CHAR count(void){ return 2; }
+		}binary;
+		typedef class octal : public numeric
+		{
+		public:
+			inline virtual const ZS4CHAR count(void){ return 8; }
+		}octal;
+		typedef class decimal : public numeric
+		{
+		public:
+			inline virtual const ZS4CHAR count(void){ return 10; }
+		}decimal;
+		typedef class hexadecimal : public numeric
+		{
+		public:
+			inline virtual const ZS4CHAR count(void){ return 16; }
+		}hexadecimal;
 
-		typedef class opcode : public type
+		typedef class opcode : public set
 		{
 		public:
 			typedef enum {
 				equal, or, and, plus, minus,
 				SIZE
 			} index;
-			inline virtual ZS4CHAR count(void){ return (ZS4CHAR)SIZE; }
-
-			inline virtual ZS4CHAR * data(void){
+			inline virtual const ZS4CHAR count(void){ return (ZS4CHAR)SIZE; }
+			inline virtual const ZS4CHAR * data(void){
 				static ZS4CHAR data[SIZE] = {
 					'=', '|', '&', '+', '-' };
 				return data;
 			}
 
 		}opcode;
-
-		typedef class container : public type
+		typedef class container : public set
 		{
 		public:
 			typedef enum {
 				parenthesis, curly, square,less,
 				SIZE
 			} index;
-			inline virtual ZS4CHAR count(void){ return (ZS4CHAR)SIZE; }
+			inline virtual const ZS4CHAR count(void){ return (ZS4CHAR)SIZE; }
 
-			inline virtual ZS4CHAR * data(void){
+			inline virtual const ZS4CHAR * data(void){
 				static ZS4CHAR data[SIZE] = {
 					'(', '{', '[', '<' };
 				return data;
 			}
 
-			inline virtual ZS4CHAR * end(void){
+			inline virtual const ZS4CHAR * end(void){
 				static ZS4CHAR data[SIZE] = {
 					')', '}', ']', '>' };
 				return data;
@@ -111,7 +140,7 @@ public:
 		}container;
 
 
-	}symbol;
+	}event;
 
 
 	typedef class storage
@@ -197,10 +226,15 @@ public:
 
 #	include <zs4util.h>
 
-	typedef class object : public stream
+	typedef class machine : public stream
 	{
 		char * store;
 		ZS4LARGE storesize;
+		inline bool valid(void)const{
+			if (storesize < (2 * sizeof(info)))
+				return false;
+			return true;
+		}
 	protected:
 		INLINE_MEMORY_FUNCTION(){ return store; }
 		INLINE_BITS_FUNCTION(){ return (storesize << 3); }
@@ -210,18 +244,8 @@ public:
 			stream * in;
 			stream * out;
 			char * str;
-			unsigned long len, pos, siz, stk, lim;
+			unsigned long len, pos, siz;
 		}info;
-
-		inline virtual e jStart(const char * n = nullptr){ if (n != nullptr) { write('"'); writeString(n); write('"'); write(':'); }; return write('{'); }
-
-		inline virtual e jEnd(){ return write('}'); }
-
-		inline bool valid(void)const{
-			if (storesize < (2 * sizeof(info)))
-				return false;
-			return true;
-		}
 		inline struct info * getInfo(void){
 			if (!valid())
 				return nullptr;
@@ -233,6 +257,8 @@ public:
 			return info;
 		}
 
+		inline virtual e jStart(const char * n = nullptr){ if (n != nullptr) { write('"'); writeString(n); write('"'); write(':'); }; return write('{'); }
+		inline virtual e jEnd(){ return write('}'); }
 		inline virtual e onj(void){
 			
 			jStart();
@@ -260,16 +286,18 @@ public:
 								jStart("p"); // persistent
 								{
 									jStart("s"); // size
-									writeString("\"t\":"); // total
-									writeInteger(0);
-									write(',');
+									{
+										writeString("\"a\":"); // available
+										writeInteger(0);
+										write(',');
 
-									writeString("\"u\":"); // used
-									writeInteger(0);
-									write(',');
+										writeString("\"t\":"); // total
+										writeInteger(0);
+										write(',');
 
-									writeString("\"a\":"); // available
-									writeInteger(0);
+										writeString("\"u\":"); // used
+										writeInteger(0);
+									}
 									jEnd(); //p
 								}
 								jEnd(); //persistent
@@ -288,8 +316,6 @@ public:
 
 			return rewind();
 		}
-
-#define	on(what) inline virtual e on ## what(void)
 
 		INLINE_ONCHAR_FUNCTION(){
 			struct info * info = getInfo();
@@ -310,7 +336,7 @@ public:
 			return WAITING;
 		}
 	public:
-		INLINE_INSTANCE(object){ store = m; storesize = s; reset(); }
+		INLINE_INSTANCE(machine){ store = m; storesize = s; reset(); }
 		INLINE_CONNECT_FUNCTION(){
 			info * info = getInfo();
 			if (info == nullptr) return FAILURE;
@@ -505,82 +531,8 @@ public:
 			return (const char**)info->str;
 		}
 
-	};
+	} machine;
 
-
-
-	/*
-	typedef class filter : public storage
-	{
-	public:
-		inline ZS4CHAR WRITE_INDEX(){return data[(zs4::p8::PROBABILITY - 1)].data;}
-		inline ZS4CHAR WRITE_INDEX_INC(){
-			(data[(zs4::p8::PROBABILITY - 1)].data)++;
-			data[(zs4::p8::PROBABILITY - 1)].data %= (BUFFER_SIZE());
-			return data[(zs4::p8::PROBABILITY - 1)].data;
-		}
-
-		inline ZS4CHAR READ_INDEX(){return data[(zs4::p8::PROBABILITY - 2)].data;}
-		inline ZS4CHAR READ_INDEX_INC(){
-			(data[(zs4::p8::PROBABILITY - 2)].data)++;
-			data[(zs4::p8::PROBABILITY - 2)].data %= (BUFFER_SIZE());
-			return data[(zs4::p8::PROBABILITY - 2)].data;
-		}
-
-		inline ZS4CHAR BUFFER_SIZE(){ return (ZS4CHAR)(sizeof(data) - 2); }
-
-		inline virtual ZS4CHAR read(ZS4CHAR & c){
-			if (!readable())
-				return 0;
-
-			c = data[READ_INDEX()].data;
-
-			READ_INDEX_INC();
-
-			return 1;
-		}
-		inline virtual ZS4CHAR write(ZS4CHAR c){
-			if (!writeable())
-				return 0;
-
-			data[WRITE_INDEX()].data = c;
-
-			WRITE_INDEX_INC();
-
-			return 1;
-		}
-		inline virtual ZS4CHAR readable(void){
-			if ((ZS4CHAR)WRITE_INDEX() == (ZS4CHAR)READ_INDEX())
-				return 0;
-
-			if ((ZS4CHAR)WRITE_INDEX() > (ZS4CHAR)READ_INDEX())
-				return ((ZS4CHAR)WRITE_INDEX() - (ZS4CHAR)READ_INDEX());
-
-			return (ZS4CHAR)(ZS4LARGE)((ZS4LARGE)(ZS4CHAR)WRITE_INDEX() + (ZS4LARGE)BUFFER_SIZE()) - (ZS4LARGE)(ZS4CHAR)READ_INDEX();
-		}
-		inline virtual ZS4CHAR writeable(void){
-			return ((BUFFER_SIZE() - 1) - readable());
-		}
-
-		inline unsigned char * shell(unsigned char * line, ZS4LARGE size)
-		{
-			for (unsigned char u = 0; (u < size) && (line[u] != 0); u++){
-				if (!writeable())
-					return nullptr;
-				else
-					write(line[u]);
-			}
-
-			line[0] = 0;
-			for (unsigned char u = 0; (u < size - 1) && (readable()); u++){
-				read(line[u]); line[u + 1] = 0;
-			}
-
-			return line;
-		}
-
-	}filter;
-*/
 }zs4;
 
 #endif

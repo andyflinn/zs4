@@ -20,17 +20,21 @@ static void storageinfo(const char * name, zs4::storage & store)
 
 int main(int argc, char **argv)
 {
+	zs4::event::opcode opcode; printf("opcode.bits() is %d\n", (int)opcode.bits());
+	zs4::event::name name; printf("name.bits() is %d\n", (int)name.bits());
+	zs4::event::numeric numeric; printf("numeric.bits() is %d\n", (int)numeric.bits());
+
 	zs4::in in;
 	zs4::out out;
 
 	char buffer[65536];
-	zs4::object object((char*)&buffer, sizeof(buffer));
-	storageinfo("object", object);
+	zs4::machine machine((char*)&buffer, sizeof(buffer));
+	storageinfo("machine", machine);
 
-	object.connect(&in, &out);
+	machine.connect(&in, &out);
 
 	for (;;){
-		if (zs4::SUCCESS != object.tickle())
+		if (zs4::SUCCESS != machine.tickle())
 			break;
 
 	}

@@ -67,6 +67,10 @@
 #	define ZS4CLOCK clock_t
 #endif
 
+#ifndef ZS4_PARSER_SIZE
+#define ZS4_PARSER_SIZE ((ZS4LARGE)((ZS4LARGE)256*(ZS4LARGE)256))
+#endif
+
 #if defined (_DEBUG) || defined (DEBUG)
 #	define DBG_GETCHAR 	getchar()
 #else
