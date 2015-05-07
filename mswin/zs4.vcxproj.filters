@@ -47,12 +47,6 @@
     <ClInclude Include="..\include\zs4jsonparser.h">
       <Filter>include</Filter>
     </ClInclude>
-    <ClInclude Include="..\include\zs4object.h">
-      <Filter>include</Filter>
-    </ClInclude>
-    <ClInclude Include="..\include\zs4pipe.h">
-      <Filter>include</Filter>
-    </ClInclude>
     <ClInclude Include="..\include\zs4ring.h">
       <Filter>include</Filter>
     </ClInclude>
@@ -93,6 +87,12 @@
       <Filter>include</Filter>
     </ClInclude>
     <ClInclude Include="..\include\zs4.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\zs4device.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\zs4util.h">
       <Filter>include</Filter>
     </ClInclude>
   </ItemGroup>

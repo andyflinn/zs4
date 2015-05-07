@@ -3,19 +3,39 @@
 
 #define P(n) printf("%s: %d\n",#n,(int)n())
 
+static void storageinfo(const char * name, zs4::storage & store)
+{
+	printf("storage information for %s:\n", name);
+
+	printf("%s.bits() is (%lld)\n", name, (ZS4LARGE)store.bits());
+	printf("%s.addressBits() is (%lld)\n", name, (ZS4LARGE)store.addressBits());
+	printf("%s.messageBits() is (%lld)\n", name, (ZS4LARGE)store.messageBits());
+	printf("%s.p8() is (%lld)\n", name, (ZS4LARGE)store.p8());
+	printf("%s.p16() is (%lld)\n", name, (ZS4LARGE)store.p16());
+	printf("%s.p32() is (%lld)\n", name, (ZS4LARGE)store.p32());
+	printf("%s.p64() is (%lld)\n", name, (ZS4LARGE)store.p64());
+
+	putchar('\n');
+}
+
 int main(int argc, char **argv)
 {
-	zs4::null<ZS4CHAR> zs4;
-	ZS4CHAR data[zs4::symbol<ZS4CHAR>::ARRAY_PRECISION];
+	zs4::in in;
+	zs4::out out;
 
-	printf("sizeof(z) returns (%d)\n", (int)sizeof(zs4));
-	
-	while (gets((char*)data)){
+	char buffer[65536];
+	zs4::object object((char*)&buffer, sizeof(buffer));
+	storageinfo("object", object);
 
-		zs4.shell(data, sizeof(data));
-		puts((char*)data);
+	object.connect(&in, &out);
+
+	for (;;){
+		if (zs4::SUCCESS != object.tickle())
+			break;
+
 	}
-	getchar();
+
+	DBG_GETCHAR;
 
 	return 0;
 }

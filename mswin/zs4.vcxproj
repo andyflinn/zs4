@@ -34,8 +34,8 @@
     <ClInclude Include="..\include\zs4json.h" />
     <ClInclude Include="..\include\zs4jsonparser.h" />
     <ClInclude Include="..\include\zs4server.h" />
-    <ClInclude Include="..\include\zs4object.h" />
-    <ClInclude Include="..\include\zs4pipe.h" />
+    <ClInclude Include="..\include\zs4device.h" />
+    <ClInclude Include="..\include\zs4util.h" />
     <ClInclude Include="..\include\zs4ring.h" />
     <ClInclude Include="..\include\zs4stack.h" />
     <ClInclude Include="..\include\zs4stat.h" />
