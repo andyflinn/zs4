@@ -38,9 +38,9 @@ public:
 			inline virtual const ZS4CHAR count(void) = 0;
 			inline virtual const ZS4CHAR * data(void) = 0;
 		public:
-			inline ZS4CHAR lookup(ZS4CHAR event, ZS4CHAR range = 10){
+			inline ZS4CHAR lookup(ZS4CHAR event){
 
-				for (ZS4LARGE i = 0; (i < range) && (i < count()); i++){
+				for (ZS4LARGE i = 0; i < count(); i++){
 					if ((ZS4CHAR)data()[i] == (ZS4CHAR)event)
 						return (ZS4CHAR)i;
 				}
@@ -65,6 +65,21 @@ public:
 			}
 
 		}name;
+
+		typedef class space : public set
+		{
+		public:
+			typedef enum {
+				s, a, b, f, n, r, t, v,
+				SIZE
+			} index;
+			inline virtual const ZS4CHAR count(void){ return SIZE; }
+			inline virtual const ZS4CHAR * data(void){
+				static ZS4CHAR data[SIZE] = { ' ', '\a', '\b', '\f', '\n', '\r', '\t', '\v' };
+				return data;
+			}
+
+		}space;
 
 		typedef class numeric : public set
 		{
@@ -139,15 +154,19 @@ public:
 
 		}container;
 
-
+		template <class eventset>
+		bool is(ZS4CHAR c){
+			eventset set;
+			if ((ZS4CHAR)(~0) == set.lookup(c))
+				return false;
+			return true;
+		}
 	}event;
 
 
 	typedef class storage
 	{
 	public:
-		inline virtual char * memory(void)const = 0;
-		#define	INLINE_MEMORY_FUNCTION() inline virtual char * memory(void)const
 
 		inline virtual ZS4LARGE bits(void)const{ return (sizeof(*this) << 3); }
 		#define	INLINE_BITS_FUNCTION() inline virtual ZS4LARGE bits(void)const
@@ -155,16 +174,10 @@ public:
 		inline virtual void reset(void){};
 		#define	INLINE_RESET_FUNCTION() inline virtual void reset(void)
 		
-		#define INLINE_INSTANCE(type) inline type(char * m, ZS4LARGE s)
-
-		inline virtual e connect(stream * in, stream * out){ return FAILURE; }
 		#define INLINE_CONNECT_FUNCTION() inline virtual e connect(stream * in, stream * out)
-
-		inline virtual e tickle(void){ return SUCCESS; }
 		#define INLINE_TICKLE_FUNCTION() inline virtual e tickle(void)
-
-		inline virtual e onChar(char & c){ return FAILURE; }
 		#define INLINE_ONCHAR_FUNCTION() inline virtual e onChar(char & c)
+		#define INLINE_ONLINE_FUNCTION() inline virtual e onLine(char * str)
 
 		inline virtual ZS4LARGE p8(void)const{ if (ZS4LARGE r = (bits() >> 3))return r; return 1; }
 		inline virtual ZS4LARGE p16(void)const{ if (ZS4LARGE r = (bits() >> 4))return r; return 1; }
@@ -175,6 +188,8 @@ public:
 		inline virtual ZS4LARGE messageBits(void)const{ return (bits() - addressBits()); }
 
 	}storage;
+
+#	include <zs4util.h>
 
 	#define device char 
 	#define devicename "p8" 
@@ -223,315 +238,6 @@ public:
 	#undef bussclass 
 	#undef devicename 
 	#undef device 
-
-#	include <zs4util.h>
-
-	typedef class machine : public stream
-	{
-		char * store;
-		ZS4LARGE storesize;
-		inline bool valid(void)const{
-			if (storesize < (2 * sizeof(info)))
-				return false;
-			return true;
-		}
-	protected:
-		INLINE_MEMORY_FUNCTION(){ return store; }
-		INLINE_BITS_FUNCTION(){ return (storesize << 3); }
-		INLINE_RESET_FUNCTION(){ memset(store, 0, storesize); }
-
-		typedef struct info {
-			stream * in;
-			stream * out;
-			char * str;
-			unsigned long len, pos, siz;
-		}info;
-		inline struct info * getInfo(void){
-			if (!valid())
-				return nullptr;
-
-			struct info * info = (struct info*)store;
-			info->str = (char*)&info[1];
-			info->siz = storesize - sizeof(struct info);
-
-			return info;
-		}
-
-		inline virtual e jStart(const char * n = nullptr){ if (n != nullptr) { write('"'); writeString(n); write('"'); write(':'); }; return write('{'); }
-		inline virtual e jEnd(){ return write('}'); }
-		inline virtual e onj(void){
-			
-			jStart();
-			{
-				jStart("zs4");
-				{
-					jStart("c"); //constants
-					{
-						jStart("m"); // memory
-						{
-							jStart("s"); // size
-							{
-								writeString("\"a\":"); // available
-								writeInteger(storesize - sizeof(struct info));
-								write(',');
-
-								writeString("\"t\":"); // total
-								writeInteger(storesize);
-								write(',');
-
-								writeString("\"u\":"); // used
-								writeInteger(sizeof(struct info));
-								write(',');
-
-								jStart("p"); // persistent
-								{
-									jStart("s"); // size
-									{
-										writeString("\"a\":"); // available
-										writeInteger(0);
-										write(',');
-
-										writeString("\"t\":"); // total
-										writeInteger(0);
-										write(',');
-
-										writeString("\"u\":"); // used
-										writeInteger(0);
-									}
-									jEnd(); //p
-								}
-								jEnd(); //persistent
-							}
-							jEnd(); // size
-						}
-						jEnd(); // memory
-					}
-					jEnd(); //constant
-				}
-				jEnd();
-			}
-			jEnd();
-
-			write('\n');
-
-			return rewind();
-		}
-
-		INLINE_ONCHAR_FUNCTION(){
-			struct info * info = getInfo();
-			if (info == nullptr || info->in == nullptr || info->out == nullptr) return FAILURE;
-
-			if (info->len < 1)
-				return FAILURE;
-
-			if (info->str[info->len - 1] == '\n')
-			{
-				rewind();
-				if (!strcmp(info->str, "?\n")){ onj(); }
-				if (!strcmp(info->str, "j\n")){ onj(); }
-
-				return SUCCESS;
-			}
-
-			return WAITING;
-		}
-	public:
-		INLINE_INSTANCE(machine){ store = m; storesize = s; reset(); }
-		INLINE_CONNECT_FUNCTION(){
-			info * info = getInfo();
-			if (info == nullptr) return FAILURE;
-			info->in = in;
-			info->out = out;
-			return SUCCESS;
-		}
-		INLINE_TICKLE_FUNCTION(){
-			struct info * info = getInfo();
-			if (info == nullptr || info->in == nullptr || info->out == nullptr) return FAILURE;
-
-			char c = 0;
-			e error = SUCCESS;
-
-			for (;;){
-				if (error = info->in->read(c))
-					return error;
-
-				if (error = write(c))
-					return error;
-
-				error = onChar(c);
-				if (error == WAITING)
-					continue;
-
-				if (error)
-					return error;
-
-				break;
-			}
-
-			info->out->writeString((const char *)info->str);
-
-			rewind();
-
-			return SUCCESS;
-		}
-
-		INLINE_READABLE_FUNCTION(){
-			struct info * info = getInfo();
-			if (info == nullptr) return 0;
-			return (info->len - info->pos);
-		}
-		INLINE_WRITEABLE_FUNCTION(){
-			struct info * info = getInfo();
-			if (info == nullptr) return 0;
-			return (info->siz - info->pos);
-		}
-
-		INLINE_READ_FUNCTION(){
-			struct info * info = getInfo();
-			if (info == nullptr) return FAILURE;
-			if (info->len == 0 || info->pos >= info->len || info->pos >= (info->siz - 1))
-				return FAILURE;
-
-			c = info->str[info->pos]; info->pos++;
-
-			return SUCCESS;
-		}
-		INLINE_WRITE_FUNCTION(){
-			struct info * info = getInfo();
-			if (info == nullptr) return FAILURE;
-			if (info->pos >= (info->siz - 1))
-				return FAILURE;
-
-			info->str[info->pos++] = c;
-			info->str[info->pos] = 0;
-			info->len = info->pos;
-
-			return SUCCESS;
-		}
-		INLINE_SEEK_FUNCTION(){
-			struct info * info = getInfo();
-			if (info == nullptr) return FAILURE;
-
-			ZS4LARGE adj = info->len;
-			if (origin == SEEK_SET) { adj = 0; }
-			else if (origin == SEEK_CUR) { adj = info->pos; }
-
-			offset += adj;
-
-			if (offset < 0)
-			{
-				info->pos = 0; return FAILURE;
-			}
-			if (offset > info->len)
-			{
-				info->pos = info->len; return FAILURE;
-			}
-			info->pos = offset; return SUCCESS;
-		}
-		INLINE_TELL_FUNCTION(){
-			struct info * info = getInfo();
-			if (info == nullptr) return FAILURE;
-			pPos = info->pos;
-			return SUCCESS;
-		}
-		INLINE_SIZE_FUNCTION(){
-			struct info * info = getInfo();
-			if (info == nullptr) return FAILURE;
-			s = info->len;
-			return SUCCESS;
-		}
-
-		inline bool check(void){
-			if (!valid())return false;
-
-			struct info * info = getInfo();
-
-			if (info->str && info->str[0] && info->len)
-				return true;
-
-			return false;
-		}
-		inline e trim(void){
-			struct info * info = getInfo();
-			if (info == nullptr) return FAILURE;
-
-			char * s = info->str; unsigned char lead = 0;
-
-			if (s == nullptr)
-				return FAILURE;
-
-			while (s && *s && isspace(*s)) { lead++; s++; }
-
-			if (lead>0)
-				strcpy(info->str, s);
-
-			info->len = (unsigned char)strlen(info->str);
-			while (info->len > 0)
-			{
-				if (!isspace(info->str[info->len - 1]))
-					break;
-
-				info->len--;
-				info->str[info->len] = 0;
-			}
-
-			info->pos = info->len;
-
-			return SUCCESS;
-		}
-		inline const char ** tokenize(const char * s, const char * sep){
-			struct info * info = getInfo();
-			if (info == nullptr) return nullptr;
-
-			unsigned char count = 0;
-			if ((s == nullptr)
-				|| (*s == 0)
-				|| (sep == nullptr)
-				|| (*sep == 0)
-				|| (info->str == 0)
-				|| (info->siz == 0)
-				)
-				return nullptr;
-
-			info->pos = info->len = 0;
-
-			// count separators
-			int sep_count = c::strcharcount(s, sep) + 1;
-
-			if (info->siz <= (sep_count*sizeof(const char *)))
-				return nullptr;
-
-			const char ** cpp = (const char**)info->str;
-			for (int i = 0; i <= sep_count; i++)
-			{
-				cpp[i] = nullptr;
-				info->len += sizeof(const char *);
-			}
-
-			// skip leading spaces and separators;
-			while ((*s) && (isspace(*s) || c::strcharcount(sep, *s))) s++;
-			if (*s == 0)
-				return nullptr;
-
-			while (*s)
-			{
-				while (*s != 0 && 0 == c::strcharcount(sep, *s))s++;
-				if (*s == 0)
-					return nullptr;
-
-				*cpp++ = &info->str[info->len];
-				while (*s != 0 && 0 != c::strcharcount(sep, *s)) {
-					if (SUCCESS != write(*s))
-						return nullptr;
-					s++;
-				}
-				if (SUCCESS != write((char)0))
-					return nullptr;
-			}
-			return (const char**)info->str;
-		}
-
-	} machine;
 
 }zs4;
 

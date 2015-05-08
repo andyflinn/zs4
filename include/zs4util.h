@@ -234,7 +234,7 @@
 			bool NOT_ZERO = false;
 
 			ZS4LARGE MAX = (~0);
-			ZS4LARGE count = 0;
+			ZS4LARGE count = 1;
 			ZS4LARGE large = 1;
 			while (large < (MAX/base)){
 				large *= base; count++;
@@ -244,11 +244,9 @@
 			ZS4LARGE accumulator;
 			while (count)
 			{
-				accumulator = 0;
-				while (remainder >= large)
+				if (0 != (accumulator = remainder / large))
 				{
-					remainder-=large;
-					accumulator++;
+					remainder -= (accumulator*large);
 					NOT_ZERO = true;
 				}
 
@@ -261,19 +259,7 @@
 				count--;
 			}
 
-			if (remainder == base)
-			{
-				if (SUCCESS != write((char)(numeric.data()[0])))
-					return BUFFEROVERFLOW;
-
-			}
-			else if (remainder)
-			{
-				if (SUCCESS != write((char)(numeric.data()[remainder])))
-					return BUFFEROVERFLOW;
-
-			}
-			else if (!NOT_ZERO)
+			if (!NOT_ZERO)
 			{
 				if (SUCCESS != write((char)(numeric.data()[0])))
 					return BUFFEROVERFLOW;
@@ -1145,7 +1131,7 @@
 
 		typedef	class integer : public value
 		{
-			static json_int atoi(const char * s, ZS4CHAR base = 10){
+			static json_int atoi(const char * s){
 				const json_int MAX = (~0);
 				json_int data;
 
@@ -1154,13 +1140,13 @@
 
 				zs4::event::numeric numeric;
 				for (ZS4CHAR i = 0; s[i] != 0 && s[i] != '\n'; i++){
-					ZS4LARGE lu = numeric.lookup((ZS4CHAR)s[i], base);
+					ZS4LARGE lu = numeric.lookup((ZS4CHAR)s[i]);
 					if (lu >= (ZS4LARGE)MAX){
 						data = 0;
 						return data;
 					}
 
-					ZS4LARGE nu = (ZS4LARGE)((ZS4LARGE)((ZS4LARGE)data*(ZS4LARGE)base) + (ZS4LARGE)lu);
+					ZS4LARGE nu = (ZS4LARGE)((ZS4LARGE)((ZS4LARGE)data*(ZS4LARGE)10) + (ZS4LARGE)lu);
 					if ((ZS4LARGE)nu > (ZS4LARGE)MAX){
 						data = MAX;
 						return MAX;
@@ -1448,7 +1434,6 @@
 	typedef class in : public file
 	{
 	public:
-		INLINE_MEMORY_FUNCTION(){return nullptr;} 
 		INLINE_BITS_FUNCTION(){ return 0; }
 
 		INLINE_READABLE_FUNCTION(){ return 1; }
@@ -1463,7 +1448,6 @@
 	typedef  class out : public file
 	{
 	public:
-		INLINE_MEMORY_FUNCTION(){ return nullptr; }
 		INLINE_BITS_FUNCTION(){ return 0; }
 
 		INLINE_WRITEABLE_FUNCTION(){ return 1; }

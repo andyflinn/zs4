@@ -141,74 +141,97 @@ public:
 
 		return SUCCESS;
 	}
-	inline unsigned device from(const char * s, ZS4CHAR base = 10){
-		zs4::event::numeric numeric;
-		device data = 0;
+
+	template <class symbolset>
+	inline e set(const char * s){
+		data = 0;
+		symbolset set;
 		for (ZS4CHAR i = 0; s[i] != 0 && s[i] != '\n'; i++){
-			ZS4LARGE lu = numeric.lookup((ZS4CHAR)s[i], base);
-			if (lu >= (ZS4LARGE)MAX){
+			ZS4CHAR lu = set.lookup((ZS4CHAR)s[i]);
+			if (lu >= set.count()){
 				data = 0;
-				return data;
+				return FAILURE;
 			}
 
-			ZS4LARGE nu = (ZS4LARGE)((ZS4LARGE)((ZS4LARGE)data*(ZS4LARGE)base) + (ZS4LARGE)lu);
+			ZS4LARGE nu = (ZS4LARGE)((ZS4LARGE)((ZS4LARGE)data*(ZS4LARGE)set.count()) + (ZS4LARGE)lu);
 			if ((ZS4LARGE)nu > (ZS4LARGE)MAX){
 				data = (device)MAX;
-				return (device)MAX;
+				return (e)MAX;
 			}
 			data = (device)nu;
 		}
-		//data = len(s);
 
-		return data; //len(s);
+		return SUCCESS;
 	}
-	inline unsigned device to(char * s, ZS4LARGE size, ZS4CHAR base = 10)const{
+	template <class symbolset>
+	inline e write(stream & out, bool sign = false)const{
+		device dta = data;
 
-		if (size < 2)
-			return (device)MAX;
+		if (sign){
+			if (dta & (1 << SIGBIT))
+			{
+				if (SUCCESS != write('-'))
+					return FAILURE;
 
-		ZS4CHAR remainder = data;
+				dta = (~dta);
+			}
+		}
+
+		ZS4LARGE remainder = dta;
 		bool NOT_ZERO = false;
 
-		ZS4LARGE count = 0;
-		ZS4LARGE large = 1; while (large < MAX){ large *= base; count++; }
+		ZS4LARGE MAX = (~0);
+		ZS4LARGE count = 1;
+		ZS4LARGE large = 1;
+		while (large < (MAX / base)){
+			large *= base; count++;
+		}
 
-		zs4::event::numeric numeric;
+		zs4::event::symbolset set;
+		ZS4LARGE accumulator;
 		while (count)
 		{
-			ZS4LARGE accumulator = 0;
-			while (remainder > large){
-				accumulator++;
+			if (0 != (accumulator = remainder / large))
+			{
+				remainder -= (accumulator*large);
 				NOT_ZERO = true;
 			}
 
 			if (NOT_ZERO){
-
-				if (size > 1){
-					*s++ = numeric.data()[accumulator];
-					*s = 0;
-					size--;
-				}
-				else {
-					return (device)MAX;
-				}
-
+				if (SUCCESS != write((char)(set.data()[accumulator])))
+					return BUFFEROVERFLOW;
 			}
+
 			large /= base;
 			count--;
 		}
 
-		return (device)MIN;
+		if (!NOT_ZERO)
+		{
+			if (SUCCESS != write((char)(set.data()[0])))
+				return BUFFEROVERFLOW;
+		}
+
+		return SUCCESS;
 	}
 
 	// C OPERATORS
 	inline operator device()const{ return data; }
 	inline operator unsigned device()const{ return data; }
 
-	inline unsigned device & operator =(device d){ data = (unsigned device) d; return data; }
-	inline unsigned device & operator &(device d){ return (data &= d); }
+	inline operator bussclass*()const{ return(bussclass*)&data; }
+	inline operator bussclass&()const{ return(bussclass&)data; }
 
-	inline unsigned device & operator =(size_t d){ data = (unsigned device) d; return data; }
+	inline unsigned device & operator &(bussclass &d){ data = (unsigned device) d.data; return data; }
+	inline unsigned device & operator &(device &d){ data = (unsigned device) d; return data; }
+	inline unsigned device & operator &(int &d){ data = (unsigned device) d; return data; }
+
+	inline unsigned device & operator =(bussclass &d){ data = (unsigned device) d.data; return data; }
+	inline unsigned device & operator =(device &d){ data = (unsigned device) d; return data; }
+	inline unsigned device & operator =(int &d){ data = (unsigned device) d; return data; }
+
+
+	//inline unsigned device & operator &(device d){ return (data &= d); }
 
 	inline operator bool()const{ if (data != 0) { return true; } return false; }
 	inline unsigned device & operator =(bool b){ if (b) data = (~0); else data = 0;  return data; }
@@ -231,15 +254,189 @@ public:
 		return data;
 	}
 
-	inline unsigned device & operator = (const char * s){
+	template <class datatype=device>
+	class object : public stream
+	{
+#		define INLINE_TICKLE_FUNCTION() inline virtual e tickle(void)
+#		define INLINE_ONCHAR_FUNCTION() inline virtual e onChar(char & c)
+#		define INLINE_ONLINE_FUNCTION() inline virtual e onLine(char * str)
+#		define INLINE_INSTANCE(type) inline type(char * m, ZS4LONG s, stream * i, stream * o)
 
-		if ((*s) == 0 || (*s) == '\n'){
-			return data;
+		char * store;
+		unsigned device storesize;
+		unsigned device stacktop;
+		unsigned device stacksize;
+		unsigned device use;
+		stream * in;
+		stream * out;
+	protected:
+		INLINE_BITS_FUNCTION(){
+			return (ZS4LARGE)(storesize << 3); 
+		}
+		INLINE_RESET_FUNCTION(){
+			memset(store, 0, storesize); 
 		}
 
-		return (data=from(s));
-	}
-	// END OF C OPERATORS
+		typedef class item {
+		public:
+			datatype nam;
+			datatype val;
+			inline e setName(const char * n){
+				e error = SUCCESS;
+				datatype w;
+				if (error = (w.set<zs4::event::name>(n)))
+					return error;
+				nam = w;
+				return SUCCESS;
+			}
+		}item;
+
+		inline virtual e jStart(const char * n = nullptr){ if (n != nullptr) { write('"'); writeString(n); write('"'); write(':'); }; return write('{'); }
+		inline virtual e jEnd(){ return write('}'); }
+		inline virtual e onj(void){
+
+			jStart();
+			{
+				jStart("zs4");
+				{
+					jStart("c"); //constants
+					{
+						jStart("m"); // context
+						{
+							jStart("s"); // size
+							{
+								writeString("\"a\":"); // available
+								writeInteger(storesize - stacksize);
+								write(',');
+
+								writeString("\"t\":"); // total
+								writeInteger(storesize);
+								write(',');
+
+								writeString("\"u\":"); // used
+								writeInteger(use);
+							}
+							jEnd(); // size
+						}
+						jEnd(); // context
+					}
+					jEnd(); //constant
+				}
+				jEnd();
+			}
+			jEnd();
+
+			e error = write('\n');
+
+			use = 0;
+			return error;
+		}
+
+		INLINE_ONLINE_FUNCTION(){
+			e error = FAILURE;
+			zs4::event event;
+			item item;
+			// cut leading space;
+			while (event.is<zs4::event::space>((ZS4CHAR)*str))str++;
+			switch (*str){
+			case '+':{
+				str++;
+				if (error = item.setName(str)) goto fail;
+				item.val.data = 0;
+
+			}
+
+			}
+		fail:
+			use = 0;
+			return error;
+		}
+		INLINE_ONCHAR_FUNCTION(){
+			if (in == nullptr || out == nullptr) return FAILURE;
+
+			if (use < 1)
+				return FAILURE;
+
+			if (store[use - 1] == '\n')
+			{
+				use = 0;
+				if (!strcmp(store, "?\n")){ return onj(); }
+				else { return onLine(store); }
+			}
+
+			return WAITING;
+		}
+	public:
+		INLINE_INSTANCE(object){
+			store = m;
+			if (s <= bussclass::MAX) { storesize = (unsigned device)s; }
+			else { storesize = bussclass::MAX; }
+			reset();
+			stacktop = storesize;
+			stacksize = 0;
+			use = 0;
+			in = i;
+			out = o;
+		}
+		INLINE_TICKLE_FUNCTION(){
+			if (in == nullptr || out == nullptr) return FAILURE;
+
+			char c = 0;
+			e error = SUCCESS;
+
+			for (;;){
+				if (error = in->read(c))
+					return error;
+
+				if (error = write(c))
+					return error;
+
+				error = onChar(c);
+				if (error == WAITING)
+					continue;
+
+				if (error)
+					return error;
+
+				break;
+			}
+
+			error = out->writeString((const char *)store);
+			use = 0;
+			return error;
+		}
+
+		INLINE_READABLE_FUNCTION(){
+			return (use);
+		}
+		INLINE_WRITEABLE_FUNCTION(){
+			return (stacktop - use - 1);
+		}
+
+		INLINE_READ_FUNCTION(){
+			if (use >= (stacktop - 1))
+				return FAILURE;
+
+			c = store[use];
+			store[use] = 0;
+			use++;
+
+			return SUCCESS;
+		}
+		INLINE_WRITE_FUNCTION(){
+			if (use >= (stacktop - 1))
+				return FAILURE;
+
+			store[use++] = c;
+			store[use] = 0;
+
+			return SUCCESS;
+		}
+		INLINE_SIZE_FUNCTION(){
+			s = use;
+			return SUCCESS;
+		}
+	};
 
 
 }bussclass;

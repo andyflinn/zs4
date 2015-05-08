@@ -27,14 +27,13 @@ int main(int argc, char **argv)
 	zs4::in in;
 	zs4::out out;
 
-	char buffer[65536];
-	zs4::machine machine((char*)&buffer, sizeof(buffer));
-	storageinfo("machine", machine);
+	char buffer[256];
+	zs4::p8::object<zs4::p8> object((char*)&buffer, sizeof(buffer), &in, &out);
 
-	machine.connect(&in, &out);
+	storageinfo("object", object);
 
 	for (;;){
-		if (zs4::SUCCESS != machine.tickle())
+		if (zs4::SUCCESS != object.tickle())
 			break;
 
 	}
