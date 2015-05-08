@@ -166,11 +166,12 @@ public:
 	template <class symbolset>
 	inline e write(stream & out, bool sign = false)const{
 		device dta = data;
+		symbolset set;
 
 		if (sign){
 			if (dta & (1 << SIGBIT))
 			{
-				if (SUCCESS != write('-'))
+				if (SUCCESS != out.write('-'))
 					return FAILURE;
 
 				dta = (~dta);
@@ -183,11 +184,10 @@ public:
 		ZS4LARGE MAX = (~0);
 		ZS4LARGE count = 1;
 		ZS4LARGE large = 1;
-		while (large < (MAX / base)){
-			large *= base; count++;
+		while (large < (MAX / set.count())){
+			large *= set.count(); count++;
 		}
 
-		zs4::event::symbolset set;
 		ZS4LARGE accumulator;
 		while (count)
 		{
@@ -198,17 +198,17 @@ public:
 			}
 
 			if (NOT_ZERO){
-				if (SUCCESS != write((char)(set.data()[accumulator])))
+				if (SUCCESS != out.write((char)(set.data()[accumulator])))
 					return BUFFEROVERFLOW;
 			}
 
-			large /= base;
+			large /= set.count();
 			count--;
 		}
 
 		if (!NOT_ZERO)
 		{
-			if (SUCCESS != write((char)(set.data()[0])))
+			if (SUCCESS != out.write((char)(set.data()[0])))
 				return BUFFEROVERFLOW;
 		}
 
@@ -254,7 +254,7 @@ public:
 		return data;
 	}
 
-	template <class datatype=device>
+	template <class datatype, class bus>
 	class object : public stream
 	{
 #		define INLINE_TICKLE_FUNCTION() inline virtual e tickle(void)
@@ -278,23 +278,44 @@ public:
 		inline unsigned device available(){
 			return stacktop - use;
 		}
-		typedef class item {
+
+		typedef struct item {
 		public:
 			datatype nam;
 			datatype val;
-			inline e setName(const char * n){
-				e error = SUCCESS;
-				datatype w;
-				if (error = (w.set<zs4::event::name>(n)))
-					return error;
-				nam = w;
-				return SUCCESS;
-			}
 		}item;
+		inline e itemNameSet(item & i, const char * n){
+			e error = SUCCESS;
+			bus w;
+			if (error = (w.set<zs4::event::name>(n)))
+				return error;
+			i.nam = w.data;
+			return SUCCESS;
+		}
+		inline item * itemArray(void){ return (item*)&store[stacktop]; }
+		inline unsigned device itemCount(void){ return ((storesize - stacktop) / sizeof(item)); }
+		inline e itemFind(device & d, const char * str){
+			item * arr = itemArray();
+			device c = itemCount();
+			item var; var.nam = var.val = 0;
+			if (SUCCESS != itemNameSet(var, str)){ return BADNAME; }
+
+			for (device i = 0; i < c; i++)
+			{
+				if (arr[i].nam == var.nam){
+					d = i;
+					return SUCCESS;
+				}
+			}
+
+			return NOTFOUND;
+		}
+
 
 		inline virtual e jStart(const char * n = nullptr){ if (n != nullptr) { write('"'); writeString(n); write('"'); write(':'); }; return write('{'); }
 		inline virtual e jEnd(){ return write('}'); }
 		inline virtual e onj(void){
+			use = 0;
 
 			jStart();
 			{
@@ -315,7 +336,7 @@ public:
 								write(',');
 
 								writeString("\"u\":"); // used
-								writeInteger(use);
+								writeInteger(storesize - stacktop);
 							}
 							jEnd(); // size
 						}
@@ -324,12 +345,36 @@ public:
 
 						jStart("i"); // context
 						{
+							device c = itemCount();
+							item * p = itemArray();
+
 							writeString("\"s\":"); // available
 							writeInteger(sizeof(item));
-							write(',');
 
+							write(',');
 							writeString("\"c\":"); // total
-							writeInteger((storesize - stacktop) / sizeof(item));
+							writeInteger(c);
+
+							if (c){
+								write(',');
+								jStart("d"); // context
+								{
+									bus b; b.data = 0;
+
+									for (device i = 0; i < c; i++)
+									{
+										if (i) write(',');
+										write('"');
+										b.data = p[i].nam;
+										b.write<zs4::event::name>(*this);
+										write('"');
+										write(':');
+										b.data = p[i].val;
+										b.write<zs4::event::decimal>(*this);
+									}
+								}
+								jEnd(); // context
+							}
 						}
 						jEnd(); // context
 					}
@@ -346,6 +391,8 @@ public:
 		}
 
 		INLINE_ONLINE_FUNCTION(){
+			use = 0;
+			device wk;
 			e error = FAILURE;
 			zs4::event event;
 			item var;
@@ -353,23 +400,53 @@ public:
 			while (event.is<zs4::event::space>((ZS4CHAR)*str))str++;
 			switch (*str){
 			case '+':{
-				if (available() < (sizeof(var) << 1)){ error = NOMEMORY; goto fail; }
+				if (available() < (sizeof(var) << 1)){
+					writeString("error no memory\n");
+					return NOMEMORY;
+				}
+
 				str++;
-				if (error = var.setName(str)) goto fail;
-				var.val.data = 0;
+				if (error = itemNameSet(var, str)){
+					writeString("error invalid name\n");
+					return BADNAME;
+				}
+				var.val = 0;
+
+				if (SUCCESS == itemFind(wk, str)){
+					writeString("error exists\n");
+					return ALREADYEXISTS;
+				}
+
 
 				stacktop -= sizeof(item);
-				item * eye =(item*) &store[stacktop];
+				item * eye = (item*)&store[stacktop];
 				*eye = var;
-				error = SUCCESS;
-				break;
+
+				writeString("added\n");
+				return SUCCESS;
 			}
-			default:
-				error = SUCCESS;
+			case '-':{
+				str++;
+				device iRemove = 0;
+				if (SUCCESS != itemFind(iRemove, str)){
+					writeString("error not found\n");
+					return NOTFOUND;
+				}
+
+				item * arr = itemArray();
+				device cnt = itemCount();
+
+				for (device i = iRemove; i > 0; i--){
+					arr[i] = arr[i - 1];
+				}
+				stacktop += sizeof(item);
+
+				writeString("removed\n");
+				return SUCCESS;
 			}
-		fail:
-			use = 0;
-			return error;
+			}
+
+			return SUCCESS;
 		}
 		INLINE_ONCHAR_FUNCTION(){
 			if (in == nullptr || out == nullptr) return FAILURE;
@@ -414,15 +491,12 @@ public:
 				if (error == WAITING)
 					continue;
 
-				if (error)
-					return error;
-
 				break;
 			}
 
-			error = out->writeString((const char *)store);
+			out->writeString((const char *)store);
 			use = 0;
-			return error;
+			return SUCCESS;
 		}
 
 		INLINE_READABLE_FUNCTION(){
