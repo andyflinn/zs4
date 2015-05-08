@@ -265,7 +265,6 @@ public:
 		char * store;
 		unsigned device storesize;
 		unsigned device stacktop;
-		unsigned device stacksize;
 		unsigned device use;
 		stream * in;
 		stream * out;
@@ -276,7 +275,9 @@ public:
 		INLINE_RESET_FUNCTION(){
 			memset(store, 0, storesize); 
 		}
-
+		inline unsigned device available(){
+			return stacktop - use;
+		}
 		typedef class item {
 		public:
 			datatype nam;
@@ -306,7 +307,7 @@ public:
 							jStart("s"); // size
 							{
 								writeString("\"a\":"); // available
-								writeInteger(storesize - stacksize);
+								writeInteger(available());
 								write(',');
 
 								writeString("\"t\":"); // total
@@ -317,6 +318,18 @@ public:
 								writeInteger(use);
 							}
 							jEnd(); // size
+						}
+						jEnd(); // context
+						write(',');
+
+						jStart("i"); // context
+						{
+							writeString("\"s\":"); // available
+							writeInteger(sizeof(item));
+							write(',');
+
+							writeString("\"c\":"); // total
+							writeInteger((storesize - stacktop) / sizeof(item));
 						}
 						jEnd(); // context
 					}
@@ -335,17 +348,24 @@ public:
 		INLINE_ONLINE_FUNCTION(){
 			e error = FAILURE;
 			zs4::event event;
-			item item;
+			item var;
 			// cut leading space;
 			while (event.is<zs4::event::space>((ZS4CHAR)*str))str++;
 			switch (*str){
 			case '+':{
+				if (available() < (sizeof(var) << 1)){ error = NOMEMORY; goto fail; }
 				str++;
-				if (error = item.setName(str)) goto fail;
-				item.val.data = 0;
+				if (error = var.setName(str)) goto fail;
+				var.val.data = 0;
 
+				stacktop -= sizeof(item);
+				item * eye =(item*) &store[stacktop];
+				*eye = var;
+				error = SUCCESS;
+				break;
 			}
-
+			default:
+				error = SUCCESS;
 			}
 		fail:
 			use = 0;
@@ -373,7 +393,6 @@ public:
 			else { storesize = bussclass::MAX; }
 			reset();
 			stacktop = storesize;
-			stacksize = 0;
 			use = 0;
 			in = i;
 			out = o;
