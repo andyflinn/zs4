@@ -167,7 +167,6 @@ public:
 		}
 	}event;
 
-
 	typedef class storage
 	{
 	public:

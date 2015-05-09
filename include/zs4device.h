@@ -230,9 +230,6 @@ public:
 	inline unsigned device & operator =(device &d){ data = (unsigned device) d; return data; }
 	inline unsigned device & operator =(int &d){ data = (unsigned device) d; return data; }
 
-
-	//inline unsigned device & operator &(device d){ return (data &= d); }
-
 	inline operator bool()const{ if (data != 0) { return true; } return false; }
 	inline unsigned device & operator =(bool b){ if (b) data = (~0); else data = 0;  return data; }
 
@@ -310,7 +307,6 @@ public:
 
 			return NOTFOUND;
 		}
-
 
 		inline virtual e jStart(const char * n = nullptr){ if (n != nullptr) { write('"'); writeString(n); write('"'); write(':'); }; return write('{'); }
 		inline virtual e jEnd(){ return write('}'); }

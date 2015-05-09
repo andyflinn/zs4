@@ -286,7 +286,7 @@
 			return SUCCESS;
 		}
 	}stream;
-
+	
 	typedef class json{
 	protected:
 		typedef long long json_int;
