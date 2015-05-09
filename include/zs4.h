@@ -6,7 +6,7 @@
 typedef class zs4
 {
 public:
-	class stream;
+//	class stream;
 	typedef enum {
 		SUCCESS = 0,
 		FAILURE,
@@ -21,7 +21,8 @@ public:
 		FILEOPENERROR,
 		ERRORCOUNT
 	}e;
-	typedef class event {
+	typedef class event
+	{
 	public:
 		typedef class set
 		{
@@ -63,7 +64,6 @@ public:
 				return r;
 			}
 		}set;
-
 		typedef class name : public set
 		{
 		public:
@@ -73,7 +73,6 @@ public:
 			}
 
 		}name;
-
 		typedef class space : public set
 		{
 		public:
@@ -88,7 +87,6 @@ public:
 			}
 
 		}space;
-
 		typedef class numeric : public set
 		{
 		public:
@@ -123,7 +121,6 @@ public:
 		public:
 			inline virtual const ZS4CHAR count(void){ return 16; }
 		}hexadecimal;
-
 		typedef class opcode : public set
 		{
 		public:
@@ -175,29 +172,23 @@ public:
 	{
 	public:
 
-		inline virtual ZS4LARGE bits(void)const{ return (sizeof(*this) << 3); }
 		#define	INLINE_BITS_FUNCTION() inline virtual ZS4LARGE bits(void)const
+		INLINE_BITS_FUNCTION(){ return (sizeof(*this) << 3); }
 
-		inline virtual void reset(void){};
 		#define	INLINE_RESET_FUNCTION() inline virtual void reset(void)
+		INLINE_RESET_FUNCTION() {};
 
 		#define INLINE_CONNECT_FUNCTION() inline virtual e connect(stream * in, stream * out)
 		#define INLINE_ONCHAR_FUNCTION() inline virtual e onChar(char & c)
 		#define INLINE_ONLINE_FUNCTION() inline virtual e onLine(char * str)
 
-		inline virtual ZS4LARGE p8(void)const{ if (ZS4LARGE r = (bits() >> 3))return r; return 1; }
-		inline virtual ZS4LARGE p16(void)const{ if (ZS4LARGE r = (bits() >> 4))return r; return 1; }
-		inline virtual ZS4LARGE p32(void)const{ if (ZS4LARGE r = (bits() >> 5))return r; return 1; }
-		inline virtual ZS4LARGE p64(void)const{ if (ZS4LARGE r = (bits() >> 6))return r; return 1; }
-
-		inline virtual ZS4LARGE addressBits(void)const{ ZS4LARGE w = 1; while (((ZS4LARGE)1 << w)<bits())w++; return w; }
-		inline virtual ZS4LARGE messageBits(void)const{ return (bits() - addressBits()); }
+		inline ZS4LARGE addressBits(void)const{ ZS4LARGE w = 1; while (((ZS4LARGE)1 << w)<bits())w++; return w; }
+		inline ZS4LARGE messageBits(void)const{ return (bits() - addressBits()); }
 
 	}storage;
 
 	typedef class stream : public storage{
 	public:
-		inline stream(){}
 		inline virtual e read(char & c){
 			return FAILURE;
 		}
@@ -344,61 +335,29 @@ public:
 
 #	include <zs4util.h>
 
-	#define device char
-	#define devicename "p8"
-	#define bussclass p8
-	#define objectclass o8
-	#define readfunction(t,f) t f ## _ ## p8(void)
-	#define writefunction(t,f,a) t f ## _ ## p8(p8 a)
-	#include <zs4device.h>
-	#undef writefunction
-	#undef readfunction
-	#undef objectclass
-	#undef bussclass
-	#undef devicename
-	#undef device
+#define device char
+#define intclass byte
+#define eventclass byteEvent
+#define objectclass byteObject
+#include <zs4device.h>
 
-	#define device short
-	#define devicename "p16"
-	#define bussclass p16
-	#define objectclass o16
-	#define readfunction(t,f) t f ## _ ## p16(void)
-	#define writefunction(t,f,a) t f ## _ ## p16(p16 a)
-	#include <zs4device.h>
-	#undef writefunction
-	#undef readfunction
-	#undef objectclass
-	#undef bussclass
-	#undef devicename
-	#undef device
+#define device short
+#define intclass word
+#define eventclass wordEvent
+#define objectclass wordObject
+#include <zs4device.h>
 
-	#define device long
-	#define bussclass p32
-	#define objectclass o32
-	#define devicename "p32"
-	#define readfunction(t,f) t f ## _ ## p32(void)
-	#define writefunction(t,f,a) t f ## _ ## p32(p32 a)
-	#include <zs4device.h>
-	#undef writefunction
-	#undef readfunction
-	#undef objectclass
-	#undef bussclass
-	#undef devicename
-	#undef device
+#define device long
+#define intclass quad
+#define eventclass quadEvent
+#define objectclass quadObject
+#include <zs4device.h>
 
-	#define device long long
-	#define bussclass p64
-	#define objectclass o64
-	#define devicename "p64"
-	#define readfunction(t,f) t f ## _ ## p64(void)
-	#define writefunction(t,f,a) t f ## _ ## p64(p64 a)
-	#include <zs4device.h>
-	#undef writefunction
-	#undef readfunction
-	#undef objectclass
-	#undef bussclass
-	#undef devicename
-	#undef device
+#define device long long
+#define intclass oct
+#define eventclass octEvent
+#define objectclass octObject
+#include <zs4device.h>
 
 }zs4;
 

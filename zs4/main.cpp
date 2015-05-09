@@ -29,7 +29,7 @@ int main(int argc, char **argv)
 	zs4::out out;
 
 	char buffer[256];
-	zs4::o8 object((char*)&buffer, sizeof(buffer), &in, &out);
+	zs4::byte::object object((char*)&buffer, sizeof(buffer), &in, &out);
 
 	storageinfo("object", object);
 
