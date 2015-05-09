@@ -128,7 +128,7 @@ public:
 		{
 		public:
 			typedef enum {
-				equal, or, and, plus, minus,
+				_equal_, _or_, _and_, _plus_, _minus_,
 				SIZE
 			} index;
 			inline virtual const ZS4CHAR count(void){ return (ZS4CHAR)SIZE; }
