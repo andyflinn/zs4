@@ -941,7 +941,7 @@
 
 							return 0;
 			}
-		};
+		}parser;
 
 		typedef	class value : public storage
 		{

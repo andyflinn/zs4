@@ -1,21 +1,6 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<CodeLite_Workspace Name="zs4" Database="./zs4.tags">
-  <Project Name="zs4static" Path="zs4static/zs4static.project" Active="No"/>
-  <Project Name="zs4" Path="zs4/zs4.project" Active="Yes"/>
-  <Environment>
-    <![CDATA[]]>
-  </Environment>
-  <Project Name="zs4dyad" Path="zs4dyad/zs4dyad.project"/>
-  <BuildMatrix>
-    <WorkspaceConfiguration Name="Debug" Selected="yes">
-      <Project Name="zs4static" ConfigName="Debug"/>
-      <Project Name="zs4" ConfigName="Debug"/>
-      <Project Name="zs4dyad" ConfigName="Debug"/>
-    </WorkspaceConfiguration>
-    <WorkspaceConfiguration Name="Release" Selected="yes">
-      <Project Name="zs4static" ConfigName="Release"/>
-      <Project Name="zs4" ConfigName="Release"/>
-      <Project Name="zs4dyad" ConfigName="Release"/>
-    </WorkspaceConfiguration>
-  </BuildMatrix>
-</CodeLite_Workspace>
+<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
+<CodeBlocks_workspace_file>
+	<Workspace title="Workspace">
+		<Project filename="zs4/zs4.cbp" />
+	</Workspace>
+</CodeBlocks_workspace_file>

@@ -1,0 +1,44 @@
+# depslib dependency file v1.0
+1431200055 source:/home/countinn/zs4/zs4/main.cpp
+	<stdio.h>
+	<zs4.h>
+
+1431201628 /home/countinn/zs4/include/zs4.h
+	<zs4config.h>
+	<zs4util.h>
+	<zs4device.h>
+	<zs4device.h>
+	<zs4device.h>
+	<zs4device.h>
+
+1431188115 /home/countinn/zs4/include/zs4config.h
+	<stdio.h>
+	<stddef.h>
+	<stdlib.h>
+	<string.h>
+	<ctype.h>
+	<time.h>
+	<math.h>
+	<sys/types.h>
+	<sys/stat.h>
+	<errno.h>
+	<tinydir.h>
+	<direct.h>
+	<unistd.h>
+	<dirent.h>
+
+1429988965 /home/countinn/zs4/include/tinydir.h
+	<errno.h>
+	<stdlib.h>
+	<string.h>
+	<windows.h>
+	<dirent.h>
+	<libgen.h>
+	<sys/stat.h>
+
+1431201509 /home/countinn/zs4/include/zs4util.h
+	<zs4config.h>
+
+1431200712 /home/countinn/zs4/include/zs4device.h
+	<zs4config.h>
+

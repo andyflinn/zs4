@@ -40,9 +40,9 @@ public:
 				return ASCII;
 			}
 			inline bool valueReverse(){ return false; }
+		public:
 			inline virtual const ZS4CHAR count(void) = 0;
 			inline virtual const ZS4CHAR * data(void) = 0;
-		public:
 			inline ZS4CHAR lookup(ZS4CHAR event){
 
 				for (ZS4LARGE i = 0; i < count(); i++){
@@ -60,7 +60,7 @@ public:
 				while (((m >> 1)&((ZS4CHAR)count())) >= count()){
 					m >>= 1; r--;
 				}
-				return r; 
+				return r;
 			}
 		}set;
 
@@ -180,7 +180,7 @@ public:
 
 		inline virtual void reset(void){};
 		#define	INLINE_RESET_FUNCTION() inline virtual void reset(void)
-		
+
 		#define INLINE_CONNECT_FUNCTION() inline virtual e connect(stream * in, stream * out)
 		#define INLINE_ONCHAR_FUNCTION() inline virtual e onChar(char & c)
 		#define INLINE_ONLINE_FUNCTION() inline virtual e onLine(char * str)
@@ -344,53 +344,61 @@ public:
 
 #	include <zs4util.h>
 
-	#define device char 
-	#define devicename "p8" 
-	#define bussclass p8 
+	#define device char
+	#define devicename "p8"
+	#define bussclass p8
+	#define objectclass o8
 	#define readfunction(t,f) t f ## _ ## p8(void)
 	#define writefunction(t,f,a) t f ## _ ## p8(p8 a)
 	#include <zs4device.h>
-	#undef writefunction 
-	#undef readfunction 
-	#undef bussclass 
-	#undef devicename 
-	#undef device 
+	#undef writefunction
+	#undef readfunction
+	#undef objectclass
+	#undef bussclass
+	#undef devicename
+	#undef device
 
-	#define device short 
-	#define devicename "p16" 
-	#define bussclass p16 
+	#define device short
+	#define devicename "p16"
+	#define bussclass p16
+	#define objectclass o16
 	#define readfunction(t,f) t f ## _ ## p16(void)
 	#define writefunction(t,f,a) t f ## _ ## p16(p16 a)
 	#include <zs4device.h>
-	#undef writefunction 
-	#undef readfunction 
-	#undef bussclass 
-	#undef devicename 
-	#undef device 
+	#undef writefunction
+	#undef readfunction
+	#undef objectclass
+	#undef bussclass
+	#undef devicename
+	#undef device
 
-	#define device long 
-	#define bussclass p32 
-	#define devicename "p32" 
+	#define device long
+	#define bussclass p32
+	#define objectclass o32
+	#define devicename "p32"
 	#define readfunction(t,f) t f ## _ ## p32(void)
 	#define writefunction(t,f,a) t f ## _ ## p32(p32 a)
 	#include <zs4device.h>
-	#undef writefunction 
-	#undef readfunction 
-	#undef bussclass 
-	#undef devicename 
-	#undef device 
+	#undef writefunction
+	#undef readfunction
+	#undef objectclass
+	#undef bussclass
+	#undef devicename
+	#undef device
 
 	#define device long long
-	#define bussclass p64 
-	#define devicename "p64" 
+	#define bussclass p64
+	#define objectclass o64
+	#define devicename "p64"
 	#define readfunction(t,f) t f ## _ ## p64(void)
 	#define writefunction(t,f,a) t f ## _ ## p64(p64 a)
 	#include <zs4device.h>
-	#undef writefunction 
-	#undef readfunction 
-	#undef bussclass 
-	#undef devicename 
-	#undef device 
+	#undef writefunction
+	#undef readfunction
+	#undef objectclass
+	#undef bussclass
+	#undef devicename
+	#undef device
 
 }zs4;
 

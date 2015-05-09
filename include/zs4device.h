@@ -2,12 +2,12 @@
 #include <zs4config.h>
 
 #ifndef device
-#define device char 
-#define devicename "p8" 
+#define device char
+#define devicename "p8"
 #define bussclass p8
 #define readfunction(t,f) t f ## _ ## p8(void)
 #define writefunction(t,f,a) t f ## _ ## p8(p8 a)
-#define mustundefdevice 1 
+#define mustundefdevice 1
 #endif
 
 typedef class bussclass : public storage
@@ -26,7 +26,7 @@ public:
 
 	// storage support
 	INLINE_BITS_FUNCTION(){
-		return PRECISION; 
+		return PRECISION;
 	}
 	inline virtual readfunction(ZS4LARGE, size){ return 1; }
 
@@ -142,10 +142,10 @@ public:
 		return SUCCESS;
 	}
 
-	template <class symbolset>
-	inline e set(const char * s){
+
+	inline e set(zs4::event::set&set,const char * s){
 		data = 0;
-		symbolset set;
+		//symbolset set;
 		for (ZS4CHAR i = 0; s[i] != 0 && s[i] != '\n'; i++){
 			ZS4CHAR lu = set.lookup((ZS4CHAR)s[i]);
 			if (lu >= set.count()){
@@ -163,10 +163,8 @@ public:
 
 		return SUCCESS;
 	}
-	template <class symbolset>
-	inline e write(stream & out, bool sign = false)const{
+	inline e write(stream & out, zs4::event::set & set, bool sign = false)const{
 		device dta = data;
-		symbolset set;
 
 		if (sign){
 			if (dta & (1 << SIGBIT))
@@ -236,7 +234,6 @@ public:
 	inline operator ZS4ANALOG()const{
 		ZS4ANALOG r = 0.0;
 		ZS4ANALOG h = 0.5;
-		ZS4CHAR tru = 0;
 		for (ZS4CHAR i = bussclass::PRECISION; i > 0; i--){
 			if ((ZS4LARGE)data | (ZS4LARGE)(1 << (i - 1))) r += h;
 			h /= 2.0;
@@ -251,317 +248,316 @@ public:
 		return data;
 	}
 
-	template <class datatype, class bus>
-	class object : public stream
-	{
-#		define INLINE_TICKLE_FUNCTION() inline virtual e tickle(void)
-#		define INLINE_ONCHAR_FUNCTION() inline virtual e onChar(char & c)
-#		define INLINE_ONLINE_FUNCTION() inline virtual e onLine(char * str)
-#		define INLINE_INSTANCE(type) inline type(char * m, ZS4LONG s, stream * i, stream * o)
-
-		char * store;
-		unsigned device storesize;
-		unsigned device stacktop;
-		unsigned device limit;
-		unsigned device children;
-		unsigned device buffer;
-		unsigned device use;
-		stream * in;
-		stream * out;
-		inline unsigned device ulim(){ return (buffer - 2); }
-	protected:
-		INLINE_BITS_FUNCTION(){
-			return (ZS4LARGE)(storesize << 3); 
-		}
-		INLINE_RESET_FUNCTION(){
-			memset(store, 0, storesize); 
-		}
-		inline unsigned device itemSpace(){
-			return stacktop - limit;
-		}
-		inline e response(char c){
-			return out->write(c);
-		}
-		inline e responseString(const char * s){
-			return out->writeString(s);
-		}
-		inline e responseInteger(unsigned long long data, unsigned char base = 10){
-			return out->writeInteger(data,base);
-		}
-		typedef struct item {
-		public:
-			datatype nam;
-			datatype val;
-		}item;
-		inline e itemNameSet(item & i, const char * n){
-			e error = SUCCESS;
-			bus w;
-			if (error = (w.set<zs4::event::name>(n)))
-				return error;
-			i.nam = w.data;
-			return SUCCESS;
-		}
-		inline item * itemArray(void){ return (item*)&store[stacktop]; }
-		inline unsigned device itemCount(void){ return ((storesize - stacktop) / sizeof(item)); }
-		inline e itemFind(device & d, const char * str){
-			item * arr = itemArray();
-			device c = itemCount();
-			item var; var.nam = var.val = 0;
-			if (SUCCESS != itemNameSet(var, str)){ return BADNAME; }
-
-			for (device i = 0; i < c; i++)
-			{
-				if (arr[i].nam == var.nam){
-					d = i;
-					return SUCCESS;
-				}
-			}
-
-			return NOTFOUND;
-		}
-
-		inline virtual e jStart(const char * n = nullptr){ if (n != nullptr) { response('"'); responseString(n); response('"'); response(':'); }; return response('{'); }
-		inline virtual e jEnd(){ return response('}'); }
-
-		class control {
-		public:
-			inline e onj(object & o){
-				o.jStart("zs4");
-				{
-					o.jStart("i"); //info
-					{
-						o.jStart("m"); // memory
-						{
-							o.responseString("\"s\":"); // total
-							o.responseInteger(o.storesize);
-							o.response(',');
-
-							o.responseString("\"b\":"); // available
-							o.responseInteger(o.buffer);
-							o.response(',');
-
-							o.responseString("\"l\":"); // available
-							o.responseInteger(o.limit);
-							o.response(',');
-
-							o.responseString("\"u\":"); // used
-							o.responseInteger(o.storesize - o.stacktop);
-						}
-						o.jEnd(); // memory
-
-						o.response(',');
-
-						o.jStart("c"); // memory
-						{
-							o.responseString("\"i\":"); // total
-							o.responseInteger(o.children);
-							//o.response(',');
-
-						}
-						o.jEnd(); // memory
-					}
-					o.jEnd();  //info
-				}
-				return o.jEnd(); // zs4
-			}
-		}control;
-
-		inline virtual e onj(void){
-			rewind();
-
-			jStart();
-			{
-				control.onj(*this);
-				// and now the actual content....
-				device c = itemCount();
-				item * p = itemArray();
-
-				if (c){
-					bus b; b.data = 0;
-
-					for (device i = 0; i < c; i++)
-					{
-						response(',');
-						response('"');
-						b.data = p[i].nam;
-						b.write<zs4::event::name>(*out);
-						response('"');
-						response(':');
-						b.data = p[i].val;
-						b.write<zs4::event::decimal>(*out);
-					}
-
-				}
-			}
-			jEnd();
-
-			return response('\n');
-		}
-
-		INLINE_ONLINE_FUNCTION(){
-			device wk;
-			e error = FAILURE;
-			zs4::event event;
-			item var;
-			// cut leading space;
-			while (event.is<zs4::event::space>((ZS4CHAR)*str))str++;
-			switch (*str){
-			case '+':{
-				if (itemSpace() < (sizeof(var))){
-					responseString("error no memory\n");
-					return NOMEMORY;
-				}
-
-				str++;
-				if (error = itemNameSet(var, str)){
-					responseString("error invalid name\n");
-					return BADNAME;
-				}
-				var.val = 0;
-
-				if (SUCCESS == itemFind(wk, str)){
-					responseString("error exists\n");
-					return ALREADYEXISTS;
-				}
-
-
-				stacktop -= sizeof(item);
-				item * eye = (item*)&store[stacktop];
-				*eye = var;
-
-				responseString("added\n");
-				return SUCCESS;
-			}
-			case '-':{
-				str++;
-				device iRemove = 0;
-				if (SUCCESS != itemFind(iRemove, str)){
-					responseString("error not found\n");
-					return NOTFOUND;
-				}
-
-				item * arr = itemArray();
-				device cnt = itemCount();
-
-				for (device i = iRemove; i > 0; i--){
-					arr[i] = arr[i - 1];
-				}
-				stacktop += sizeof(item);
-
-				responseString("removed\n");
-				return SUCCESS;
-			}
-			}
-
-			return response('\n');
-		}
-		INLINE_ONCHAR_FUNCTION(){
-			if (in == nullptr || out == nullptr) return FAILURE;
-
-			if (use < 1)
-				return FAILURE;
-
-			if (store[use - 1] == '\n')
-			{
-				rewind();
-				if (!strcmp(store, "?\n")){ return onj(); }
-				else { return onLine(store); }
-			}
-
-			if (use >= (ulim()))
-			{
-				char c;
-				while (in->readable()){
-					in->read(c);
-					if (c == '\n')
-						break;
-				}
-				rewind();
-				responseString("error buffer overflow\n");
-				return BUFFEROVERFLOW;
-			}
-
-			return WAITING;
-		}
-	public:
-		INLINE_INSTANCE(object){
-			store = m;
-			if (s <= bussclass::MAX) { storesize = (unsigned device)s; }
-			else { storesize = bussclass::MAX; }
-			reset();
-			stacktop = storesize;
-			buffer = storesize / 4; if (buffer > 256){ buffer = (unsigned device)256; }
-			limit = (storesize - buffer);
-			children = 0;
-			use = 0;
-			in = i;
-			out = o;
-		}
-		inline virtual e tickle(void){
-			if (in == nullptr || out == nullptr) return FAILURE;
-
-			char c = 0;
-			e error = SUCCESS;
-
-			while (in->readable()){
-				if (error = in->read(c))
-					return error;
-
-				if (error = write(c))
-					return error;
-
-				error = onChar(c);
-				if (error == WAITING)
-					continue;
-
-				if (error)
-					return error;
-
-				break;
-			}
-
-			return error;
-		}
-
-		INLINE_READABLE_FUNCTION(){
-			return (use);
-		}
-		INLINE_WRITEABLE_FUNCTION(){
-			return (ulim() - use);
-		}
-
-		INLINE_READ_FUNCTION(){
-			if (use >= ulim())
-				return WAITING;
-
-			c = store[use];
-			store[use] = 0;
-			use++;
-
-			return SUCCESS;
-		}
-		INLINE_WRITE_FUNCTION(){
-			if (use >= ulim())
-				return WAITING;
-
-			store[use++] = c;
-			store[use] = 0;
-
-			return SUCCESS;
-		}
-		INLINE_SIZE_FUNCTION(){
-			s = use;
-			return SUCCESS;
-		}
-		INLINE_REWIND_FUNCTION(){use = 0;return SUCCESS;}
-	};
-
-
 }bussclass;
-	
+
+typedef class objectclass : public stream{
+#	define INLINE_TICKLE_FUNCTION() inline virtual e tickle(void)
+#	define INLINE_ONCHAR_FUNCTION() inline virtual e onChar(char & c)
+#	define INLINE_ONLINE_FUNCTION() inline virtual e onLine(char * str)
+#	define INLINE_INSTANCE() inline objectclass(char * m, ZS4LONG s, stream * i, stream * o)
+
+    char * store;
+    unsigned device storesize;
+    unsigned device stacktop;
+    unsigned device limit;
+    unsigned device children;
+    unsigned device buffer;
+    unsigned device use;
+    stream * in;
+    stream * out;
+    inline unsigned device ulim(){ return (buffer - 2); }
+protected:
+    INLINE_BITS_FUNCTION(){
+        return (ZS4LARGE)(storesize << 3);
+    }
+    INLINE_RESET_FUNCTION(){
+        memset(store, 0, storesize);
+    }
+    inline unsigned device itemSpace(){
+        return stacktop - limit;
+    }
+    inline e response(char c){
+        return out->write(c);
+    }
+    inline e responseString(const char * s){
+        return out->writeString(s);
+    }
+    inline e responseInteger(unsigned long long data, unsigned char base = 10){
+        return out->writeInteger(data,base);
+    }
+    typedef struct item {
+    public:
+        device nam;
+        device val;
+    }item;
+    inline e itemNameSet(item & i, const char * n){
+        zs4::event::name set;
+        e error = SUCCESS;
+        zs4::bussclass w;
+        if (error = w.set((zs4::event::set&)set,n))
+            return error;
+        i.nam = w.data;
+        return SUCCESS;
+    }
+    inline item * itemArray(void){ return (item*)&store[stacktop]; }
+    inline unsigned device itemCount(void){ return ((storesize - stacktop) / sizeof(item)); }
+    inline e itemFind(device & d, const char * str){
+        item * arr = itemArray();
+        device c = itemCount();
+        item var; var.nam = var.val = 0;
+        if (SUCCESS != itemNameSet(var, str)){ return BADNAME; }
+
+        for (device i = 0; i < c; i++)
+        {
+            if (arr[i].nam == var.nam){
+                d = i;
+                return SUCCESS;
+            }
+        }
+
+        return NOTFOUND;
+    }
+
+    inline virtual e jStart(const char * n = nullptr){ if (n != nullptr) { response('"'); responseString(n); response('"'); response(':'); }; return response('{'); }
+    inline virtual e jEnd(){ return response('}'); }
+
+    inline e onc(){
+        jStart("zs4");
+        {
+            jStart("i"); //info
+            {
+                jStart("m"); // memory
+                {
+                    responseString("\"s\":"); // total
+                    responseInteger(storesize);
+                    response(',');
+
+                    responseString("\"b\":"); // available
+                    responseInteger(buffer);
+                    response(',');
+
+                    responseString("\"l\":"); // available
+                    responseInteger(limit);
+                    response(',');
+
+                    responseString("\"u\":"); // used
+                    responseInteger(storesize - stacktop);
+                }
+                jEnd(); // memory
+
+                response(',');
+
+                jStart("c"); // memory
+                {
+                    responseString("\"i\":"); // total
+                    responseInteger(children);
+                    //response(',');
+
+                }
+                jEnd(); // memory
+            }
+            jEnd();  //info
+        }
+        return jEnd(); // zs4
+    }
+
+    inline virtual e onv(void){
+
+        jStart();
+        {
+            onc();
+            // and now the actual content....
+            device c = itemCount();
+            item * p = itemArray();
+
+            if (c){
+                zs4::bussclass b; b.data = 0;
+                zs4::event::name nam;
+                zs4::event::decimal dec;
+
+                for (device i = 0; i < c; i++)
+                {
+                    response(',');
+                    response('"');
+                    b.data = p[i].nam;
+                    b.write(*out,nam);
+                    response('"');
+                    response(':');
+                    b.data = p[i].val;
+                    b.write(*out,dec);
+                }
+
+            }
+        }
+        jEnd();
+
+        return response('\n');
+    }
+
+    INLINE_ONLINE_FUNCTION(){
+        device wk;
+        e error = FAILURE;
+        zs4::event event;
+        item var;
+        // cut leading space;
+        while (event.is<zs4::event::space>((ZS4CHAR)*str))str++;
+        switch (*str){
+        case '+':{
+            if (itemSpace() < (sizeof(var))){
+                responseString("error no memory\n");
+                return NOMEMORY;
+            }
+
+            str++;
+            if (error = itemNameSet(var, str)){
+                responseString("error invalid name\n");
+                return BADNAME;
+            }
+            var.val = 0;
+
+            if (SUCCESS == itemFind(wk, str)){
+                responseString("error exists\n");
+                return ALREADYEXISTS;
+            }
+
+
+            stacktop -= sizeof(item);
+            item * eye = (item*)&store[stacktop];
+            *eye = var;
+
+            responseString("added\n");
+            return SUCCESS;
+        }
+        case '-':{
+            str++;
+            device iRemove = 0;
+            if (SUCCESS != itemFind(iRemove, str)){
+                responseString("error not found\n");
+                return NOTFOUND;
+            }
+
+            item * arr = itemArray();
+            device cnt = itemCount();
+
+            for (device i = iRemove; i > 0; i--){
+                arr[i] = arr[i - 1];
+            }
+            stacktop += sizeof(item);
+
+            responseString("removed\n");
+            return SUCCESS;
+        }
+        }
+
+        return response('\n');
+    }
+    INLINE_ONCHAR_FUNCTION(){
+        if (in == nullptr || out == nullptr) return FAILURE;
+
+        if (use < 1)
+            return FAILURE;
+
+        if (store[use - 1] == '\n')
+        {
+            rewind();
+            if (!strcmp(store, "?\n")){ return onv(); }
+            else { return onLine(store); }
+        }
+
+        if (use >= (ulim()))
+        {
+            char c;
+            while (in->readable()){
+                in->read(c);
+                if (c == '\n')
+                    break;
+            }
+            rewind();
+            responseString("error buffer overflow\n");
+            return BUFFEROVERFLOW;
+        }
+
+        return WAITING;
+    }
+public:
+    INLINE_INSTANCE(){
+        store = m;
+        if (s <= bussclass::MAX) { storesize = (unsigned device)s; }
+        else { storesize = bussclass::MAX; }
+        reset();
+        stacktop = storesize;
+        buffer = storesize / 4; if (buffer > 256){ buffer = (unsigned device)256; }
+        limit = (storesize - buffer);
+        children = 0;
+        use = 0;
+        in = i;
+        out = o;
+    }
+    inline virtual e tickle(void){
+        if (in == nullptr || out == nullptr) return FAILURE;
+
+        char c = 0;
+        e error = SUCCESS;
+
+        while (in->readable()){
+            if ((error = in->read(c)))
+                return error;
+
+            if ((error = write(c)))
+                return error;
+
+            error = onChar(c);
+            if (error == WAITING)
+                continue;
+
+            if (error)
+                return error;
+
+            break;
+        }
+
+        return error;
+    }
+
+    INLINE_READABLE_FUNCTION(){
+        return (use);
+    }
+    INLINE_WRITEABLE_FUNCTION(){
+        return (ulim() - use);
+    }
+
+    INLINE_READ_FUNCTION(){
+        if (use >= ulim())
+            return WAITING;
+
+        c = store[use];
+        store[use] = 0;
+        use++;
+
+        return SUCCESS;
+    }
+    INLINE_WRITE_FUNCTION(){
+        if (use >= ulim())
+            return WAITING;
+
+        store[use++] = c;
+        store[use] = 0;
+
+        return SUCCESS;
+    }
+    INLINE_SIZE_FUNCTION(){
+        s = use;
+        return SUCCESS;
+    }
+    INLINE_REWIND_FUNCTION(){use = 0;return SUCCESS;}
+}objectclass;
+
+
+
+
 #ifdef mustundefdevice
 #undef device
-#undef devicename 
+#undef devicename
 #undef bussclass
 #undef readfunction
 #undef writefunction
