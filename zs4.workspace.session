@@ -1,30 +1,60 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Session Name="/home/countinn/zs4/zs4.workspace">
-  <int Value="3" Name="m_selectedTab"/>
+  <int Value="8" Name="m_selectedTab"/>
   <wxString Value="/home/countinn/zs4/zs4.workspace" Name="m_workspaceName"/>
   <TabInfoArray Name="TabInfoArray">
     <TabInfo>
       <wxString Value="/home/countinn/zs4/include/zs4config.h" Name="FileName"/>
-      <int Value="20" Name="FirstVisibleLine"/>
-      <int Value="21" Name="CurrentLine"/>
+      <int Value="3" Name="FirstVisibleLine"/>
+      <int Value="17" Name="CurrentLine"/>
       <wxArrayString Name="Bookmarks"/>
     </TabInfo>
     <TabInfo>
       <wxString Value="/home/countinn/zs4/zs4static/zs4ssl.cpp" Name="FileName"/>
-      <int Value="4" Name="FirstVisibleLine"/>
+      <int Value="1" Name="FirstVisibleLine"/>
       <int Value="2" Name="CurrentLine"/>
       <wxArrayString Name="Bookmarks"/>
     </TabInfo>
     <TabInfo>
       <wxString Value="/home/countinn/zs4/include/zs4string.h" Name="FileName"/>
-      <int Value="299" Name="FirstVisibleLine"/>
+      <int Value="296" Name="FirstVisibleLine"/>
       <int Value="297" Name="CurrentLine"/>
       <wxArrayString Name="Bookmarks"/>
     </TabInfo>
     <TabInfo>
       <wxString Value="/home/countinn/zs4/include/zs4jsonparser.h" Name="FileName"/>
-      <int Value="210" Name="FirstVisibleLine"/>
+      <int Value="255" Name="FirstVisibleLine"/>
       <int Value="208" Name="CurrentLine"/>
+      <wxArrayString Name="Bookmarks"/>
+    </TabInfo>
+    <TabInfo>
+      <wxString Value="/home/countinn/zs4/zs4dyad/zs4dyad.h" Name="FileName"/>
+      <int Value="59" Name="FirstVisibleLine"/>
+      <int Value="60" Name="CurrentLine"/>
+      <wxArrayString Name="Bookmarks"/>
+    </TabInfo>
+    <TabInfo>
+      <wxString Value="/home/countinn/zs4/zs4dyad/dyad.h" Name="FileName"/>
+      <int Value="7" Name="FirstVisibleLine"/>
+      <int Value="46" Name="CurrentLine"/>
+      <wxArrayString Name="Bookmarks"/>
+    </TabInfo>
+    <TabInfo>
+      <wxString Value="/home/countinn/zs4/include/jsonobject.h" Name="FileName"/>
+      <int Value="191" Name="FirstVisibleLine"/>
+      <int Value="193" Name="CurrentLine"/>
+      <wxArrayString Name="Bookmarks"/>
+    </TabInfo>
+    <TabInfo>
+      <wxString Value="/home/countinn/zs4/include/zs4stream.h" Name="FileName"/>
+      <int Value="132" Name="FirstVisibleLine"/>
+      <int Value="153" Name="CurrentLine"/>
+      <wxArrayString Name="Bookmarks"/>
+    </TabInfo>
+    <TabInfo>
+      <wxString Value="/home/countinn/zs4/zs4/main.cpp" Name="FileName"/>
+      <int Value="11" Name="FirstVisibleLine"/>
+      <int Value="25" Name="CurrentLine"/>
       <wxArrayString Name="Bookmarks"/>
     </TabInfo>
   </TabInfoArray>

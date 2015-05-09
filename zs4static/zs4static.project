@@ -8,8 +8,10 @@
   <Description/>
   <Dependencies/>
   <VirtualDirectory Name="src">
-    <File Name="zs4ssl.cpp"/>
-    <File Name="zs4ssl.h"/>
+    <File Name="tinydir.h"/>
+    <File Name="zs4crypt.cpp"/>
+    <File Name="zs4crypt.h"/>
+    <File Name="zs4fs.cpp"/>
   </VirtualDirectory>
   <VirtualDirectory Name="include">
     <File Name="../include/jsonobject.h"/>
