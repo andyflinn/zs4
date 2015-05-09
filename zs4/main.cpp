@@ -5,6 +5,7 @@
 
 static void storageinfo(const char * name, zs4::storage & store)
 {
+	/*
 	printf("storage information for %s:\n", name);
 
 	printf("%s.bits() is (%lld)\n", name, (ZS4LARGE)store.bits());
@@ -14,8 +15,8 @@ static void storageinfo(const char * name, zs4::storage & store)
 	printf("%s.p16() is (%lld)\n", name, (ZS4LARGE)store.p16());
 	printf("%s.p32() is (%lld)\n", name, (ZS4LARGE)store.p32());
 	printf("%s.p64() is (%lld)\n", name, (ZS4LARGE)store.p64());
-
 	putchar('\n');
+*/
 }
 
 int main(int argc, char **argv)
@@ -34,8 +35,9 @@ int main(int argc, char **argv)
 
 	for (;;){
 		if (zs4::SUCCESS != object.tickle())
-			break;
-
+		{
+			printf("press ctrl c to quit\n");
+		}
 	}
 
 	DBG_GETCHAR;

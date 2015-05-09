@@ -39,6 +39,7 @@ public:
 				};
 				return ASCII;
 			}
+			inline bool valueReverse(){ return false; }
 			inline virtual const ZS4CHAR count(void) = 0;
 			inline virtual const ZS4CHAR * data(void) = 0;
 		public:
@@ -46,7 +47,10 @@ public:
 
 				for (ZS4LARGE i = 0; i < count(); i++){
 					if ((ZS4CHAR)data()[i] == (ZS4CHAR)event)
+					{
+						if (valueReverse()) { return (ZS4CHAR)(count() - i); }
 						return (ZS4CHAR)i;
+					}
 				}
 				return (ZS4CHAR)(~0);
 			}
@@ -178,7 +182,6 @@ public:
 		#define	INLINE_RESET_FUNCTION() inline virtual void reset(void)
 		
 		#define INLINE_CONNECT_FUNCTION() inline virtual e connect(stream * in, stream * out)
-		#define INLINE_TICKLE_FUNCTION() inline virtual e tickle(void)
 		#define INLINE_ONCHAR_FUNCTION() inline virtual e onChar(char & c)
 		#define INLINE_ONLINE_FUNCTION() inline virtual e onLine(char * str)
 
@@ -191,6 +194,153 @@ public:
 		inline virtual ZS4LARGE messageBits(void)const{ return (bits() - addressBits()); }
 
 	}storage;
+
+	typedef class stream : public storage{
+	public:
+		inline stream(){}
+		inline virtual e read(char & c){
+			return FAILURE;
+		}
+		#define	INLINE_READ_FUNCTION() inline virtual e read(char & c)
+		inline virtual e write(char c){
+			return FAILURE;
+		}
+		#define	INLINE_WRITE_FUNCTION() inline virtual e write(char c)
+		inline virtual ZS4LARGE readable(void){
+			return 0;
+		}
+		#define	INLINE_READABLE_FUNCTION() inline virtual ZS4LARGE readable(void)
+		inline virtual ZS4LARGE writeable(void){
+			return 0;
+		}
+		#define	INLINE_WRITEABLE_FUNCTION() inline virtual ZS4LARGE writeable(void)
+		inline virtual e flush(void){
+			return FAILURE;
+		}
+		#define	INLINE_FLUSH_FUNCTION() inline virtual e flush(void)
+		inline virtual e close(void){
+			return FAILURE;
+		}
+		#define	INLINE_CLOSE_FUNCTION() inline virtual e close(void)
+		inline virtual e rewind(void){
+			return seek(0, SEEK_SET);
+		}
+		#define	INLINE_REWIND_FUNCTION() inline virtual e rewind(void)
+		inline virtual e seekEnd(void){
+			return seek(0, SEEK_END);
+		}
+		#define	INLINE_SEEKEND_FUNCTION() inline virtual e seekEnd(void)
+		inline virtual e seek(ZS4LARGE offset, int origin){
+			return FAILURE;
+		}
+		#define	INLINE_SEEK_FUNCTION() inline virtual e seek(ZS4LARGE offset, int origin)
+		inline virtual e tell(ZS4LARGE & pPos){
+			return FAILURE;
+		}
+		#define	INLINE_TELL_FUNCTION() inline virtual e tell(ZS4LARGE & pPos)
+		inline virtual e size(ZS4LARGE & s){
+			e err;
+			ZS4LARGE pos = 0;
+			ZS4LARGE size = 0;
+
+			if ((err = tell(pos)) != SUCCESS)
+				return err;
+
+			if ((err = seek(0, SEEK_END)) != SUCCESS)
+				return err;
+
+			if ((err = tell(size)) != SUCCESS)
+				return err;
+
+			if ((err = seek(pos, SEEK_SET)) != SUCCESS)
+				return err;
+
+			s = size;
+
+			return SUCCESS;
+		}
+		#define	INLINE_SIZE_FUNCTION() inline virtual e size(ZS4LARGE & s)
+
+		inline virtual e writeString(const char * str){
+			if (str == nullptr || (*str) == 0)
+				return NODATA;
+
+			unsigned char len = (unsigned char)strlen(str);
+			for (unsigned char i = 0; i < len; i++){
+				if (SUCCESS != write(str[i]))
+					return FAILURE;
+			}
+			return SUCCESS;
+		}
+		#define	INLINE_WRITESTRING_FUNCTION() inline virtual e write(const char * str)
+
+		inline e writeInteger(unsigned long long data, unsigned char base = 10){
+
+			if (data & (1 << 63))
+			{
+				if (SUCCESS != write('-'))
+					return FAILURE;
+
+				data = (~data);
+			}
+
+
+			ZS4LARGE remainder = data;
+			bool NOT_ZERO = false;
+
+			ZS4LARGE MAX = (~0);
+			ZS4LARGE count = 1;
+			ZS4LARGE large = 1;
+			while (large < (MAX / base)){
+				large *= base; count++;
+			}
+
+			zs4::event::numeric numeric;
+			ZS4LARGE accumulator;
+			while (count)
+			{
+				if (0 != (accumulator = remainder / large))
+				{
+					remainder -= (accumulator*large);
+					NOT_ZERO = true;
+				}
+
+				if (NOT_ZERO){
+					if (SUCCESS != write((char)(numeric.data()[accumulator])))
+						return BUFFEROVERFLOW;
+				}
+
+				large /= base;
+				count--;
+			}
+
+			if (!NOT_ZERO)
+			{
+				if (SUCCESS != write((char)(numeric.data()[0])))
+					return BUFFEROVERFLOW;
+			}
+			return SUCCESS;
+		}
+		inline e writeJsonString(const char * out)
+		{
+			for (const char * str = out; str && *str; str++)
+			{
+				switch (*str)
+				{
+				case '\\': if (SUCCESS != writeString("\\\\"))return FAILURE; break;
+				case '"': if (SUCCESS != writeString("\\\""))return FAILURE; break;
+				case '/': if (SUCCESS != writeString("\\/"))return FAILURE; break;
+				case '\b': if (SUCCESS != writeString("\\b"))return FAILURE; break;
+				case '\f': if (SUCCESS != writeString("\\f"))return FAILURE; break;
+				case '\n': if (SUCCESS != writeString("\\n"))return FAILURE; break;
+				case '\r': if (SUCCESS != writeString("\\r"))return FAILURE; break;
+				case '\t': if (SUCCESS != writeString("\\t"))return FAILURE; break;
+				default: if (SUCCESS != write(*str))return FAILURE; break;
+				}
+			}
+			return SUCCESS;
+		}
+	}stream;
 
 #	include <zs4util.h>
 
