@@ -10,8 +10,11 @@ int main(int argc, char **argv)
 	util::in in;
 	util::out out;
 
-	byte_t buffer[255];
-	zs4::byte::object object((unsigned byte_t*)&buffer, sizeof(buffer), &in, &out);
+	zs4::quad::bytestream quadin((zs4::byte::stream*)&in);
+	zs4::quad::bytestream quadout((zs4::byte::stream*)&out);
+	
+	zs4::quad_t buffer[255];
+	zs4::quad::object object((unsigned long *)buffer, (unsigned long)255, &quadin, &quadout);
 
 	for (;;){
 		if (SUCCESS != object.tickle())

@@ -4,7 +4,7 @@
 #ifndef device
 #define device char
 #define intclass byte
-#define type_t byte_t
+typedef char byte_t;
 #endif
 
 #ifndef ZS4LARGE
@@ -14,7 +14,6 @@
 typedef class intclass
 {
 public:
-	typedef device type_t;
 	static const ZS4LARGE PRECISION = (ZS4LARGE)(unsigned device)(sizeof(device) << 3);
 	static const ZS4LARGE MASK = (ZS4LARGE)(unsigned device)(~0);
 	static const ZS4LARGE MAX = MASK;
@@ -486,6 +485,41 @@ public:
 
 	}stream;
 
+	typedef class bytestream : public stream
+	{
+		zs4::byte::stream * stream = nullptr;
+	public:
+		inline bytestream(zs4::byte::stream * bs){
+			stream = bs;
+		}
+
+		INLINE_READ_FUNCTION(){
+			zs4::byte::integer b;
+			e error = stream->read(b.data);
+			if (error)return error;
+			c = (unsigned device)b.data;
+			return SUCCESS;
+		}
+		INLINE_WRITE_FUNCTION(){
+			zs4::byte::integer b;
+			b.data = (unsigned char)c;
+			return stream->write(b.data);
+		}
+		INLINE_READABLE_FUNCTION(){
+			return (unsigned device)stream->readable();
+		}
+		INLINE_WRITEABLE_FUNCTION(){
+			return (unsigned device)stream->writeable();
+		}
+		INLINE_FLUSH_FUNCTION(){ return stream->flush(); }
+		INLINE_CLOSE_FUNCTION(){ return stream->close(); }
+		INLINE_REWIND_FUNCTION(){ return stream->rewind(); }
+		INLINE_SEEKEND_FUNCTION(){ return stream->seekEnd(); }
+		INLINE_SEEK_FUNCTION(){ return stream->seek(offset,origin); }
+		INLINE_TELL_FUNCTION(){ return stream->tell(pPos); }
+		INLINE_SIZE_FUNCTION(){ return stream->size(s); }
+	};
+
 	typedef class integer
 	{
 	public:
@@ -605,19 +639,18 @@ public:
 		}
 
 		inline e set(symbol::set&set, unsigned device * s){
-			data = 0;
+			//data = 0;
 
 			for (unsigned device i = 0; s[i] != 0 && s[i] != '\n'; i++){
 				unsigned device lu = set.lookup((unsigned device)s[i]);
 				if (lu >= set.count()){
-					data = 0;
+					//data = 0;
 					return FAILURE;
 				}
 
 				ZS4LARGE nu = (ZS4LARGE)((ZS4LARGE)((ZS4LARGE)data*(ZS4LARGE)set.count()) + (ZS4LARGE)lu);
-				if ((ZS4LARGE)nu > (ZS4LARGE)MAX){
-					data = (unsigned device)MAX;
-					return (e)MAX;
+				if ((ZS4LARGE)nu > (unsigned device)MAX){
+					return FAILURE;
 				}
 				data = (unsigned device)nu;
 			}
@@ -717,6 +750,7 @@ public:
 			return stacktop - limit;
 		}
 
+		inline unsigned device itemSize(){ return 2; }
 		typedef struct item {
 		public:
 			unsigned device nam;
@@ -732,7 +766,7 @@ public:
 			return SUCCESS;
 		}
 		inline item * itemArray(void){ return (item*)&store[stacktop]; }
-		inline unsigned device itemCount(void){ return ((storesize - stacktop) / sizeof(item)); }
+		inline unsigned device itemCount(void){ return ((storesize - stacktop) / 2); }
 		inline e itemFind(unsigned device & d, unsigned device * str){
 			item * arr = itemArray();
 			unsigned device c = itemCount();
@@ -823,12 +857,12 @@ public:
 			unsigned device wk;
 			e error = FAILURE;
 			symbol symbol;
-			item var;
+			item var; var.nam = var.val = 0;
 			// cut leading space;
 			while (symbol.is<symbol::space>(*str))str++;
 			switch (*str){
 			case '+':{
-				if (itemSpace() < (sizeof(var))){
+				if (itemSpace() < 2){
 					return jError(NOMEMORY);
 				}
 
@@ -836,16 +870,15 @@ public:
 				if (error = itemNameSet(var, str)){
 					return jError(BADNAME);
 				}
-				var.val = 0;
 
+				var.val = 0;
 				if (SUCCESS == itemFind(wk, str)){
 					return jError(ALREADYEXISTS);
 				}
 
 
-				stacktop -= sizeof(item);
-				item * eye = (item*)&store[stacktop];
-				*eye = var;
+				stacktop -= itemSize();
+				(*itemArray()) = var;
 
 				out->write('0');
 				return jDone();
@@ -863,7 +896,7 @@ public:
 				for (unsigned device i = iRemove; i > 0; i--){
 					arr[i] = arr[i - 1];
 				}
-				stacktop += sizeof(item);
+				stacktop += itemSize();
 
 				return jDone();
 			}
@@ -1012,6 +1045,5 @@ public:
 
 #undef objectclass
 #undef symbolclass
-#undef type_t
 #undef intclass
 #undef device
