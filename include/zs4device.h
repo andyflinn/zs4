@@ -170,8 +170,8 @@ public:
 				return (unsigned device)(~0);
 			}
 			inline unsigned device bits(void){
-				unsigned device m = (~0)>>1;
-				unsigned device r = (unsigned device)((sizeof(unsigned device) << 3) - 1);
+				unsigned device m = (unsigned device)(~0) >> 1;
+				unsigned device r = (unsigned device)((unsigned device)(sizeof(unsigned device) << 3) - 1);
 				while (((m >> 1)&((unsigned device)count())) >= count()){
 					m >>= 1; r--;
 				}
@@ -380,8 +380,8 @@ public:
 
 			bool NOT_ZERO = false;
 
-			unsigned device MAX = (~0);
-			unsigned device count = 1;
+			unsigned device MAX = (unsigned device)(~0);
+			unsigned device count = (unsigned device)1;
 			ZS4LARGE large = 1;
 			while (large < (MAX / base)){
 				large *= base; count++;
@@ -673,7 +673,7 @@ public:
 			ZS4LARGE remainder = dta;
 			bool NOT_ZERO = false;
 
-			ZS4LARGE MAX = (~0);
+			ZS4LARGE MAX = (ZS4LARGE)(~0);
 			ZS4LARGE count = 1;
 			ZS4LARGE large = 1;
 			while (large < (MAX / set.count())){
@@ -723,7 +723,7 @@ public:
 		inline unsigned device & operator =(int &d){ data = (unsigned device) d; return data; }
 
 		inline operator bool()const{ if (data != 0) { return true; } return false; }
-		inline unsigned device & operator =(bool b){ if (b) data = (~0); else data = 0;  return data; }
+		inline unsigned device & operator =(bool b){ if (b) data = (unsigned device)(~0); else data = 0;  return data; }
 
 	}integer;
 
@@ -973,7 +973,8 @@ public:
 			else { storesize = MAX; }
 			reset();
 			stacktop = storesize;
-			buffer = storesize / 4; if (buffer > 256){ buffer = (unsigned device)256; }
+			buffer = (storesize / 4); 
+			if (buffer > 255){ buffer = (unsigned device)255; }
 			limit = (storesize - buffer);
 			children = 0;
 			use = 0;

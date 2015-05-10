@@ -250,15 +250,12 @@ do { if (!state.first_pass) string[string_length] = b;  ++string_length; } while
 
 			inline json_value * json_parse_ex(json_settings * settings, const char * json)
 			{
-				char error[128];
 				ZS4LARGE cur_line;
 				const char * cur_line_begin, *i;
 				json_value * top, *root, *alloc = 0;
 				json_state state;
 				long flags;
 				long num_digits, num_fraction, num_e;
-
-				error[0] = '\0';
 
 				memset(&state, 0, sizeof(json_state));
 				memcpy(&state.settings, settings, sizeof(json_settings));
