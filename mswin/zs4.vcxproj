@@ -24,13 +24,12 @@
   <ItemGroup>
     <ClInclude Include="..\include\buffer.h" />
     <ClInclude Include="..\include\tinydir.h" />
-    <ClInclude Include="..\include\zs4_save.h" />
     <ClInclude Include="..\include\zs4array.h" />
     <ClInclude Include="..\include\intbits.h" />
     <ClInclude Include="..\include\zs4config.h" />
     <ClInclude Include="..\include\zs4file.h" />
     <ClInclude Include="..\include\zs4fs.h" />
-    <ClInclude Include="..\include\zs4function.h" />
+    <ClInclude Include="..\include\zs4error.h" />
     <ClInclude Include="..\include\zs4json.h" />
     <ClInclude Include="..\include\zs4jsonparser.h" />
     <ClInclude Include="..\include\zs4server.h" />

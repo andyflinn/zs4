@@ -1,14 +1,141 @@
 
-#include <zs4config.h>
+//#include <zs4config.h>
+#include <zs4error.h>
 
 #ifndef device
 #define device char
 #define intclass byte
+#define type_t byte_t
+#endif
+
+#ifndef ZS4LARGE
+#	define ZS4LARGE unsigned long long
 #endif
 
 typedef class intclass
 {
 public:
+	typedef device type_t;
+	static const ZS4LARGE PRECISION = (ZS4LARGE)(unsigned device)(sizeof(device) << 3);
+	static const ZS4LARGE MASK = (ZS4LARGE)(unsigned device)(~0);
+	static const ZS4LARGE MAX = MASK;
+	static const ZS4LARGE MIN = (ZS4LARGE)((device)0);
+	static const ZS4LARGE SIGBIT = (ZS4LARGE)(PRECISION - 1);
+	static const ZS4LARGE PROBABILITY = (ZS4LARGE)(1 << PRECISION);
+
+	static const unsigned device * zs4(){ static const unsigned device zs4[] = { 'z', 's', '4', 0 }; return zs4; }
+
+	inline static unsigned device * NEWLINE(){ static unsigned device r[] = { '\n', 0 }; return r; }
+
+	inline static unsigned device cmp(unsigned device c1, unsigned device c2){
+		return c1 - c2;
+	}
+	inline static unsigned device cmp(const unsigned device * str1, const unsigned device * str2, const unsigned device * terminator = nullptr){
+		if (terminator == nullptr){
+			for (;;)
+			{
+				if (*str1 == 0 && *str2 == 0)
+					return 0;
+
+				if (*str1 != *str2)
+					return *str1 - *str2;
+
+				str1++; str2++;
+			}
+
+		}
+		else{
+			for (;;)
+			{
+				if (count(str1, terminator) && count(str2, terminator))
+					return 0;
+
+				if (*str1 != *str2)
+					return *str1 - *str2;
+
+				str1++; str2++;
+			}
+		}
+	}
+	inline static unsigned device ncmp(const unsigned device * str1, const unsigned device * str2, unsigned device n){
+		for (unsigned device i = 0; i < n; i++)
+		{
+			unsigned device c1 = *str1++;
+			unsigned device c2 = *str2++;
+			if (c1 == 0 && c2 == 0) return 0;
+			if (c1 != c2) return c1 - c2;
+		}
+
+		return 0;
+	}
+
+	inline static unsigned device len(const unsigned device * str, const unsigned device * terminator = nullptr){
+		unsigned device ret = 0;
+		if (terminator == nullptr){
+			while (*str){ str++; ret++; }
+		}
+		else{
+			while (0 != (*str) && (0 == count(terminator, *str))){ str++; ret++; }
+		}
+		return ret;
+	}
+	inline static unsigned device count(const unsigned device * str, unsigned device c){
+		if (str == 0)
+			return 0;
+
+		unsigned device ret = 0;
+
+		while (*str != 0)
+		{
+			if (c == *str)
+				ret++;
+			str++;
+		}
+
+		return ret;
+	}
+	inline static unsigned device count(const unsigned device * s, const unsigned device * chrs){
+		unsigned device ret = 0;
+		for (const unsigned device * cp = s; cp && *cp; cp++)
+		{
+			for (const unsigned device * p = chrs; p && *p; p++)
+			{
+				if (*cp == *p)
+					ret++;
+			}
+		}
+
+		return ret;
+	}
+	inline static unsigned device swap(unsigned device org, unsigned device * str, unsigned device nu){
+		unsigned device ret = 0;
+		while (*str != 0) { if (*str == org) { *str = nu; ret++; } str++; }
+		return ret;
+	}
+	inline static unsigned device ecmp(const unsigned device * str, const unsigned device * end){
+		unsigned device len_str = len(str);
+		unsigned device len_end = len(end);
+
+		if (len_end > len_str)
+			return 1;
+
+
+		return cmp(&str[len_str - len_end], end);
+	}
+
+
+	inline static unsigned device strcmp(const unsigned device * str1, const unsigned device * str2){
+		for (;;)
+		{
+			if (*str1 == 0 && *str2 == 0)
+				return 0;
+
+			if (*str1 != *str2)
+				return *str1 - *str2;
+
+			str1++; str2++;
+		}
+	}
 
 	typedef class event
 	{
@@ -33,7 +160,7 @@ public:
 		public:
 			inline virtual const unsigned device count(void) = 0;
 			inline virtual const unsigned device * data(void) = 0;
-			inline unsigned device lookup(ZS4CHAR event){
+			inline unsigned device lookup(const unsigned event){
 
 				for (unsigned device i = 0; i < count(); i++){
 					if ((unsigned device)data()[i] == (unsigned device)event)
@@ -157,126 +284,168 @@ public:
 		}
 	}event;
 
-	typedef class integer : public storage
+	#define	INLINE_RESET_FUNCTION() inline virtual void reset(void)
+
+	typedef class storage
+	{
+	public:
+
+#define	INLINE_BITS_FUNCTION() inline virtual ZS4LARGE bits(void)const
+		INLINE_BITS_FUNCTION(){ return (sizeof(*this) << 3); }
+
+		INLINE_RESET_FUNCTION() {};
+
+#define INLINE_CONNECT_FUNCTION() inline virtual e connect(stream * in, stream * out)
+
+		inline ZS4LARGE addressBits(void)const{ ZS4LARGE w = 1; while (((ZS4LARGE)1 << w)<bits())w++; return w; }
+		inline ZS4LARGE messageBits(void)const{ return (bits() - addressBits()); }
+
+	}storage;
+
+	typedef class stream : public storage{
+	public:
+		static const unsigned device seek_cur = 1;
+		static const unsigned device seek_end = 2;
+		static const unsigned device seek_set = 0;
+
+#define	INLINE_READ_FUNCTION() inline virtual e read(unsigned device & c)
+		INLINE_READ_FUNCTION(){return FAILURE;}
+#define	INLINE_WRITE_FUNCTION() inline virtual e write(unsigned device c)
+		INLINE_WRITE_FUNCTION(){return FAILURE;	}
+#define	INLINE_READABLE_FUNCTION() inline virtual unsigned device readable(void)
+		INLINE_READABLE_FUNCTION(){	return 0; }
+#define	INLINE_WRITEABLE_FUNCTION() inline virtual unsigned device writeable(void)
+		INLINE_WRITEABLE_FUNCTION(){return 0;}
+#define	INLINE_FLUSH_FUNCTION() inline virtual e flush(void)
+		INLINE_FLUSH_FUNCTION(){ return SUCCESS; }
+#define	INLINE_CLOSE_FUNCTION() inline virtual e close(void)
+		INLINE_CLOSE_FUNCTION(){return SUCCESS;}
+#define	INLINE_REWIND_FUNCTION() inline virtual e rewind(void)
+		INLINE_REWIND_FUNCTION(){return seek(0, SEEK_SET);}
+#define	INLINE_SEEKEND_FUNCTION() inline virtual e seekEnd(void)
+		INLINE_SEEKEND_FUNCTION(){return seek(0, seek_end);}
+#define	INLINE_SEEK_FUNCTION() inline virtual e seek(ZS4LARGE offset, int origin)
+		INLINE_SEEK_FUNCTION(){return FAILURE;}
+#define	INLINE_TELL_FUNCTION() inline virtual e tell(ZS4LARGE & pPos)
+		INLINE_TELL_FUNCTION(){return FAILURE;}
+#define	INLINE_SIZE_FUNCTION() inline virtual e size(ZS4LARGE & s)
+		INLINE_SIZE_FUNCTION(){
+			e err;
+			ZS4LARGE pos = 0;
+			ZS4LARGE size = 0;
+
+			if ((err = tell(pos)) != SUCCESS)
+				return err;
+
+			if ((err = seek(0, SEEK_END)) != SUCCESS)
+				return err;
+
+			if ((err = tell(size)) != SUCCESS)
+				return err;
+
+			if ((err = seek(pos, SEEK_SET)) != SUCCESS)
+				return err;
+
+			s = size;
+
+			return SUCCESS;
+		}
+
+#define	INLINE_WRITESTRING_FUNCTION() inline virtual e write(const unsigned device * str)
+		INLINE_WRITESTRING_FUNCTION(){
+			if (str == nullptr || (*str) == 0)
+				return NODATA;
+
+			unsigned device l = len(str);
+			for (unsigned char i = 0; i < l; i++){
+				if (SUCCESS != write(str[i]))
+					return FAILURE;
+			}
+			return SUCCESS;
+		}
+
+		inline e writeInteger(unsigned device data, unsigned device base = 10){
+
+			if (data & (1 << SIGBIT))
+			{
+				if (SUCCESS != write('-'))
+					return FAILURE;
+
+				data = (~data);
+			}
+
+			unsigned device remainder = data;
+			
+			bool NOT_ZERO = false;
+
+			unsigned device MAX = (~0);
+			unsigned device count = 1;
+			ZS4LARGE large = 1;
+			while (large < (MAX / base)){
+				large *= base; count++;
+			}
+
+			event::numeric numeric;
+			ZS4LARGE accumulator;
+			while (count)
+			{
+				if (0 != (accumulator = remainder / large))
+				{
+					remainder -= (unsigned device)(ZS4LARGE)(accumulator*large);
+					NOT_ZERO = true;
+				}
+
+				if (NOT_ZERO){
+					if (SUCCESS != write((char)(numeric.data()[accumulator])))
+						return BUFFEROVERFLOW;
+				}
+
+				large /= base;
+				count--;
+			}
+
+			if (!NOT_ZERO)
+			{
+				if (SUCCESS != write((char)(numeric.data()[0])))
+					return BUFFEROVERFLOW;
+			}
+			return SUCCESS;
+		}
+		inline e writeJsonString(const unsigned device * out)
+		{
+			for (const unsigned device * str = out; str && *str; str++)
+			{
+				switch (*str)
+				{
+				case '\\': if (SUCCESS != write('\\'))return FAILURE; if (SUCCESS != write('\\'))return FAILURE; break;
+				case '"': if (SUCCESS != write('\\'))return FAILURE; if (SUCCESS != write('\"'))return FAILURE;  break;
+				case '/': if (SUCCESS != write('\\'))return FAILURE; if (SUCCESS != write('/'))return FAILURE;  break;
+				case '\b': if (SUCCESS != write('\\'))return FAILURE; if (SUCCESS != write('b'))return FAILURE;  break;
+				case '\f': if (SUCCESS != write('\\'))return FAILURE; if (SUCCESS != write('f'))return FAILURE;  break;
+				case '\n': if (SUCCESS != write('\\'))return FAILURE; if (SUCCESS != write('n'))return FAILURE;  break;
+				case '\r': if (SUCCESS != write('\\'))return FAILURE; if (SUCCESS != write('r'))return FAILURE;  break;
+				case '\t': if (SUCCESS != write('\\'))return FAILURE; if (SUCCESS != write('t'))return FAILURE;  break;
+				default: if (SUCCESS != write(*str))return FAILURE; break;
+				}
+			}
+			return SUCCESS;
+		}
+	}stream;
+
+	typedef class integer
 	{
 	public:
 		unsigned device data = 0;
 
-		static const ZS4LARGE PRECISION = (ZS4LARGE)(unsigned device)(sizeof(device) << 3);
-		static const ZS4LARGE MASK = (ZS4LARGE)(unsigned device)(~0);
-		static const ZS4LARGE MAX = MASK;
-		static const ZS4LARGE MIN = (ZS4LARGE)((device)0);
-		static const ZS4LARGE SIGBIT = (ZS4LARGE)(PRECISION - 1);
-		static const ZS4LARGE PROBABILITY = (ZS4LARGE)(1 << PRECISION);
-
 		// storage support
-		INLINE_BITS_FUNCTION(){
-			return PRECISION;
-		}
 		inline static unsigned device bitSet(unsigned device d, unsigned device i){ i %= PRECISION; d |= (unsigned device)((unsigned device)1 << (unsigned device)i); return d; }
 		inline static unsigned device bitClear(unsigned device d, unsigned device i){ i %= PRECISION; d &= (unsigned device)((unsigned device)~((unsigned device)1 << (unsigned device)i)); return d; }
 		inline static bool bitGet(unsigned device d, unsigned device i){ i %= PRECISION; if (d & (unsigned device)((unsigned device)1 << (unsigned device)i))return true; return false; }
 		inline static bool bitGetMS(unsigned device d){ return bitGet(d, (PRECISION - 1)); }
 		inline static bool bitGetLS(unsigned device d){ return bitGet(d, 0); }
 
-		inline static unsigned device cmp(unsigned device c1, unsigned device c2){
-			return c1 - c2;
-		}
-		inline static unsigned device cmp(const unsigned device * str1, const unsigned device * str2, const unsigned device * terminator = nullptr){
-			if (terminator == nullptr){
-				for (;;)
-				{
-					if (*str1 == 0 && *str2 == 0)
-						return 0;
-
-					if (*str1 != *str2)
-						return *str1 - *str2;
-
-					str1++; str2++;
-				}
-
-			}
-			else{
-				for (;;)
-				{
-					if (count(str1, terminator) && count(str2, terminator))
-						return 0;
-
-					if (*str1 != *str2)
-						return *str1 - *str2;
-
-					str1++; str2++;
-				}
-			}
-		}
-		inline static unsigned device ncmp(const unsigned device * str1, const unsigned device * str2, unsigned device n){
-			for (unsigned device i = 0; i < n; i++)
-			{
-				unsigned device c1 = *str1++;
-				unsigned device c2 = *str2++;
-				if (c1 == 0 && c2 == 0) return 0;
-				if (c1 != c2) return c1 - c2;
-			}
-
-			return 0;
-		}
-
-		inline static unsigned device len(const unsigned device * str, unsigned device * terminator = nullptr){
-			unsigned device ret = 0;
-			if (terminator == nullptr){
-				while (*str){ str++; ret++; }
-			}
-			else{
-				while (0 != (*str) && (0 == count(terminator, *str))){ str++; ret++; }
-			}
-			return ret;
-		}
-		inline static unsigned device count(const unsigned device * str, unsigned device c){
-			if (str == 0)
-				return 0;
-
-			unsigned device ret = 0;
-
-			while (*str != 0)
-			{
-				if (c == *str)
-					ret++;
-				str++;
-			}
-
-			return ret;
-		}
-		inline static unsigned device count(const unsigned device * s, const unsigned device * chrs){
-			unsigned device ret = 0;
-			for (const unsigned device * cp = s; cp && *cp; cp++)
-			{
-				for (const unsigned device * p = chrs; p && *p; p++)
-				{
-					if (*cp == *p)
-						ret++;
-				}
-			}
-
-			return ret;
-		}
-		inline static unsigned device swap(unsigned device org, unsigned device * str, unsigned device nu){
-			unsigned device ret = 0;
-			while (*str != 0) { if (*str == org) { *str = nu; ret++; } str++; }
-			return ret;
-		}
-		inline static unsigned device ecmp(const unsigned device * str, const unsigned device * end){
-			unsigned device len_str = len(str);
-			unsigned device len_end = len(end);
-
-			if (len_end > len_str)
-				return 1;
-
-
-			return cmp(&str[len_str - len_end], end);
-		}
-
 		INLINE_RESET_FUNCTION(){ data = 0; }
-		inline signed cmp(device c)const{return data - c;}
+		inline unsigned device cmp(device c)const{ return data - c; }
 
 		inline e io(stream * in, stream * out){
 			device o = 0;
@@ -286,11 +455,11 @@ public:
 		}
 
 
-		inline e set(event::set&set,const char * s){
+		inline e set(event::set&set, unsigned device * s){
 			data = 0;
 			//symbolset set;
-			for (ZS4CHAR i = 0; s[i] != 0 && s[i] != '\n'; i++){
-				ZS4CHAR lu = set.lookup((ZS4CHAR)s[i]);
+			for (unsigned device i = 0; s[i] != 0 && s[i] != '\n'; i++){
+				unsigned device lu = set.lookup((unsigned device)s[i]);
 				if (lu >= set.count()){
 					data = 0;
 					return FAILURE;
@@ -298,16 +467,16 @@ public:
 
 				ZS4LARGE nu = (ZS4LARGE)((ZS4LARGE)((ZS4LARGE)data*(ZS4LARGE)set.count()) + (ZS4LARGE)lu);
 				if ((ZS4LARGE)nu > (ZS4LARGE)MAX){
-					data = (device)MAX;
+					data = (unsigned device)MAX;
 					return (e)MAX;
 				}
-				data = (device)nu;
+				data = (unsigned device)nu;
 			}
 
 			return SUCCESS;
 		}
-		inline e write(stream & out, zs4::event::set & set, bool sign = false)const{
-			device dta = data;
+		inline e write(stream & out, event::set & set, bool sign = false)const{
+			unsigned device dta = data;
 
 			if (sign){
 				if ((ZS4LARGE)dta & (ZS4LARGE)(1 << SIGBIT))
@@ -374,32 +543,12 @@ public:
 		inline operator bool()const{ if (data != 0) { return true; } return false; }
 		inline unsigned device & operator =(bool b){ if (b) data = (~0); else data = 0;  return data; }
 
-		inline operator ZS4ANALOG()const{
-			ZS4ANALOG r = 0.0;
-			ZS4ANALOG h = 0.5;
-			for (ZS4CHAR i = PRECISION; i > 0; i--){
-				if ((ZS4LARGE)data | (ZS4LARGE)(1 << (i - 1))) r += h;
-				h /= 2.0;
-			}
-			return r;
-		}
-		inline unsigned device & operator =(ZS4ANALOG a){
-			if (a < 0.0) a = 0.0;
-			if (a > 1.0) a = 1.0;
-
-			data = (ZS4CHAR)((ZS4ANALOG)((ZS4ANALOG)MAX * (ZS4ANALOG)a));
-			return data;
-		}
-
 	}integer;
 
 	typedef class object : public stream{
 	#	define INLINE_TICKLE_FUNCTION() inline virtual e tickle(void)
-	#	define INLINE_ONCHAR_FUNCTION() inline virtual e onChar(char & c)
-	#	define INLINE_ONLINE_FUNCTION() inline virtual e onLine(char * str)
-	#	define INLINE_INSTANCE() inline object(char * m, ZS4LONG s, stream * i, stream * o)
 
-		char * store;
+		unsigned device * store;
 		unsigned device storesize;
 		unsigned device stacktop;
 		unsigned device limit;
@@ -414,26 +563,27 @@ public:
 			return (ZS4LARGE)(storesize << 3);
 		}
 		INLINE_RESET_FUNCTION(){
-			memset(store, 0, storesize);
+			char * p = (char*)store;
+			for (unsigned device i = 0; i < storesize; i++){ p[i] = 0; }
 		}
 		inline unsigned device itemSpace(){
 			return stacktop - limit;
 		}
-		inline e response(char c){
-			return out->write(c);
+		inline e response(unsigned device c){
+			return out->write((unsigned device) c);
 		}
-		inline e responseString(const char * s){
-			return out->writeString(s);
+		inline e responseString(const unsigned device * s){
+			return out->write(s);
 		}
-		inline e responseInteger(unsigned long long data, unsigned char base = 10){
+		inline e responseInteger(unsigned device data, unsigned device base = 10){
 			return out->writeInteger(data,base);
 		}
 		typedef struct item {
 		public:
-			device nam;
-			device val;
+			unsigned device nam;
+			unsigned device val;
 		}item;
-		inline e itemNameSet(item & i, const char * n){
+		inline e itemNameSet(item & i, unsigned device * n){
 			event::name set;
 			e error = SUCCESS;
 			integer w;
@@ -444,13 +594,13 @@ public:
 		}
 		inline item * itemArray(void){ return (item*)&store[stacktop]; }
 		inline unsigned device itemCount(void){ return ((storesize - stacktop) / sizeof(item)); }
-		inline e itemFind(device & d, const char * str){
+		inline e itemFind(unsigned device & d, unsigned device * str){
 			item * arr = itemArray();
-			device c = itemCount();
+			unsigned device c = itemCount();
 			item var; var.nam = var.val = 0;
 			if (SUCCESS != itemNameSet(var, str)){ return BADNAME; }
 
-			for (device i = 0; i < c; i++)
+			for (unsigned device i = 0; i < c; i++)
 			{
 				if (arr[i].nam == var.nam){
 					d = i;
@@ -461,39 +611,57 @@ public:
 			return NOTFOUND;
 		}
 
-		inline virtual e jStart(const char * n = nullptr){ if (n != nullptr) { response('"'); responseString(n); response('"'); response(':'); }; return response('{'); }
+		inline virtual e jInteger(const unsigned device n, unsigned device data, unsigned char base = 10){
+			jNameColon(n);
+			return responseInteger(data, base);
+		}
+		inline virtual e jNameColon(const unsigned device n){
+			response('"');
+			response('n');
+			response('"');
+			return response(':');
+		}
+
+		inline virtual e jStart(const unsigned device n){
+			jNameColon(n);
+			return response('{');
+		}
+
+		inline virtual e jStart(const unsigned device * n = nullptr){
+				if (n != nullptr) {
+				response('"'); 
+				responseString(n); 
+				response('"'); 
+				response(':'); 
+			} 
+			return response('{'); }
 		inline virtual e jEnd(){ return response('}'); }
 
 		inline e onc(){
-			jStart("zs4");
+			jStart(zs4());
 			{
-				jStart("i"); //info
+				jStart('i'); //info
 				{
-					jStart("m"); // memory
+					jStart('m'); // memory
 					{
-						responseString("\"s\":"); // total
-						responseInteger(storesize);
+						jInteger('s', storesize);
 						response(',');
 
-						responseString("\"b\":"); // available
-						responseInteger(buffer);
+						jInteger('b', buffer);
 						response(',');
 
-						responseString("\"l\":"); // available
-						responseInteger(limit);
+						jInteger('l', limit);
 						response(',');
 
-						responseString("\"u\":"); // used
-						responseInteger(storesize - stacktop);
+						jInteger('u',(storesize - stacktop));
 					}
 					jEnd(); // memory
 
 					response(',');
 
-					jStart("c"); // memory
+					jStart('c'); // memory
 					{
-						responseString("\"i\":"); // total
-						responseInteger(children);
+						jInteger('c', children);
 						//response(',');
 
 					}
@@ -515,8 +683,8 @@ public:
 
 				if (c){
 					integer b; b.data = 0;
-					zs4::event::name nam;
-					zs4::event::decimal dec;
+					event::name nam;
+					event::decimal dec;
 
 					for (device i = 0; i < c; i++)
 					{
@@ -537,29 +705,30 @@ public:
 			return response('\n');
 		}
 
-		INLINE_ONLINE_FUNCTION(){
-			device wk;
+#		define INLINE_ONSCAN_FUNCTION() inline virtual e onScan(unsigned device * str)
+		INLINE_ONSCAN_FUNCTION(){
+			unsigned device wk;
 			e error = FAILURE;
-			zs4::event event;
+			event event;
 			item var;
 			// cut leading space;
-			while (event.is<zs4::event::space>((ZS4CHAR)*str))str++;
+			while (event.is<event::space>(*str))str++;
 			switch (*str){
 			case '+':{
 				if (itemSpace() < (sizeof(var))){
-					responseString("error no memory\n");
+					response('\n');
 					return NOMEMORY;
 				}
 
 				str++;
 				if (error = itemNameSet(var, str)){
-					responseString("error invalid name\n");
+					response('\n');
 					return BADNAME;
 				}
 				var.val = 0;
 
 				if (SUCCESS == itemFind(wk, str)){
-					responseString("error exists\n");
+					response('\n');
 					return ALREADYEXISTS;
 				}
 
@@ -568,65 +737,67 @@ public:
 				item * eye = (item*)&store[stacktop];
 				*eye = var;
 
-				responseString("added\n");
+				response('\n');
 				return SUCCESS;
 			}
 			case '-':{
 				str++;
-				device iRemove = 0;
+				unsigned device iRemove = 0;
 				if (SUCCESS != itemFind(iRemove, str)){
-					responseString("error not found\n");
+					response('\n');
 					return NOTFOUND;
 				}
 
 				item * arr = itemArray();
-				device cnt = itemCount();
+				unsigned device cnt = itemCount();
 
-				for (device i = iRemove; i > 0; i--){
+				for (unsigned device i = iRemove; i > 0; i--){
 					arr[i] = arr[i - 1];
 				}
 				stacktop += sizeof(item);
 
-				responseString("removed\n");
+				response('\n');
 				return SUCCESS;
 			}
 			}
 
 			return response('\n');
 		}
-		INLINE_ONCHAR_FUNCTION(){
+#		define INLINE_ONINTEGER_FUNCTION() inline virtual e onInteger(unsigned device & c)
+		INLINE_ONINTEGER_FUNCTION(){
 			if (in == nullptr || out == nullptr) return FAILURE;
 
 			if (use < 1)
 				return FAILURE;
 
-			if (store[use - 1] == '\n')
+			if (0 == ecmp(store,NEWLINE()))
 			{
 				rewind();
-				if (!strcmp(store, "?\n")){ return onv(); }
-				else { return onLine(store); }
+				if (store[0] == '?'){ return onv(); }
+				else { return onScan(store); }
 			}
 
 			if (use >= (ulim()))
 			{
-				char c;
+				unsigned device c;
 				while (in->readable()){
 					in->read(c);
 					if (c == '\n')
 						break;
 				}
 				rewind();
-				responseString("error buffer overflow\n");
+				response('\n');
 				return BUFFEROVERFLOW;
 			}
 
 			return WAITING;
 		}
 	public:
+#		define INLINE_INSTANCE() inline object(unsigned device * m, unsigned device s, stream * i, stream * o)
 		INLINE_INSTANCE(){
 			store = m;
-			if (s <= integer::MAX) { storesize = (unsigned device)s; }
-			else { storesize = integer::MAX; }
+			if (s <= MAX) { storesize = (unsigned device)s; }
+			else { storesize = MAX; }
 			reset();
 			stacktop = storesize;
 			buffer = storesize / 4; if (buffer > 256){ buffer = (unsigned device)256; }
@@ -639,7 +810,7 @@ public:
 		inline virtual e tickle(void){
 			if (in == nullptr || out == nullptr) return FAILURE;
 
-			char c = 0;
+			unsigned device c = 0;
 			e error = SUCCESS;
 
 			while (in->readable()){
@@ -649,7 +820,7 @@ public:
 				if ((error = write(c)))
 					return error;
 
-				error = onChar(c);
+				error = onInteger(c);
 				if (error == WAITING)
 					continue;
 
@@ -699,5 +870,6 @@ public:
 
 #undef objectclass
 #undef eventclass
+#undef type_t
 #undef intclass
 #undef device

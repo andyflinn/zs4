@@ -1,145 +1,14 @@
 #ifndef ZS4_UTIL
 #define ZS4_UTIL
 
+#include <zs4.h>
 #include <zs4config.h>
 
-	class c
-	{
-	public:
-		inline static bool charUpperable(char c)	{
-			if (c >= 'a' && c <= 'z')
-				return true;
+#define byte_t char 
 
-			return false;
-		}
-		inline static bool charLowerable(char c){
-			if (c >= 'A' && c <= 'Z')
-				return true;
-
-			return false;
-		}
-		inline static char charMakeUpper(char c){
-			if (charUpperable(c))
-				return (c - 0x020);
-
-			return c;
-		}
-		inline static char charMakeLower(char c){
-			if (charLowerable(c))
-				return (c + 0x020);
-
-			return c;
-		}
-		inline static int charCompare(char c1, char c2){
-			return c1 - c2;
-		}
-
-		inline static unsigned char strlen(const char * str){
-			unsigned char ret = 0;
-			while (str != nullptr && (*str != 0)){
-				ret++;
-			}
-			return ret;
-		}
-		inline static int strcmp(const char * str1, const char * str2){
-			for (;;)
-			{
-				if (*str1 == 0 && *str2 == 0)
-					return 0;
-
-				if (*str1 != *str2)
-					return *str1 - *str2;
-
-				str1++; str2++;
-			}
-		}
-		inline static int stricmp(const char * str1, const char * str2){
-			for (;;)
-			{
-				register char c1 = *str1++;
-				register char c2 = *str2++;
-
-				if (c1 == 0 && c2 == 0)
-					return 0;
-
-				c1 = charMakeLower(c1);
-				c2 = charMakeLower(c2);
-
-				if (c1 != c2)
-					return c1 - c2;
-			}
-		}
-		inline static int strncmp(const char * str1, const char * str2, ZS4LARGE n){
-			char c1, c2, *s1 = (char *)str1, *s2 = (char *)str2;
-			for (ZS4LARGE i = 0; i < n; i++)
-			{
-				c1 = *s1++;
-				c2 = *s2++;
-				if (c1 == 0 && c2 == 0) return 0;
-				if (c1 != c2) return c1 - c2;
-			}
-
-			return 0;
-		}
-
-		inline static int strnicmp(const char * str1, const char * str2, ZS4LARGE n){
-			char c1, c2, *s1 = (char *)str1, *s2 = (char *)str2;
-			for (ZS4LARGE i = 0; i < n; i++)
-			{
-				c1 = *s1++;
-				c2 = *s2++;
-				if (c1 == 0 && c2 == 0) return 0;
-				c1 = charMakeLower(c1);
-				c2 = charMakeLower(c2);
-				if (c1 != c2) return c1 - c2;
-			}
-
-			return 0;
-		}
-		inline static int strcharcount(const char * s, const char * chrs){
-			int ret = 0;
-			for (const char * cp = s; cp && *cp; cp++)
-			{
-				for (const char * p = chrs; p && *p; p++)
-				{
-					if (*cp == *p)
-						ret++;
-				}
-			}
-
-			return ret;
-		}
-		inline static int strcharcount(const char * s, const char c){
-			char ch[2] = { c, 0 };
-			return strcharcount(s, ch);
-		}
-		inline static int strcharswap(char org, char * str, char nu){
-			int ret = 0;
-			while (*str != 0) { if (*str == org) { *str = nu; ret++; } str++; }
-			return ret;
-		}
-		inline static int striend(const char * str, const char * end){
-			ZS4LARGE len_str = strlen(str);
-			ZS4LARGE len_end = strlen(end);
-
-			if (len_end > len_str)
-				return 1;
-
-
-			return stricmp(&str[len_str - len_end], end);
-		}
-		inline static int strend(const char * str, const char * end){
-			ZS4LARGE len_str = strlen(str);
-			ZS4LARGE len_end = strlen(end);
-
-			if (len_end > len_str)
-				return 1;
-
-
-			return strcmp(&str[len_str - len_end], end);
-		}
-	};
-
+typedef class util : public zs4::byte
+{
+public:
 	typedef class json{
 	protected:
 		typedef long long json_int;
@@ -364,14 +233,14 @@
 			}
 
 #define e_off \
-	((int)(i - cur_line_begin))
+((int)(i - cur_line_begin))
 
 #define whitespace \
-   case '\n': ++cur_line;  cur_line_begin = i; \
-   case ' ': case '\t': case '\r'
+case '\n': ++cur_line;  cur_line_begin = i; \
+case ' ': case '\t': case '\r'
 
 #define string_add(b)  \
-	do { if (!state.first_pass) string[string_length] = b;  ++string_length; } while (0);
+do { if (!state.first_pass) string[string_length] = b;  ++string_length; } while (0);
 
 			const static long
 				flag_next = 1, flag_reproc = 2, flag_need_comma = 4, flag_seek_value = 8,
@@ -943,146 +812,7 @@
 			}
 		}parser;
 
-		typedef	class value : public storage
-		{
-		public:
-			inline virtual e init(void){
-				return FAILURE;
-			}
-			inline virtual e save(stream & out) = 0;
-			inline virtual value & operator =(const char *in) = 0;
-			inline virtual value & operator =(const json_value * in) = 0;
-		}value;
-
-		typedef	class boolean : public value
-		{
-			const char * troo = "true";
-			const char * falz = "false";
-		public:
-			bool v;
-			inline boolean(){ v = false; }
-			inline virtual ~boolean(){}
-			inline virtual e save(stream & out){
-				if (v) return out.writeString(troo);
-				else return out.writeString(falz);
-			}
-
-			inline virtual value & operator =(const char *in){
-				if (!c::strcmp(in, troo))
-					v = true;
-				else v = false;
-				return (*this);
-			}
-			inline virtual value & operator =(const json_value * in){
-				if (in != nullptr && in->type == json_boolean && in->u.boolean)
-					v = true;
-				else v = false;
-
-				return (*this);
-			}
-		}boolean;
-
-		typedef	class integer : public value
-		{
-			static json_int atoi(const char * s){
-				const json_int MAX = (~0);
-				json_int data;
-
-				bool negative = false;
-				if (*s == '-'){ s++; negative = true; }
-
-				zs4::event::numeric numeric;
-				for (ZS4CHAR i = 0; s[i] != 0 && s[i] != '\n'; i++){
-					ZS4LARGE lu = numeric.lookup((ZS4CHAR)s[i]);
-					if (lu >= (ZS4LARGE)MAX){
-						data = 0;
-						return data;
-					}
-
-					ZS4LARGE nu = (ZS4LARGE)((ZS4LARGE)((ZS4LARGE)data*(ZS4LARGE)10) + (ZS4LARGE)lu);
-					if ((ZS4LARGE)nu > (ZS4LARGE)MAX){
-						data = MAX;
-						return MAX;
-					}
-					data = nu;
-				}
-
-				if (negative) data = (-data);
-
-				return data;
-			}
-		public:
-			json_int v;
-			inline integer(){ v = false; }
-			inline virtual ~integer(){}
-			inline virtual e save(stream & out){
-				return out.writeInteger(v);
-			}
-
-			inline virtual value & operator =(const char *in){
-				v = atoi(in);
-				return(*this);
-			}
-			inline virtual value & operator =(const json_value * in){
-				if (in != nullptr && in->type == json_integer)
-					v = in->u.integer;
-				else v = 0;
-				return (*this);
-			}
-		}integer;
-
-		typedef class analog : public value
-		{
-		public:
-			ZS4ANALOG v;
-			inline analog(){ v = 0.0; }
-			inline virtual ~analog(){}
-			inline virtual e save(stream & out){
-				char buf[128];
-				sprintf(buf, "%g", v);
-				return out.writeString(buf);
-			}
-
-			inline virtual value & operator =(const char *in){
-				v = atof(in);
-				return(*this);
-			}
-			inline virtual value & operator =(const json_value * in){
-				if (in != nullptr && in->type == json_double)
-					v = in->u.dbl;
-				else v = 0;
-				return (*this);
-			}
-		}analog;
-
-		typedef class string : public value
-		{
-			char v[256];
-		public:
-			inline string(){ memset(v, 0, sizeof(v)); }
-			inline virtual ~string(){}
-			inline virtual e save(stream & out){
-				return out.writeJsonString(v);
-			}
-
-			inline virtual value & operator =(const char *in){
-				if (strlen(in)>(sizeof(v) - 1))
-					return(*this);
-				strcpy(v, in);
-				return(*this);
-			}
-			inline virtual value & operator =(const json_value * in){
-				if (in == nullptr || in->type != json_string || in->u.string.length > (sizeof(v) - 1))
-					return (*this);
-
-				strcpy(v, in->u.string.ptr);
-				return(*this);
-			}
-		}string;
-
 	}json;
-
-
 	typedef class fileinfo
 	{
 		ZS4CHAR buffer[256];
@@ -1096,19 +826,7 @@
 			size = 0;
 			created = modified = 0;
 			readonly = hidden = isdir = false;
-			slash_count = 0;
 			return SUCCESS;
-		}
-		inline static int CompareSlashCountAscend(const void * v1, const void * v2)
-		{
-			register fileinfo * c1 = ((fileinfo**)v1)[0];
-			register fileinfo * c2 = ((fileinfo**)v2)[0];
-
-			return c1->slash_count - c2->slash_count;
-		}
-		inline static int CompareSlashCountDescend(const void * v1, const void * v2)
-		{
-			return -CompareSlashCountAscend(v1, v2);
 		}
 		inline static int CompareFileSizeAscend(const void * v1, const void * v2)
 		{
@@ -1138,9 +856,9 @@
 		{
 			return -CompareFileSizeAscend(v1, v2);
 		}
-		inline e info(const char * objectname)
+		inline e info(char * objectname)
 		{
-			if (strlen(objectname) > sizeof(buffer))
+			if (strlen((char*)objectname) > sizeof(buffer))
 				return FAILURE;
 
 			e err = SUCCESS;
@@ -1159,17 +877,14 @@
 
 			strcpy((char*)buffer, (const char*)objectname);
 
-			slash_count = c::strcharcount(objectname, "/\\");
-			return err;
 		}
 
 		size_t size;
 		time_t created;
 		time_t modified;
 		bool readonly, hidden, isdir;
-		int slash_count;
 	}fileinfo;
-	typedef class file : public stream
+	typedef class file : public zs4::byte::stream
 	{
 	protected:
 		ZS4LARGE read_able;
@@ -1185,7 +900,7 @@
 			close();
 		};
 
-		inline e openRead(const char * name){
+		inline e openRead(byte_t * name){
 			close();
 
 			if (SUCCESS != info.info(name))
@@ -1199,7 +914,7 @@
 			open_for_write = false;
 			return SUCCESS;
 		}
-		inline e openWrite(const char * name){
+		inline e openWrite(byte_t * name){
 			close();
 			handle = fopen(name, "w+");
 			if (handle == nullptr)
@@ -1221,16 +936,16 @@
 			return SUCCESS;
 		}
 
-		INLINE_READABLE_FUNCTION(){
+		inline virtual unsigned byte_t readable(){
 			if (handle == nullptr) return 0;
 			return read_able;
 		}
-		INLINE_WRITEABLE_FUNCTION(){
+		inline virtual unsigned byte_t writeable(void){
 			if (handle == nullptr) return 0;
 			return (~0);
 		}
 
-		INLINE_READ_FUNCTION(){
+		inline virtual e read(unsigned byte_t & c){
 			if (!readable())
 				return FAILURE;
 
@@ -1240,7 +955,7 @@
 
 			return SUCCESS;
 		}
-		INLINE_WRITE_FUNCTION(){
+		inline virtual e write(unsigned byte_t c){
 			if (!writeable())
 				return FAILURE;
 
@@ -1287,9 +1002,9 @@
 	typedef class in : public file
 	{
 	public:
-		INLINE_BITS_FUNCTION(){ return 0; }
 
-		INLINE_READABLE_FUNCTION(){ return 1; }
+		inline virtual unsigned byte_t readable(){ return 1; }
+
 
 		inline in(void){
 			handle = stdin;
@@ -1301,13 +1016,7 @@
 	typedef  class out : public file
 	{
 	public:
-		INLINE_BITS_FUNCTION(){ return 0; }
-
-		INLINE_WRITEABLE_FUNCTION(){ return 1; }
-		INLINE_WRITESTRING_FUNCTION(){
-			puts(str);
-			return SUCCESS;
-		}
+		inline virtual unsigned byte_t writeable(void){ return 1; }
 		inline out(void){
 			handle = stdout;
 		};
@@ -1380,22 +1089,22 @@
 
 			return SUCCESS;
 		}
-		inline static e rmFile(const char * name){
+		inline static e rmFile(byte_t * name){
 			if (!unlink((const char *)name)) return SUCCESS;
 			return FAILURE;
 		}
-		inline static e rmDir(const char * name){
+		inline static e rmDir(byte_t * name){
 			if (!rmdir((const char *)name)) return SUCCESS;
 			return FAILURE;
 		}
-		inline static e info(const char * objectname, fileinfo * info){
+		inline static e info(byte_t * objectname, fileinfo * info){
 			if (objectname == nullptr || objectname[0] == 0 || info == nullptr)
 				return FAILURE;
 
 			return info->info(objectname);
 		}
 
-		inline static time_t created(const char * fnam){
+		inline static time_t created(byte_t * fnam){
 			fileinfo info;
 
 			if ((!isFile(fnam))
@@ -1405,7 +1114,7 @@
 
 			return info.created;
 		}
-		inline static time_t modified(const char * fnam){
+		inline static time_t modified(byte_t * fnam){
 			fileinfo info;
 
 			if ((!fs::isFile(fnam))
@@ -1415,7 +1124,7 @@
 
 			return info.modified;
 		}
-		inline size_t list(const char * name, bool hidden_files){
+		inline size_t list(byte_t * name, bool hidden_files){
 
 			count = 0;
 
@@ -1437,7 +1146,10 @@
 				if (tinydir_readfile(&dir, &file) == -1)
 					break;
 
-				if (strcmp(file.name, ".") && strcmp(file.name, "..") && strcmp(file.name, ".zs4"))
+				if (strcmp((const unsigned byte_t*)file.name, (const unsigned byte_t*)".")
+					&& strcmp((const unsigned byte_t*)file.name, (const unsigned byte_t*)"..")
+					&& strcmp((const unsigned byte_t*)file.name, (const unsigned byte_t*)".zs4")
+					)
 				{
 
 					if ((nullptr == (nu = nuStat())) || SUCCESS != nu->info(file.name))
@@ -1464,5 +1176,7 @@
 		fileinfo * statArray[ZS4_MAX_DIR_SIZE];
 		fileinfo statData[ZS4_MAX_DIR_SIZE];
 	}fs;
+
+}util;
 
 #endif
