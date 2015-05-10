@@ -10,7 +10,7 @@ int main(int argc, char **argv)
 	util::in in;
 	util::out out;
 
-	char buffer[255];
+	byte_t buffer[255];
 	zs4::byte::object object((unsigned byte_t*)&buffer, sizeof(buffer), &in, &out);
 
 	for (;;){

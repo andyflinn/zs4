@@ -1004,8 +1004,6 @@ do { if (!state.first_pass) string[string_length] = b;  ++string_length; } while
 	public:
 
 		inline virtual unsigned byte_t readable(){ return 1; }
-
-
 		inline in(void){
 			handle = stdin;
 		};
