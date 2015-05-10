@@ -377,7 +377,7 @@ public:
 		inline e writeInteger(symbol::set&set, unsigned device data, unsigned device base = 10){
 
 			unsigned device remainder = data;
-			
+
 			bool NOT_ZERO = false;
 
 			unsigned device MAX = (~0);
@@ -518,7 +518,7 @@ public:
 		INLINE_SEEK_FUNCTION(){ return stream->seek(offset,origin); }
 		INLINE_TELL_FUNCTION(){ return stream->tell(pPos); }
 		INLINE_SIZE_FUNCTION(){ return stream->size(s); }
-	};
+	}bytestream;
 
 	typedef class integer
 	{
@@ -586,7 +586,7 @@ public:
 				}
 				goto return_value;
 			}
-			
+
 			if (opCount == 2){
 				if (opc[1] == '=')
 				{
@@ -760,7 +760,7 @@ public:
 			symbol::name set;
 			e error = SUCCESS;
 			integer w;
-			if (error = w.set((symbol::set&)set, n))
+			if ((error = w.set((symbol::set&)set, n)))
 				return error;
 			i.nam = w.data;
 			return SUCCESS;
@@ -891,7 +891,6 @@ public:
 				}
 
 				item * arr = itemArray();
-				unsigned device cnt = itemCount();
 
 				for (unsigned device i = iRemove; i > 0; i--){
 					arr[i] = arr[i - 1];
@@ -907,7 +906,6 @@ public:
 
 				unsigned device end_save;
 
-				device c = itemCount();
 				item * p = itemArray();
 
 				unsigned device *name = str;
@@ -933,9 +931,9 @@ public:
 					return jNull();
 				}
 
-	
+
 			}}//switch()
-			
+
 
 			return jDone();
 		}
