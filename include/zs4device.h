@@ -195,9 +195,15 @@ public:
 		typedef class name : public set
 		{
 		public:
-			inline virtual const unsigned device count(void){ return 26; }
+			typedef enum {
+				underscore, a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p, q, r, s, t, u, v, w, x, y, z,
+				SIZE
+			} index;
+			inline virtual const unsigned device count(void){ return (unsigned device)SIZE; }
 			inline virtual const unsigned device * data(void){
-				return &(ASCII())['a'];
+				static unsigned device data[SIZE] = { '_',
+					'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z' };
+				return data;
 			}
 
 		}name;
@@ -253,13 +259,13 @@ public:
 		{
 		public:
 			typedef enum {
-				_equal_, _or_, _and_, _plus_, _minus_,_multi_,_divide_,_remain_,_lt_,_gt_,
+				_equal_, _or_, _and_, _plus_, _minus_,_multi_,_divide_,_remain_,_lt_,_gt_,_at_,
 				SIZE
 			} index;
 			inline virtual const unsigned device count(void){ return (unsigned device)SIZE; }
 			inline virtual const unsigned device * data(void){
 				static unsigned device data[SIZE] = {
-					'=', '|', '&', '+', '-', '*', '/', '%', '<', '>' };
+					'=', '|', '&', '+', '-', '*', '/', '%', '<', '>','@' };
 				return data;
 			}
 
@@ -309,8 +315,6 @@ public:
 		inline ZS4LARGE messageBits(void)const{ return (bits() - addressBits()); }
 
 	}storage;
-
-#define	INLINE_RESET_FUNCTION() inline virtual void reset(void)
 
 	typedef class stream : public storage{
 	public:
@@ -560,6 +564,7 @@ public:
 		inline static bool bitGetMS(unsigned device d){ return bitGet(d, (PRECISION - 1)); }
 		inline static bool bitGetLS(unsigned device d){ return bitGet(d, 0); }
 
+#define	INLINE_RESET_FUNCTION() inline virtual void reset(void)
 		INLINE_RESET_FUNCTION(){ data = 0; }
 		inline unsigned device cmp(device c)const{ return data - c; }
 
@@ -859,6 +864,7 @@ public:
 	}integer;
 
 	typedef class object : public stream{
+		zs4::driver * driver;
 		unsigned device * store;
 		unsigned device storesize;
 		unsigned device stacktop;
@@ -1019,7 +1025,7 @@ public:
 				}
 				stacktop += itemSize();
 
-				return out->jDone();
+				return out->jNull();
 			}
 			default:{
 				integer value; value.data = 0;
@@ -1088,8 +1094,8 @@ public:
 			return WAITING;
 		}
 	public:
-#		define INLINE_INSTANCE() inline object(unsigned device * m, unsigned device s, stream * i, stream * o)
-		INLINE_INSTANCE(){
+#		define INLINE_CONSTRUCT() inline virtual void construct(zs4::driver * driver, unsigned device * m, unsigned device s, stream * i, stream * o)
+		INLINE_CONSTRUCT(){
 			store = m;
 			if (s <= MAX) { storesize = (unsigned device)s; }
 			else { storesize = MAX; }
@@ -1102,6 +1108,21 @@ public:
 			use = 0;
 			in = i;
 			out = o;
+		}
+		inline object(){
+			store = NULL;
+			storesize = 0;
+			stacktop = 0;
+			limit = 0;
+			children = 0;
+			buffer = 0;
+			use = 0;
+			stream * in = NULL;
+			stream * out = NULL;
+		}
+#		define INLINE_INSTANCE() inline object(zs4::driver * driver, unsigned device * m, unsigned device s, stream * i, stream * o)
+		INLINE_INSTANCE(){
+			construct(driver, m, s, i, o);
 		}
 		inline virtual e tickle(void){
 			if (in == NULL || out == NULL) return FAILURE;
