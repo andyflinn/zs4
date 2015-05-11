@@ -25,9 +25,7 @@ public:
 
 	inline static unsigned device * NEWLINE(){ static unsigned device r[] = { '\n', 0 }; return r; }
 
-	inline static unsigned device cmp(unsigned device c1, unsigned device c2){
-		return c1 - c2;
-	}
+	inline static unsigned device cmp(unsigned device c1, unsigned device c2){return c1 - c2;	}
 	inline static unsigned device cmp(const unsigned device * str1, const unsigned device * str2, const unsigned device * terminator = NULL){
 		if (terminator == NULL){
 			for (;;)
@@ -135,8 +133,7 @@ public:
 		}
 	}
 
-	typedef class symbol
-	{
+	typedef class symbol{
 	public:
 		typedef class set
 		{
@@ -302,8 +299,7 @@ public:
 		}
 	}symbol;
 
-	typedef class storage
-	{
+	typedef class storage{
 	public:
 
 #define	INLINE_BITS_FUNCTION() inline virtual ZS4LARGE bits(void)const
@@ -517,8 +513,7 @@ public:
 
 	}stream;
 
-	typedef class bytestream : public stream
-	{
+	typedef class bytestream : public stream{
 		zs4::byte::stream * stream = NULL;
 	public:
 		inline bytestream(zs4::byte::stream * bs){
@@ -552,8 +547,7 @@ public:
 		INLINE_SIZE_FUNCTION(){ return stream->size(s); }
 	}bytestream;
 
-	typedef class integer
-	{
+	typedef class integer{
 	public:
 		unsigned device data = 0;
 
@@ -710,13 +704,15 @@ public:
 
 				if (opc[0] == '+' && opc[1] == '+')
 				{
+                    out->writeInteger(sdec, data);
 					data++;
-					goto return_value;
-				}
+                    return out->jDone();
+                }
 				if (opc[0] == '-' && opc[1] == '-')
 				{
+                    out->writeInteger(sdec, data);
 					data--;
-					goto return_value;
+                    return out->jDone();
 				}
 
 				if (opc[0] == '<' && opc[1] == '<')
@@ -876,23 +872,11 @@ public:
 		stream * out;
 		inline unsigned device ulim(){ return (buffer - 2); }
 	protected:
-		INLINE_BITS_FUNCTION(){
-			return (ZS4LARGE)(storesize << 3);
-		}
-		INLINE_RESET_FUNCTION(){
-			unsigned device * p = store;
-			for (unsigned device i = 0; i < storesize; i++){ p[i] = 0; }
-		}
-		inline unsigned device itemSpace(){
-			return stacktop - limit;
-		}
-
+		INLINE_BITS_FUNCTION(){	return (ZS4LARGE)(storesize << 3);}
+		INLINE_RESET_FUNCTION(){unsigned device * p = store;for (unsigned device i = 0; i < storesize; i++){ p[i] = 0; }}
+		inline unsigned device itemSpace(){return stacktop - limit;}
 		inline unsigned device itemSize(){ return 2; }
-		typedef struct item {
-		public:
-			unsigned device nam;
-			unsigned device val;
-		}item;
+		typedef struct item {unsigned device nam;unsigned device val;}item;
 		inline e itemNameSet(item & i, unsigned device * n){
 			symbol::name set;
 			e error = SUCCESS;
@@ -909,15 +893,7 @@ public:
 			unsigned device c = itemCount();
 			item var; var.nam = var.val = 0;
 			if (SUCCESS != itemNameSet(var, str)){ return BADNAME; }
-
-			for (unsigned device i = 0; i < c; i++)
-			{
-				if (arr[i].nam == var.nam){
-					d = i;
-					return SUCCESS;
-				}
-			}
-
+			for (unsigned device i = 0; i < c; i++){if (arr[i].nam == var.nam){d = i;return SUCCESS;}}
 			return NOTFOUND;
 		}
 
@@ -979,7 +955,41 @@ public:
 			return out->jDone();
 		}
 
-#		define INLINE_ONSCAN_FUNCTION() inline virtual e onScan(unsigned device * str)
+        inline e eval(const unsigned device * str,const unsigned len ){
+            integer value; value.data = 0;
+            symbol::name enam;
+            symbol::decimal edec;
+			symbol symbol;
+
+            unsigned device end_save;
+
+            item * p = itemArray();
+
+            const unsigned device *name = str;
+            unsigned device name_length = 0;
+            while (symbol.is<symbol::name>(*str)){ str++; name_length++; }
+            unsigned device * name_end = str;
+            if (name_length == 0)
+                return out->jError(BADNAME);
+
+            end_save = *name_end; *name_end = 0;
+            unsigned device item_index = 0;
+            e item_find_result = itemFind(item_index, name);
+            *name_end = end_save;
+
+            if (SUCCESS == item_find_result){
+                value.data = p[item_find_result].val;
+                if ((error = value.io(name_end, out)))
+                    return error;
+                p[item_find_result].val = value.data;
+                return SUCCESS;
+            }
+            else{
+                return out->jNull();
+            }
+
+        }
+ #		define INLINE_ONSCAN_FUNCTION() inline virtual e onScan(unsigned device * str)
 		INLINE_ONSCAN_FUNCTION(){
 			unsigned device wk;
 			e error = FAILURE;
