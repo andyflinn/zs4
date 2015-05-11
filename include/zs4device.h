@@ -28,8 +28,8 @@ public:
 	inline static unsigned device cmp(unsigned device c1, unsigned device c2){
 		return c1 - c2;
 	}
-	inline static unsigned device cmp(const unsigned device * str1, const unsigned device * str2, const unsigned device * terminator = nullptr){
-		if (terminator == nullptr){
+	inline static unsigned device cmp(const unsigned device * str1, const unsigned device * str2, const unsigned device * terminator = NULL){
+		if (terminator == NULL){
 			for (;;)
 			{
 				if (*str1 == 0 && *str2 == 0)
@@ -67,9 +67,9 @@ public:
 		return 0;
 	}
 
-	inline static unsigned device len(const unsigned device * str, const unsigned device * terminator = nullptr){
+	inline static unsigned device len(const unsigned device * str, const unsigned device * terminator = NULL){
 		unsigned device ret = 0;
-		if (terminator == nullptr){
+		if (terminator == NULL){
 			while (*str){ str++; ret++; }
 		}
 		else{
@@ -363,7 +363,7 @@ public:
 
 #define	INLINE_WRITESTRING_FUNCTION() inline virtual e write(const unsigned device * str)
 		INLINE_WRITESTRING_FUNCTION(){
-			if (str == nullptr || (*str) == 0)
+			if (str == NULL || (*str) == 0)
 				return NODATA;
 
 			unsigned device l = len(str);
@@ -448,8 +448,8 @@ public:
 			jNameColon(n);
 			return write('{');
 		}
-		inline virtual e jStart(const unsigned device * n = nullptr){
-			if (n != nullptr) {
+		inline virtual e jStart(const unsigned device * n = NULL){
+			if (n != NULL) {
 				write('"');
 				write(n);
 				write('"');
@@ -487,7 +487,7 @@ public:
 
 	typedef class bytestream : public stream
 	{
-		zs4::byte::stream * stream = nullptr;
+		zs4::byte::stream * stream = NULL;
 	public:
 		inline bytestream(zs4::byte::stream * bs){
 			stream = bs;
@@ -787,7 +787,7 @@ public:
 		inline virtual e jInteger(const unsigned device n, unsigned device data, unsigned char base = 10){return out->jInteger(n, data, base);}
 		inline virtual e jNameColon(const unsigned device n){return out->jNameColon(n);}
 		inline virtual e jStart(const unsigned device n){return out->jStart(n);}
-		inline virtual e jStart(const unsigned device * n = nullptr){return out->jStart(n);}
+		inline virtual e jStart(const unsigned device * n = NULL){return out->jStart(n);}
 		inline virtual e jEnd(){ return out->jEnd(); }
 		inline virtual e jDone(){ return out->jDone(); }
 		inline virtual e jError(e error){return out->jError(error);}
@@ -939,7 +939,7 @@ public:
 		}
 #		define INLINE_ONINTEGER_FUNCTION() inline virtual e onInteger(unsigned device & c)
 		INLINE_ONINTEGER_FUNCTION(){
-			if (in == nullptr || out == nullptr) return FAILURE;
+			if (in == NULL || out == NULL) return FAILURE;
 
 			if (use < 1)
 				return FAILURE;
@@ -982,7 +982,7 @@ public:
 			out = o;
 		}
 		inline virtual e tickle(void){
-			if (in == nullptr || out == nullptr) return FAILURE;
+			if (in == NULL || out == NULL) return FAILURE;
 
 			unsigned device c = 0;
 			e error = SUCCESS;

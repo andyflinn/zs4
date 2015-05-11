@@ -92,7 +92,7 @@ public:
 
 			inline virtual ZS4CHAR * zs4alloc(ZS4LARGE size){
 				if (size > (ZS4_PARSER_SIZE - len))
-					return nullptr;
+					return NULL;
 
 				ZS4CHAR * mem = &buffer[len];
 				len += size;
@@ -105,14 +105,14 @@ public:
 		public:
 			inline parser(void){
 				len = 0;
-				JObj = nullptr;
+				JObj = NULL;
 			}
 
 			inline json_value * value(void){ return JObj; }
 			inline json_value * parse(const char * json){
 
 				len = 0;
-				JObj = nullptr;
+				JObj = NULL;
 
 				json_settings settings; memset(&settings, 0, sizeof(json_settings));
 				settings.max_memory = sizeof(buffer);
@@ -123,7 +123,7 @@ public:
 					return nuJv;
 				}
 
-				return nullptr;
+				return NULL;
 			}
 		private:
 			inline static ZS4SHORT hex_value(char c)
@@ -890,7 +890,7 @@ do { if (!state.first_pass) string[string_length] = b;  ++string_length; } while
 		bool open_for_write;
 	public:
 		inline file(void){
-			handle = nullptr;
+			handle = NULL;
 			close();
 		};
 		inline virtual ~file(void){
@@ -904,7 +904,7 @@ do { if (!state.first_pass) string[string_length] = b;  ++string_length; } while
 				return FILEINFOERROR;
 
 			handle = fopen(name, "rb");
-			if (handle == nullptr)
+			if (handle == NULL)
 				return FILEOPENERROR;
 
 			read_able = info.size;
@@ -914,7 +914,7 @@ do { if (!state.first_pass) string[string_length] = b;  ++string_length; } while
 		inline e openWrite(byte_t * name){
 			close();
 			handle = fopen(name, "w+");
-			if (handle == nullptr)
+			if (handle == NULL)
 				return FILEOPENERROR;
 
 			info.info(name);
@@ -922,10 +922,10 @@ do { if (!state.first_pass) string[string_length] = b;  ++string_length; } while
 			return SUCCESS;
 		}
 		inline e close(void){
-			if (handle != nullptr)
+			if (handle != NULL)
 			{
 				fclose(handle);
-				handle = nullptr;
+				handle = NULL;
 			}
 			read_able = 0;
 			info.clear();
@@ -934,11 +934,11 @@ do { if (!state.first_pass) string[string_length] = b;  ++string_length; } while
 		}
 
 		inline virtual unsigned byte_t readable(){
-			if (handle == nullptr) return 0;
+			if (handle == NULL) return 0;
 			return read_able;
 		}
 		inline virtual unsigned byte_t writeable(void){
-			if (handle == nullptr) return 0;
+			if (handle == NULL) return 0;
 			return (~0);
 		}
 
@@ -963,13 +963,13 @@ do { if (!state.first_pass) string[string_length] = b;  ++string_length; } while
 			return SUCCESS;
 		}
 		INLINE_SEEK_FUNCTION(){
-			if (handle == nullptr)
+			if (handle == NULL)
 				return FAILURE;
 
 			return (e)fseek((FILE*)handle, (long)offset, (int)origin);
 		}
 		INLINE_TELL_FUNCTION(){
-			if (handle == nullptr)
+			if (handle == NULL)
 			{
 				pPos = 0;
 				return FAILURE;
@@ -980,7 +980,7 @@ do { if (!state.first_pass) string[string_length] = b;  ++string_length; } while
 			return SUCCESS;
 		}
 		INLINE_SIZE_FUNCTION(){
-			if (nullptr == handle)
+			if (NULL == handle)
 			{
 				s = 0;
 				return FAILURE;
@@ -1005,7 +1005,7 @@ do { if (!state.first_pass) string[string_length] = b;  ++string_length; } while
 			handle = stdin;
 		};
 		inline virtual ~in(void){
-			handle = nullptr;
+			handle = NULL;
 		};
 	}in;
 	typedef  class out : public file
@@ -1016,7 +1016,7 @@ do { if (!state.first_pass) string[string_length] = b;  ++string_length; } while
 			handle = stdout;
 		};
 		inline virtual ~out(void){
-			handle = nullptr;
+			handle = NULL;
 		};
 	}out;
 	typedef class fs
@@ -1093,7 +1093,7 @@ do { if (!state.first_pass) string[string_length] = b;  ++string_length; } while
 			return FAILURE;
 		}
 		inline static e info(byte_t * objectname, fileinfo * info){
-			if (objectname == nullptr || objectname[0] == 0 || info == nullptr)
+			if (objectname == NULL || objectname[0] == 0 || info == NULL)
 				return FAILURE;
 
 			return info->info(objectname);
@@ -1147,7 +1147,7 @@ do { if (!state.first_pass) string[string_length] = b;  ++string_length; } while
 					)
 				{
 
-					if ((nullptr == (nu = nuStat())) || SUCCESS != nu->info(file.name))
+					if ((NULL == (nu = nuStat())) || SUCCESS != nu->info(file.name))
 						break;
 				}
 				tinydir_next(&dir);
@@ -1159,7 +1159,7 @@ do { if (!state.first_pass) string[string_length] = b;  ++string_length; } while
 
 		inline fileinfo * nuStat(void)	{
 			if (count >= (ZS4_MAX_DIR_SIZE - 1))
-				return nullptr;
+				return NULL;
 
 			statData[count].clear();
 			fileinfo * ret = &statData[count];

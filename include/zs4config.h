@@ -78,6 +78,6 @@
 #	define DBG_GETCHAR
 #endif
 
-#define nullptr 0
+#define NULL 0
 
 #endif
