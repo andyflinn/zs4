@@ -253,13 +253,13 @@ public:
 		{
 		public:
 			typedef enum {
-				_equal_, _or_, _and_, _plus_, _minus_,_multi_,_divide_,_remain_,
+				_equal_, _or_, _and_, _plus_, _minus_,_multi_,_divide_,_remain_,_lt_,_gt_,
 				SIZE
 			} index;
 			inline virtual const unsigned device count(void){ return (unsigned device)SIZE; }
 			inline virtual const unsigned device * data(void){
 				static unsigned device data[SIZE] = {
-					'=', '|', '&', '+', '-', '*', '/', '%' };
+					'=', '|', '&', '+', '-', '*', '/', '%', '<', '>' };
 				return data;
 			}
 
@@ -268,20 +268,20 @@ public:
 		{
 		public:
 			typedef enum {
-				parenthesis, curly, square, less,
+				parenthesis, curly, square,
 				SIZE
 			} index;
 			inline virtual const unsigned device count(void){ return (unsigned device)SIZE; }
 
 			inline virtual const unsigned device * data(void){
 				static unsigned device data[SIZE] = {
-					'(', '{', '[', '<' };
+					'(', '{', '[' };
 				return data;
 			}
 
 			inline virtual const unsigned device * end(void){
 				static unsigned device data[SIZE] = {
-					')', '}', ']', '>' };
+					')', '}', ']' };
 				return data;
 			}
 
@@ -567,9 +567,9 @@ public:
 			e error = SUCCESS;
 			symbol::decimal sdec;
 			symbol::opcode opcode;
-			unsigned device opc[3];
+			unsigned device opc[8];
 
-			unsigned device opCount = opcode.get(in, opc, 3);
+			unsigned device opCount = opcode.get(in, opc, 4);
 			if (opCount == 0)
 				goto return_value;
 			else in = &in[opCount];
@@ -592,7 +592,7 @@ public:
 					integer addval; addval.data = 0;
 					if (SUCCESS != (error = addval.set(sdec, in)))
 						return out->jError(error);
-					addval.data = (data-addval.data);
+					addval.data = (data - addval.data);
 					out->writeInteger(sdec, addval.data);
 					return out->jDone();
 				}
@@ -612,7 +612,36 @@ public:
 					out->writeInteger(sdec, addval.data);
 					return out->jDone();
 				}
-				goto return_value;
+				if (*opc == '*'){
+					integer addval; addval.data = 0;
+					if (SUCCESS != (error = addval.set(sdec, in)))
+						return out->jError(error);
+					addval.data *= data;
+					out->writeInteger(sdec, addval.data);
+					return out->jDone();
+				}
+				if (*opc == '/'){
+					integer addval; addval.data = 0;
+					if (SUCCESS != (error = addval.set(sdec, in)))
+						return out->jError(error);
+					if (addval.data == 0)
+						return out->jError(DIVIDEBYZERO);
+					addval.data = (data / addval.data);
+					out->writeInteger(sdec, addval.data);
+					return out->jDone();
+				}
+				if (*opc == '%'){
+					integer addval; addval.data = 0;
+					if (SUCCESS != (error = addval.set(sdec, in)))
+						return out->jError(error);
+					if (addval.data == 0)
+						return out->jError(DIVIDEBYZERO);
+					addval.data = (data % addval.data);
+					out->writeInteger(sdec, addval.data);
+					return out->jDone();
+				}
+
+				return out->jError(BADOPERATOR);
 			}
 
 			if (opCount == 2){
@@ -646,7 +675,32 @@ public:
 						data &= addval.data;
 						goto return_value;
 					}
-					goto return_value;
+					if (*opc == '*'){
+						integer addval; addval.data = 0;
+						if (SUCCESS != (error = addval.set(sdec, in)))
+							return out->jError(error);
+						data *= addval.data;
+						goto return_value;
+					}
+					if (*opc == '/'){
+						integer addval; addval.data = 0;
+						if (SUCCESS != (error = addval.set(sdec, in)))
+							return out->jError(error);
+						if (addval.data == 0)
+							return out->jError(DIVIDEBYZERO);
+						data /= addval.data;
+						goto return_value;
+					}
+					if (*opc == '%'){
+						integer addval; addval.data = 0;
+						if (SUCCESS != (error = addval.set(sdec, in)))
+							return out->jError(error);
+						if (addval.data == 0)
+							return out->jError(DIVIDEBYZERO);
+						data %= addval.data;
+						goto return_value;
+					}
+					return out->jError(BADOPERATOR);
 				}
 
 				if (opc[0] == '+' && opc[1] == '+')
@@ -654,13 +708,60 @@ public:
 					data++;
 					goto return_value;
 				}
-
 				if (opc[0] == '-' && opc[1] == '-')
 				{
 					data--;
 					goto return_value;
 				}
+
+				if (opc[0] == '<' && opc[1] == '<')
+				{
+					integer addval; addval.data = 0;
+					if (SUCCESS != (error = addval.set(sdec, in)))
+						return out->jError(error);
+					addval.data = data << addval.data;
+					out->writeInteger(sdec, addval.data);
+					return out->jDone();
+				}
+				if (opc[0] == '>' && opc[1] == '>')
+				{
+					integer addval; addval.data = 0;
+					if (SUCCESS != (error = addval.set(sdec, in)))
+						return out->jError(error);
+					addval.data = data >> addval.data;
+					out->writeInteger(sdec, addval.data);
+					return out->jDone();
+				}
+
+				return out->jError(BADOPERATOR);
 			}
+
+			if (opCount == 3){
+				if (opc[2] == '=')
+				{
+					if (opc[0] == '<' && opc[1] == '<')
+					{
+						integer addval; addval.data = 0;
+						if (SUCCESS != (error = addval.set(sdec, in)))
+							return out->jError(error);
+						data <<= addval.data;
+						out->writeInteger(sdec, data);
+						return out->jDone();
+					}
+					if (opc[0] == '>' && opc[1] == '>')
+					{
+						integer addval; addval.data = 0;
+						if (SUCCESS != (error = addval.set(sdec, in)))
+							return out->jError(error);
+						data >>= addval.data;
+						out->writeInteger(sdec, data);
+						return out->jDone();
+					}
+					return out->jError(BADOPERATOR);
+				}
+				return out->jError(BADOPERATOR);
+			}
+
 			return_value:
 			out->writeInteger(sdec, data);
 			return out->jDone();
