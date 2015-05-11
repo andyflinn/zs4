@@ -562,7 +562,7 @@ public:
 		INLINE_RESET_FUNCTION(){ data = 0; }
 		inline unsigned device cmp(device c)const{ return data - c; }
 
-		inline e io(unsigned device * in, stream * out){
+		inline e io(const unsigned device * in, unsigned device & result){
 			e error = SUCCESS;
 			symbol::decimal sdec;
 			symbol::opcode opcode;
@@ -576,71 +576,71 @@ public:
 			if (opCount == 1){
 				if (*opc == '='){
 					if (SUCCESS != (error = set(sdec, in)))
-						return out->jError(error);
+						return error;
 					goto return_value;
 				}
 				if (*opc == '+'){
 					integer addval; addval.data = 0;
 					if (SUCCESS != (error = addval.set(sdec, in)))
-						return out->jError(error);
+						return error;
 					addval.data += data;
-					out->writeInteger(sdec, addval.data);
-					return out->jDone();
+					result = addval.data;
+					return SUCCESS;
 				}
 				if (*opc == '-'){
 					integer addval; addval.data = 0;
 					if (SUCCESS != (error = addval.set(sdec, in)))
-						return out->jError(error);
+						return error;
 					addval.data = (data - addval.data);
-					out->writeInteger(sdec, addval.data);
-					return out->jDone();
+					result = addval.data;
+					return SUCCESS;
 				}
 				if (*opc == '|'){
 					integer addval; addval.data = 0;
 					if (SUCCESS != (error = addval.set(sdec, in)))
-						return out->jError(error);
+						return error;
 					addval.data |= data;
-					out->writeInteger(sdec, addval.data);
-					return out->jDone();
+					result = addval.data;
+					return SUCCESS;
 				}
 				if (*opc == '&'){
 					integer addval; addval.data = 0;
 					if (SUCCESS != (error = addval.set(sdec, in)))
-						return out->jError(error);
+						return error;
 					addval.data &= data;
-					out->writeInteger(sdec, addval.data);
-					return out->jDone();
+					result = addval.data;
+					return SUCCESS;
 				}
 				if (*opc == '*'){
 					integer addval; addval.data = 0;
 					if (SUCCESS != (error = addval.set(sdec, in)))
-						return out->jError(error);
+						return error;
 					addval.data *= data;
-					out->writeInteger(sdec, addval.data);
-					return out->jDone();
+					result = addval.data;
+					return SUCCESS;
 				}
 				if (*opc == '/'){
 					integer addval; addval.data = 0;
 					if (SUCCESS != (error = addval.set(sdec, in)))
-						return out->jError(error);
+						return error;
 					if (addval.data == 0)
-						return out->jError(DIVIDEBYZERO);
+						return DIVIDEBYZERO;
 					addval.data = (data / addval.data);
-					out->writeInteger(sdec, addval.data);
-					return out->jDone();
+					result = addval.data;
+					return SUCCESS;
 				}
 				if (*opc == '%'){
 					integer addval; addval.data = 0;
 					if (SUCCESS != (error = addval.set(sdec, in)))
-						return out->jError(error);
+						return error;
 					if (addval.data == 0)
-						return out->jError(DIVIDEBYZERO);
+						return DIVIDEBYZERO;
 					addval.data = (data % addval.data);
-					out->writeInteger(sdec, addval.data);
-					return out->jDone();
+					result = addval.data;
+					return SUCCESS;
 				}
 
-				return out->jError(BADOPERATOR);
+				return BADOPERATOR;
 			}
 
 			if (opCount == 2){
@@ -649,92 +649,90 @@ public:
 					if (*opc == '+'){
 						integer addval; addval.data = 0;
 						if (SUCCESS != (error = addval.set(sdec, in)))
-							return out->jError(error);
+							return error;
 						data += addval.data;
 						goto return_value;
 					}
 					if (*opc == '-'){
 						integer addval; addval.data = 0;
 						if (SUCCESS != (error = addval.set(sdec, in)))
-							return out->jError(error);
+							return error;
 						data -= addval.data;
 						goto return_value;
 					}
 					if (*opc == '|'){
 						integer addval; addval.data = 0;
 						if (SUCCESS != (error = addval.set(sdec, in)))
-							return out->jError(error);
+							return error;
 						data |= addval.data;
 						goto return_value;
 					}
 					if (*opc == '&'){
 						integer addval; addval.data = 0;
 						if (SUCCESS != (error = addval.set(sdec, in)))
-							return out->jError(error);
+							return error;
 						data &= addval.data;
 						goto return_value;
 					}
 					if (*opc == '*'){
 						integer addval; addval.data = 0;
 						if (SUCCESS != (error = addval.set(sdec, in)))
-							return out->jError(error);
+							return error;
 						data *= addval.data;
 						goto return_value;
 					}
 					if (*opc == '/'){
 						integer addval; addval.data = 0;
 						if (SUCCESS != (error = addval.set(sdec, in)))
-							return out->jError(error);
+							return error;
 						if (addval.data == 0)
-							return out->jError(DIVIDEBYZERO);
+							return DIVIDEBYZERO;
 						data /= addval.data;
 						goto return_value;
 					}
 					if (*opc == '%'){
 						integer addval; addval.data = 0;
 						if (SUCCESS != (error = addval.set(sdec, in)))
-							return out->jError(error);
+							return error;
 						if (addval.data == 0)
-							return out->jError(DIVIDEBYZERO);
+							return DIVIDEBYZERO;
 						data %= addval.data;
 						goto return_value;
 					}
-					return out->jError(BADOPERATOR);
+					return BADOPERATOR;
 				}
 
 				if (opc[0] == '+' && opc[1] == '+')
 				{
-                    out->writeInteger(sdec, data);
-					data++;
-                    return out->jDone();
+					result = data++;
+                    return SUCCESS;
                 }
 				if (opc[0] == '-' && opc[1] == '-')
 				{
-                    out->writeInteger(sdec, data);
-					data--;
-                    return out->jDone();
+					result = data--;
+					return SUCCESS;
 				}
 
 				if (opc[0] == '<' && opc[1] == '<')
 				{
 					integer addval; addval.data = 0;
 					if (SUCCESS != (error = addval.set(sdec, in)))
-						return out->jError(error);
+						return error;
 					addval.data = data << addval.data;
-					out->writeInteger(sdec, addval.data);
-					return out->jDone();
+					result = addval;
+					return SUCCESS;
 				}
 				if (opc[0] == '>' && opc[1] == '>')
 				{
 					integer addval; addval.data = 0;
 					if (SUCCESS != (error = addval.set(sdec, in)))
-						return out->jError(error);
+						return error;
 					addval.data = data >> addval.data;
-					out->writeInteger(sdec, addval.data);
-					return out->jDone();
+					result = addval;
+					return SUCCESS;
 				}
 
-				return out->jError(BADOPERATOR);
+				return BADOPERATOR;
 			}
 
 			if (opCount == 3){
@@ -744,28 +742,26 @@ public:
 					{
 						integer addval; addval.data = 0;
 						if (SUCCESS != (error = addval.set(sdec, in)))
-							return out->jError(error);
+							return error;
 						data <<= addval.data;
-						out->writeInteger(sdec, data);
-						return out->jDone();
+						goto return_value;
 					}
 					if (opc[0] == '>' && opc[1] == '>')
 					{
 						integer addval; addval.data = 0;
 						if (SUCCESS != (error = addval.set(sdec, in)))
-							return out->jError(error);
+							return error;
 						data >>= addval.data;
-						out->writeInteger(sdec, data);
-						return out->jDone();
+						goto return_value;
 					}
-					return out->jError(BADOPERATOR);
+					return BADOPERATOR;
 				}
-				return out->jError(BADOPERATOR);
+				return BADOPERATOR;
 			}
 
 			return_value:
-			out->writeInteger(sdec, data);
-			return out->jDone();
+			result = data;
+			return SUCCESS;
 		}
 
 		inline e set(symbol::set&set, const unsigned device * s){
@@ -955,22 +951,22 @@ public:
 			return out->jDone();
 		}
 
-        inline e eval(const unsigned device * str,const unsigned len ){
-            integer value; value.data = 0;
+		inline e eval(unsigned device * str, unsigned device & result){
+			e error = FAILURE;
+			integer value; value.data = 0;
             symbol::name enam;
-            symbol::decimal edec;
-			symbol symbol;
+ 			symbol symbol;
 
             unsigned device end_save;
 
             item * p = itemArray();
 
-            const unsigned device *name = str;
+            unsigned device *name = str;
             unsigned device name_length = 0;
             while (symbol.is<symbol::name>(*str)){ str++; name_length++; }
             unsigned device * name_end = str;
             if (name_length == 0)
-                return out->jError(BADNAME);
+                return BADNAME;
 
             end_save = *name_end; *name_end = 0;
             unsigned device item_index = 0;
@@ -978,17 +974,18 @@ public:
             *name_end = end_save;
 
             if (SUCCESS == item_find_result){
+				unsigned device r = 0;
                 value.data = p[item_find_result].val;
-                if ((error = value.io(name_end, out)))
+                if ((error = value.io(name_end, r)))
                     return error;
-                p[item_find_result].val = value.data;
+                p[item_find_result].val = result = value.data;
                 return SUCCESS;
             }
             else{
-                return out->jNull();
+                return NOTFOUND;
             }
-
         }
+
  #		define INLINE_ONSCAN_FUNCTION() inline virtual e onScan(unsigned device * str)
 		INLINE_ONSCAN_FUNCTION(){
 			unsigned device wk;
@@ -1038,37 +1035,13 @@ public:
 				return out->jNull();
 			}
 			default:{
-				integer value; value.data = 0;
-				symbol::name enam;
-				symbol::decimal edec;
+				unsigned device result = 0;
+				if (error = eval(str,result))
+					return out->jError(error);
 
-				unsigned device end_save;
-
-				item * p = itemArray();
-
-				unsigned device *name = str;
-				unsigned device name_length = 0;
-				while (symbol.is<symbol::name>(*str)){ str++; name_length++; }
-				unsigned device * name_end = str;
-				if (name_length == 0)
-					return out->jError(BADNAME);
-
-				end_save = *name_end; *name_end = 0;
-				unsigned device item_index = 0;
-				e item_find_result = itemFind(item_index, name);
-				*name_end = end_save;
-
-				if (SUCCESS == item_find_result){
-					value.data = p[item_find_result].val;
-					if ((error = value.io(name_end, out)))
-						return error;
-					p[item_find_result].val = value.data;
-					return SUCCESS;
-				}
-				else{
-					return out->jNull();
-				}
-
+				symbol::decimal number;
+				out->writeInteger(number, result);
+				return out->jDone();
 
 			}}//switch()
 
