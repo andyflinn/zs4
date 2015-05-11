@@ -37,6 +37,7 @@
 		<Unit filename="../include/zs4.h" />
 		<Unit filename="../include/zs4config.h" />
 		<Unit filename="../include/zs4device.h" />
+		<Unit filename="../include/zs4error.h" />
 		<Unit filename="../include/zs4util.h" />
 		<Unit filename="main.cpp" />
 		<Extensions>
