@@ -154,7 +154,6 @@ public:
 				};
 				return ASCII;
 			}
-			inline virtual bool valueReverse(){ return false; }
 		public:
 			inline virtual const unsigned device count(void) = 0;
 			inline virtual const unsigned device * data(void) = 0;
@@ -163,8 +162,7 @@ public:
 				for (unsigned device i = 0; i < count(); i++){
 					if ((unsigned device)data()[i] == (unsigned device)symbol)
 					{
-						if (valueReverse()){ value = (count() - i); }
-						else { value = i; };
+						value = i;
 						return SUCCESS;
 					}
 				}
@@ -201,7 +199,6 @@ public:
 			inline virtual const unsigned device * data(void){
 				return &(ASCII())['a'];
 			}
-			//inline virtual bool valueReverse(){ return true; }
 
 		}name;
 		typedef class space : public set
@@ -256,13 +253,13 @@ public:
 		{
 		public:
 			typedef enum {
-				_equal_, _or_, _and_, _plus_, _minus_,
+				_equal_, _or_, _and_, _plus_, _minus_,_multi_,_divide_,_remain_,
 				SIZE
 			} index;
 			inline virtual const unsigned device count(void){ return (unsigned device)SIZE; }
 			inline virtual const unsigned device * data(void){
 				static unsigned device data[SIZE] = {
-					'=', '|', '&', '+', '-' };
+					'=', '|', '&', '+', '-', '*', '/', '%' };
 				return data;
 			}
 
