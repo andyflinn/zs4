@@ -15,7 +15,7 @@ int main(int argc, char **argv)
 	
 	zs4::quad_t buffer[255];
 	zs4::quad::object object((unsigned long *)buffer, (unsigned long)255, &quadin, &quadout);
-
+	
 	for (;;){
 		if (SUCCESS != object.tickle())
 		{

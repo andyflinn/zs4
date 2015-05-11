@@ -154,20 +154,21 @@ public:
 				};
 				return ASCII;
 			}
-			inline bool valueReverse(){ return false; }
+			inline virtual bool valueReverse(){ return false; }
 		public:
 			inline virtual const unsigned device count(void) = 0;
 			inline virtual const unsigned device * data(void) = 0;
-			inline unsigned device lookup(const unsigned device symbol){
+			inline e lookup(unsigned device symbol, unsigned device & value){
 
 				for (unsigned device i = 0; i < count(); i++){
 					if ((unsigned device)data()[i] == (unsigned device)symbol)
 					{
-						if (valueReverse()) { return (unsigned device)(count() - i); }
-						return (unsigned device)i;
+						if (valueReverse()){ value = (count() - i); }
+						else { value = i; };
+						return SUCCESS;
 					}
 				}
-				return (unsigned device)(~0);
+				return NOTFOUND;
 			}
 			inline unsigned device bits(void){
 				unsigned device m = (unsigned device)(~0) >> 1;
@@ -181,9 +182,10 @@ public:
 				unsigned device r = 0;
 				if (max < 2) return r;
 
-				*to = 0;
+				*to = 0; 
+				unsigned device lu;
 				for (unsigned device i = 0; i < (max - 1); i++){
-					if (lookup(from[i]) == (unsigned device)(~0))
+					if (SUCCESS != lookup(from[i],lu))
 						break;
 					*to++ = from[i];
 					*to = 0;
@@ -199,6 +201,7 @@ public:
 			inline virtual const unsigned device * data(void){
 				return &(ASCII())['a'];
 			}
+			//inline virtual bool valueReverse(){ return true; }
 
 		}name;
 		typedef class space : public set
@@ -289,8 +292,8 @@ public:
 
 		template <class symbolset>
 		bool is(unsigned device c){
-			symbolset set;
-			if ((unsigned device)(~0) == set.lookup(c))
+			symbolset set; unsigned device lu;
+			if (SUCCESS!= set.lookup(c,lu))
 				return false;
 			return true;
 		}
@@ -374,8 +377,24 @@ public:
 			return SUCCESS;
 		}
 
-		inline e writeInteger(symbol::set&set, unsigned device data, unsigned device base = 10){
+#define	INLINE_TRANSLATECHARPTR_FUNCTION() inline virtual e translate(const char * cp)
+		INLINE_TRANSLATECHARPTR_FUNCTION(){
+			if (cp == NULL)
+				return NODATA;
 
+			e error = SUCCESS;
+			unsigned device wide;
+			while (char c = *cp++){
+				wide = (unsigned device)c;
+				if (error = write(wide))
+					return error;
+			}
+
+			return error;
+		}
+
+		inline e writeInteger(symbol::set&set, unsigned device data){
+			unsigned device base = set.count();
 			unsigned device remainder = data;
 
 			bool NOT_ZERO = false;
@@ -432,15 +451,26 @@ public:
 			return SUCCESS;
 		}
 
-		inline virtual e jInteger(const unsigned device n, unsigned device data, unsigned char base = 10){
-			symbol::numeric num;
+		inline virtual e jInteger(const unsigned device n, unsigned device v){
+			symbol::decimal num;
 			jNameColon(n);
-			return writeInteger(num,data, base);
+			return writeInteger(num, v);
+		}
+		inline virtual e jInteger(const char * n, unsigned device v){
+			symbol::decimal num;
+			jNameColon(n);
+			return writeInteger(num, v);
 		}
 		inline virtual e jNameColon(const unsigned device n){
-			symbol::name enam;
+			symbol::name name;
 			write('"');
-			writeInteger(enam, n, enam.count());
+			writeInteger(name, n);
+			write('"');
+			return write(':');
+		}
+		inline virtual e jNameColon(const char * n){
+			write('"');
+			translate(n);
 			write('"');
 			return write(':');
 		}
@@ -448,13 +478,14 @@ public:
 			jNameColon(n);
 			return write('{');
 		}
-		inline virtual e jStart(const unsigned device * n = NULL){
-			if (n != NULL) {
-				write('"');
-				write(n);
-				write('"');
-				write(':');
-			}
+		inline virtual e jStart(const char * n){
+			write('"');
+			translate(n);
+			write('"');
+			write(':');
+			return write('{');
+		}
+		inline virtual e jStart(){
 			return write('{');
 		}
 		inline virtual e jEnd(){ return write('}'); }
@@ -557,7 +588,7 @@ public:
 					if (SUCCESS != (error = addval.set(sdec, in)))
 						return out->jError(error);
 					addval.data += data;
-					out->writeInteger(sdec, addval.data, 10);
+					out->writeInteger(sdec, addval.data);
 					return out->jDone();
 				}
 				if (*opc == '-'){
@@ -565,7 +596,7 @@ public:
 					if (SUCCESS != (error = addval.set(sdec, in)))
 						return out->jError(error);
 					addval.data = (data-addval.data);
-					out->writeInteger(sdec, addval.data, 10);
+					out->writeInteger(sdec, addval.data);
 					return out->jDone();
 				}
 				if (*opc == '|'){
@@ -573,7 +604,7 @@ public:
 					if (SUCCESS != (error = addval.set(sdec, in)))
 						return out->jError(error);
 					addval.data |= data;
-					out->writeInteger(sdec, addval.data, 10);
+					out->writeInteger(sdec, addval.data);
 					return out->jDone();
 				}
 				if (*opc == '&'){
@@ -581,7 +612,7 @@ public:
 					if (SUCCESS != (error = addval.set(sdec, in)))
 						return out->jError(error);
 					addval.data &= data;
-					out->writeInteger(sdec, addval.data, 10);
+					out->writeInteger(sdec, addval.data);
 					return out->jDone();
 				}
 				goto return_value;
@@ -634,27 +665,29 @@ public:
 				}
 			}
 			return_value:
-			out->writeInteger(sdec, data, 10);
+			out->writeInteger(sdec, data);
 			return out->jDone();
 		}
 
-		inline e set(symbol::set&set, unsigned device * s){
-			//data = 0;
+		inline e set(symbol::set&set, const unsigned device * s){
+			e error = SUCCESS;
+
+			unsigned device work = 0;
+			unsigned device lu = 0;
 
 			for (unsigned device i = 0; s[i] != 0 && s[i] != '\n'; i++){
-				unsigned device lu = set.lookup((unsigned device)s[i]);
-				if (lu >= set.count()){
-					//data = 0;
+				
+				if (error = set.lookup(s[i],lu))
 					return FAILURE;
-				}
 
-				ZS4LARGE nu = (ZS4LARGE)((ZS4LARGE)((ZS4LARGE)data*(ZS4LARGE)set.count()) + (ZS4LARGE)lu);
+				ZS4LARGE nu = (ZS4LARGE)((ZS4LARGE)((ZS4LARGE)work*(ZS4LARGE)set.count()) + (ZS4LARGE)lu);
 				if ((ZS4LARGE)nu > (unsigned device)MAX){
 					return FAILURE;
 				}
-				data = (unsigned device)nu;
+				work = (unsigned device)nu;
 			}
 
+			data = work;
 			return SUCCESS;
 		}
 		inline e write(stream & out, symbol::set & set, bool sign = false)const{
@@ -743,7 +776,7 @@ public:
 			return (ZS4LARGE)(storesize << 3);
 		}
 		INLINE_RESET_FUNCTION(){
-			char * p = (char*)store;
+			unsigned device * p = store;
 			for (unsigned device i = 0; i < storesize; i++){ p[i] = 0; }
 		}
 		inline unsigned device itemSpace(){
@@ -784,54 +817,44 @@ public:
 			return NOTFOUND;
 		}
 
-		inline virtual e jInteger(const unsigned device n, unsigned device data, unsigned char base = 10){return out->jInteger(n, data, base);}
-		inline virtual e jNameColon(const unsigned device n){return out->jNameColon(n);}
-		inline virtual e jStart(const unsigned device n){return out->jStart(n);}
-		inline virtual e jStart(const unsigned device * n = NULL){return out->jStart(n);}
-		inline virtual e jEnd(){ return out->jEnd(); }
-		inline virtual e jDone(){ return out->jDone(); }
-		inline virtual e jError(e error){return out->jError(error);}
-		inline virtual e jNull(){return out->jNull();}
-		inline virtual e jComma(){ return out->jComma(); }
-
 		inline e onc(){
-			jStart(zs4());
+			out->jStart("zs4");
 			{
-				symbol::name enam;
-				jStart(enam.lookup('i')); //info
+				symbol::name name;
+				out->jStart("i"); //info
 				{
-					jStart(enam.lookup('m')); // memory
+					out->jStart("m"); // memory
 					{
-						jInteger(enam.lookup('s'), storesize);
-						jComma();
+						out->jInteger("s", storesize);
+						out->jComma();
 
-						jInteger(enam.lookup('b'), buffer);
-						jComma();
+						out->jInteger("b", buffer);
+						out->jComma();
 
-						jInteger(enam.lookup('l'), limit);
-						jComma();
+						out->jInteger("l", limit);
+						out->jComma();
 
-						jInteger(enam.lookup('u'), (storesize - stacktop));
+						out->jInteger("u", (storesize - stacktop));
 					}
-					jEnd(); // memory
+					out->jEnd(); // memory
 
-					jComma();
+					out->jComma();
 
-					jStart(enam.lookup('c')); // memory
+					out->jStart("c"); // memory
 					{
-						jInteger(enam.lookup('c'), children);
+						out->jInteger("c", children);
 						//jComma();
 
 					}
-					jEnd(); // memory
+					out->jEnd(); // memory
 				}
-				jEnd();  //info
+				out->jEnd();  //info
 			}
-			return jEnd(); // zs4
+			return out->jEnd(); // zs4
 		}
 		inline virtual e onv(void){
 
-			jStart();
+			out->jStart();
 			{
 				onc();
 				// and now the actual content....
@@ -841,15 +864,15 @@ public:
 				if (c){
 					for (device i = 0; i < c; i++)
 					{
-						jComma();
-						jInteger(p[i].nam, p[i].val);
+						out->jComma();
+						out->jInteger(p[i].nam, p[i].val);
 					}
 
 				}
 			}
-			jEnd();
+			out->jEnd();
 
-			return jDone();
+			return out->jDone();
 		}
 
 #		define INLINE_ONSCAN_FUNCTION() inline virtual e onScan(unsigned device * str)
@@ -863,31 +886,32 @@ public:
 			switch (*str){
 			case '+':{
 				if (itemSpace() < 2){
-					return jError(NOMEMORY);
+					return out->jError(NOMEMORY);
 				}
 
 				str++;
 				if (error = itemNameSet(var, str)){
-					return jError(BADNAME);
+					return out->jError(BADNAME);
 				}
 
 				var.val = 0;
 				if (SUCCESS == itemFind(wk, str)){
-					return jError(ALREADYEXISTS);
+					return out->jError(ALREADYEXISTS);
 				}
 
 
 				stacktop -= itemSize();
-				(*itemArray()) = var;
+				item * a = itemArray();
+				a[0] = var;
 
 				out->write('0');
-				return jDone();
+				return out->jDone();
 			}
 			case '-':{
 				str++;
 				unsigned device iRemove = 0;
 				if (SUCCESS != itemFind(iRemove, str)){
-					return jError(NOTFOUND);
+					return out->jError(NOTFOUND);
 				}
 
 				item * arr = itemArray();
@@ -897,7 +921,7 @@ public:
 				}
 				stacktop += itemSize();
 
-				return jDone();
+				return out->jDone();
 			}
 			default:{
 				integer value; value.data = 0;
@@ -913,7 +937,7 @@ public:
 				while (symbol.is<symbol::name>(*str)){ str++; name_length++; }
 				unsigned device * name_end = str;
 				if (name_length == 0)
-					return jError(BADNAME);
+					return out->jError(BADNAME);
 
 				end_save = *name_end; *name_end = 0;
 				unsigned device item_index = 0;
@@ -928,14 +952,14 @@ public:
 					return SUCCESS;
 				}
 				else{
-					return jNull();
+					return out->jNull();
 				}
 
 
 			}}//switch()
 
 
-			return jDone();
+			return out->jDone();
 		}
 #		define INLINE_ONINTEGER_FUNCTION() inline virtual e onInteger(unsigned device & c)
 		INLINE_ONINTEGER_FUNCTION(){
@@ -960,7 +984,7 @@ public:
 						break;
 				}
 				rewind();
-				return jError(BUFFEROVERFLOW);
+				return out->jError(BUFFEROVERFLOW);
 			}
 
 			return WAITING;

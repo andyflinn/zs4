@@ -78,6 +78,8 @@
 #	define DBG_GETCHAR
 #endif
 
+#ifndef NULL
 #define NULL 0
+#endif
 
 #endif
