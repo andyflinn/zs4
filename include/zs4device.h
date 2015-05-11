@@ -182,7 +182,7 @@ public:
 				unsigned device r = 0;
 				if (max < 2) return r;
 
-				*to = 0; 
+				*to = 0;
 				unsigned device lu;
 				for (unsigned device i = 0; i < (max - 1); i++){
 					if (SUCCESS != lookup(from[i],lu))
@@ -386,7 +386,7 @@ public:
 			unsigned device wide;
 			while (char c = *cp++){
 				wide = (unsigned device)c;
-				if (error = write(wide))
+				if ((error = write(wide)))
 					return error;
 			}
 
@@ -676,8 +676,8 @@ public:
 			unsigned device lu = 0;
 
 			for (unsigned device i = 0; s[i] != 0 && s[i] != '\n'; i++){
-				
-				if (error = set.lookup(s[i],lu))
+
+				if ((error = set.lookup(s[i],lu)))
 					return FAILURE;
 
 				ZS4LARGE nu = (ZS4LARGE)((ZS4LARGE)((ZS4LARGE)work*(ZS4LARGE)set.count()) + (ZS4LARGE)lu);
@@ -890,7 +890,7 @@ public:
 				}
 
 				str++;
-				if (error = itemNameSet(var, str)){
+				if ((error = itemNameSet(var, str))){
 					return out->jError(BADNAME);
 				}
 
@@ -946,7 +946,7 @@ public:
 
 				if (SUCCESS == item_find_result){
 					value.data = p[item_find_result].val;
-					if (error = value.io(name_end, out))
+					if ((error = value.io(name_end, out)))
 						return error;
 					p[item_find_result].val = value.data;
 					return SUCCESS;
@@ -997,7 +997,7 @@ public:
 			else { storesize = MAX; }
 			reset();
 			stacktop = storesize;
-			buffer = (storesize / 4); 
+			buffer = (storesize / 4);
 			if (buffer > 255){ buffer = (unsigned device)255; }
 			limit = (storesize - buffer);
 			children = 0;
