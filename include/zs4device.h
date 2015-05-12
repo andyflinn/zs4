@@ -13,6 +13,20 @@ typedef char byte_t;
 
 typedef class intclass
 {
+	// temporarily replace array element;
+	typedef class temporary {
+		unsigned device * where;
+		unsigned device saveValue;
+	public:
+		inline temporary(unsigned device * which, unsigned device newValue){
+			where = which;
+			saveValue = *which;
+			*which = newValue;
+		}
+		inline virtual ~temporary(){
+			*where = saveValue;
+		}
+	}temporary;
 public:
 	static const ZS4LARGE PRECISION = (ZS4LARGE)(unsigned device)(sizeof(device) << 3);
 	static const ZS4LARGE MASK = (ZS4LARGE)(unsigned device)(~0);
@@ -218,6 +232,7 @@ public:
 			}
 
 		}space;
+
 		typedef class numeric : public set
 		{
 		public:
@@ -252,6 +267,7 @@ public:
 		public:
 			inline virtual const unsigned device count(void){ return 16; }
 		}hexadecimal;
+
 		typedef class opcode : public set
 		{
 		public:
@@ -267,31 +283,37 @@ public:
 			}
 
 		}opcode;
+
 		typedef class container : public set
 		{
-		public:
 			typedef enum {
-				parenthesis, curly, square,
-				SIZE
-			} index;
+				OPEN,CLOSE,
+			SIZE};
+			
+			unsigned device arr[SIZE];
+		public:
+			inline container(unsigned device opn, unsigned device cls)
+			{
+				arr[OPEN] = opn; arr[CLOSE] = cls;
+			}
 			inline virtual const unsigned device count(void){ return (unsigned device)SIZE; }
 
 			inline virtual const unsigned device * data(void){
-				static unsigned device data[SIZE] = {
-					'(', '{', '[' };
-				return data;
+				return arr;
 			}
 
-			inline virtual const unsigned device * end(void){
-				static unsigned device data[SIZE] = {
-					')', '}', ']' };
-				return data;
+			inline virtual const unsigned device open(void){
+				return arr[OPEN];
+			}
+
+			inline virtual const unsigned device close(void){
+				return arr[CLOSE];
 			}
 
 		}container;
 
 		template <class symbolset>
-		bool is(unsigned device c){
+		bool is(const unsigned device c){
 			symbolset set; unsigned device lu;
 			if (SUCCESS!= set.lookup(c,lu))
 				return false;
@@ -951,7 +973,7 @@ public:
 			return out->jDone();
 		}
 
-		inline e eval(unsigned device * str, unsigned device & result){
+		inline e evalsimple(unsigned device * str, unsigned device & result){
 			e error = FAILURE;
 			integer value; value.data = 0;
             symbol::name enam;
@@ -985,6 +1007,92 @@ public:
                 return NOTFOUND;
             }
         }
+
+		inline e eval(unsigned device * str, unsigned device & result){
+			e error = PARSERROR;
+			symbol symbol;
+			bool openfound = false;
+
+			while (symbol.is<symbol::space>(*str))str++;
+
+			if (*str == '('){
+				
+				unsigned device count = 1;
+				unsigned device * content = ++str;
+				for (; *str != 0; str++){
+					if (*str == '('){ count++; }
+					else if (*str == ')'){
+						if (--count == MAX) return error;
+						else if (count == 0){
+							temporary set(str, 0);
+							unsigned device r = 0;
+							if (error == eval(content, r)) return error;
+							result = r;
+							return SUCCESS;
+						}
+					}
+				}
+
+				return NOFRAMEND;
+			}
+
+			symbol::name name;
+			if (symbol.is<symbol::name>(*str)){
+				unsigned device * name = str;
+				while (symbol.is<symbol::name>(*str)){ str++; }
+				unsigned device name_index = 0;
+				{
+					temporary set(str, 0);
+					if (SUCCESS != itemFind(name_index, name))
+						return BADNAME;
+				}
+				integer value;
+				value.data = itemArray()[name_index].val;
+
+				for (;;)
+				{
+					while (symbol.is<symbol::space>(*str))str++;
+					if (*str == 0){ result = value.data; return SUCCESS; }
+					
+					if (symbol.is<symbol::opcode>(*str)){
+						unsigned device * opc = str;
+						integer operand;
+						while (symbol.is<symbol::opcode>(*str))str++;
+						while (symbol.is<symbol::space>(*str))str++;
+						if (symbol.is<symbol::name>(*str)){
+							name = str;
+							while (symbol.is<symbol::name>(*str)){ str++; }
+							name_index = 0;
+							{
+								temporary set(str, 0);
+								if (SUCCESS != itemFind(name_index, name))
+									return BADNAME;
+							}
+							operand.data = itemArray()[name_index].val;
+						}
+						else if (symbol.is<symbol::decimal>(*str)){
+							symbol::decimal dec;
+							unsigned device * number = str;
+							while (symbol.is<symbol::decimal>(*str)){ str++; }
+							{
+								temporary set(str, 0);
+								if (SUCCESS != operand.set(dec,number) )
+									return BADVALUE;
+
+								return value.io(opc, result);
+							}
+						}
+
+					}
+
+
+				}
+
+				return NOTFOUND;
+			}
+
+			return NOTFOUND;
+		}
 
  #		define INLINE_ONSCAN_FUNCTION() inline virtual e onScan(unsigned device * str)
 		INLINE_ONSCAN_FUNCTION(){

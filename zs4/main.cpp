@@ -13,8 +13,8 @@ int main(int argc, char **argv)
 	zs4::quad::bytestream quadin((zs4::byte::stream*)&in);
 	zs4::quad::bytestream quadout((zs4::byte::stream*)&out);
 	
-	zs4::quad_t buffer[255];
-	zs4::quad::object object(NULL,(unsigned long *)buffer, (unsigned long)255, &quadin, &quadout);
+	unsigned char buffer[255];
+	zs4::byte::object object(NULL,buffer,255, &in, &out);
 	
 	for (;;){
 		if (SUCCESS != object.tickle())
