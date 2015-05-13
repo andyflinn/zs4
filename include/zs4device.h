@@ -11,6 +11,10 @@ typedef char byte_t;
 #	define ZS4LARGE unsigned long long
 #endif
 
+#define EVAL_BUFSIZE (256)
+#define EVAL_BUFLIMIT (EVAL_BUFSIZE-2)
+
+
 typedef class intclass
 {
 	// temporarily replace array element;
@@ -132,6 +136,12 @@ public:
 
 		return cmp(&str[len_str - len_end], end);
 	}
+	inline static unsigned device cpy(unsigned device * to, const unsigned device * from){
+		unsigned device ret = 0;
+		while (*from != 0){ *to++ = *from++; ret++; }
+		*to = 0;
+		return ret;
+	}
 
 
 	inline static unsigned device strcmp(const unsigned device * str1, const unsigned device * str2){
@@ -178,6 +188,12 @@ public:
 					}
 				}
 				return NOTFOUND;
+			}
+			bool is(const unsigned device c){
+				unsigned device lu;
+				if (SUCCESS != lookup(c, lu))
+					return false;
+				return true;
 			}
 			inline unsigned device bits(void){
 				unsigned device m = (unsigned device)(~0) >> 1;
@@ -859,8 +875,8 @@ public:
 		}
 		inline e write(stream & out, symbol::set & set, bool sign = false)const{
 		    e error;
-		    unsigned device arr[256];
-		    if (error = write(arr,256,set,sign))return error;
+			unsigned device arr[EVAL_BUFSIZE];
+			if (error = write(arr, (unsigned device)EVAL_BUFSIZE, set, sign))return error;
 		    for (const unsigned device * ptr = arr; *ptr != 0; ptr++){
                 if (error = out.write(*ptr))return error;
 		    }
@@ -903,9 +919,10 @@ public:
 		INLINE_BITS_FUNCTION(){	return (ZS4LARGE)(storesize << 3);}
 		INLINE_RESET_FUNCTION(){unsigned device * p = store;for (unsigned device i = 0; i < storesize; i++){ p[i] = 0; }}
 
-        bool isEndOfLine(const unsigned device * str){
+        bool isEndOfLine(unsigned device i){
             symbol symbol;
-            while(*str){if (!symbol.is<symbol::space>(*str++)) return false;}
+			for (unsigned device x = i; store[x]; x++)
+				{ if (!symbol.is<symbol::space>(store[x])) return false; }
             return true;
         }
 
@@ -990,121 +1007,221 @@ public:
 			return out->jDone();
 		}
 
-		inline e evalOpcode(integer & value, unsigned device * str, unsigned device & result){
+		inline e evalOpcode(integer & value, unsigned device & i, unsigned device & result){
 			e error = FAILURE;
- 			symbol symbol;
-            integer operand;
-            unsigned device buffer[256];
-            unsigned device counter = 0;
+            integer r;
+			integer operand;
+			unsigned device buffer[EVAL_BUFSIZE];
+			unsigned device counter = 0;
 
+			symbol::container container('(', ')');
+			symbol::name name;
+			symbol::opcode opcode;
+			symbol::space space;
+			symbol::decimal decimal;
 
-			unsigned device * opc = str;
-			while (symbol.is<symbol::opcode>(*str)){buffer[counter++]=*str++; buffer[counter]=0;};
-			if (isEndOfLine(str)){
-                integer r;
-                temporary set(str, 0);
-                if (error = value.io(opc,r.data))return error;
+			// get all opcode symbols
+			unsigned device opc = i;
+			while (opcode.is(store[i])){
+				if (counter > EVAL_BUFLIMIT) return BUFFEROVERFLOW;
+				buffer[counter++] = store[i++];
+				buffer[counter] = 0;
+			};
+			unsigned device arg = counter;
+
+			if (isEndOfLine(i)){
+				temporary set(&store[i], 0);
+				if (error = value.io(&store[opc], r.data))return error;
                 result = r.data;
                 return SUCCESS;
 			}
 
-            while (symbol.is<symbol::space>(*str))str++;
-            if (symbol.is<symbol::name>(*str)){
-                unsigned device * name = str;
-                while (symbol.is<symbol::name>(*str)){ str++; }
+			while (space.is(store[i]))i++;
+
+			if (name.is(store[i])){
+                unsigned device start = i;
+				while (name.is(store[i])){ i++; }
                 unsigned device name_index = 0;
                 {
-                    if (SUCCESS != itemFind(name_index, name))
+					temporary set(&store[i], 0);
+					if (SUCCESS != itemFind(name_index, &store[start]))
                         return BADNAME;
                 }
                 operand.data = itemArray()[name_index].val;
-                symbol::decimal decimal;
                 if (error = operand.write(&buffer[counter],(256-counter),decimal))return error;
+
+				if (error = value.io(buffer, r.data))return error;
+				itemArray()[name_index].val = operand.data;
+				result = value.data = r.data;
+				return SUCCESS;
+
             }
-            else if (symbol.is<symbol::decimal>(*str)){
-                while (symbol.is<symbol::decimal>(*str))
+			else if (decimal.is(store[i])){
+				while (decimal.is(store[i]))
                 {
-                    if (counter > (256-2)) return BUFFEROVERFLOW;
-                    buffer[counter++]=*str++;
+					if (counter > EVAL_BUFLIMIT) return BUFFEROVERFLOW;
+					buffer[counter++] = store[i++];
                     buffer[counter]=0;
                 }
-            }
-            else {
-                return NOTIMPLEMENTED;
-            }
+				
+				if (error = value.io(buffer, r.data))return error;
 
-            integer r;
+
+				result = r.data;
+				return SUCCESS;
+			}
+			else if (store[i] == container.open()){
+				if (error = evalContainer(container, i, r.data))return error;
+				if (error = r.write(&buffer[counter], (EVAL_BUFSIZE - counter), decimal))return error;
+				if (error = value.io(buffer, r.data))return error;
+
+
+				result = r.data;
+				return SUCCESS;
+			}
+			else {
+				return NOTIMPLEMENTED;
+            }
 
             if (error = value.io(buffer,r.data))return error;
             result = r.data;
             return SUCCESS;
-         }
+		}
 
-		inline e eval(unsigned device * str, unsigned device & result){
+		inline e evalContainer(symbol::container&container, unsigned device & i, unsigned device & result){
+			// ((5*5)+10)
 			e error = PARSERROR;
-			symbol symbol;
-			bool openfound = false;
+			integer value;
 
-			while (symbol.is<symbol::space>(*str))str++;
+			if (store[i] == container.open()){
+				if (len(&store[i]) >= (EVAL_BUFSIZE))return STACKOVERFLOW;
 
-			if (*str == '('){
+				unsigned device stash[EVAL_BUFSIZE]; 
+				cpy(stash, &store[++i]);
 
 				unsigned device count = 1;
-				unsigned device * content = ++str;
-				for (; *str != 0; str++){
-					if (*str == '('){ count++; }
-					else if (*str == ')'){
-						if (--count == MAX) return error;
-						else if (count == 0){
-							temporary set(str, 0);
-							unsigned device r = 0;
-							if (error == eval(content, r)) return error;
-							result = r;
-							return SUCCESS;
-						}
+				unsigned device c;
+				for (c = 0; stash[c] != 0; c++){
+					if (stash[c] == container.close()){
+						if (--count == MAX) return PARSERROR;
+						else if (count == 0){break;}
 					}
+					if (stash[c] == container.open()){ count++; }
+					store[i + c] = stash[c]; store[i + c + 1] = 0;
 				}
+				unsigned device r;
+				unsigned device save_i = i;
+				if (error = eval(i, value.data))return error;
+				i = save_i;
 
-				return NOFRAMEND;
+				symbol::decimal decimal;
+				if (error = value.write(&store[i], use - i, decimal)) return error;
+				count = len(&store[i]);
+				cpy(&store[i + count],&stash[c+1]);
+
+				if (error = eval(i, value.data))return error;
+				result = value.data;
+				return SUCCESS;
 			}
 
+			return NOFRAMEND;
+		}
+
+		inline e evalName(unsigned device & i, unsigned device & result){
+			e error = PARSERROR;
+			integer r;
 			integer value;
+			symbol::container container('(', ')');
 			symbol::name name;
+			symbol::opcode opcode;
+			symbol::space space;
 
-			if (symbol.is<symbol::name>(*str)){
-				unsigned device * name = str;
-				while (symbol.is<symbol::name>(*str)){ str++; }
-				unsigned device name_index = 0;
-				{
-					temporary set(str, 0);
-					if (SUCCESS != itemFind(name_index, name))
-						return BADNAME;
-				}
-				value.data = itemArray()[name_index].val;
-				if (isEndOfLine(str)){result=value.data;return SUCCESS;}
- 				while (symbol.is<symbol::space>(*str))str++;
+			unsigned device start = i;
+			while (name.is(store[i]))i++;
+			unsigned device name_index = 0;
+			{
+				temporary set(&store[i], 0);
+				if (SUCCESS != itemFind(name_index, &store[start]))
+					return BADNAME;
+			}
+			value.data = itemArray()[name_index].val;
+			if (isEndOfLine(i)){ result = value.data; return SUCCESS; }
 
-                if (symbol.is<symbol::opcode>(*str)){
-                    integer r;
-                    if (error = evalOpcode(value,str,r.data)){return error;}
-                    else{result=r.data;return SUCCESS;}
-                }
-            }
+			while (space.is(store[i]))i++;
 
-            {
-				for (;;)
-				{
-					while (symbol.is<symbol::space>(*str))str++;
-					if (*str == 0){ result = value.data; return SUCCESS; }
+			if (opcode.is(store[i])){
+				unsigned device opc = i;
+				if (error = evalOpcode(value, i, r.data)) return error;
+				itemArray()[name_index].val = value.data;
+				result = r.data;
+				return SUCCESS;
+			}
 
-					if (symbol.is<symbol::opcode>(*str)){
+			return NOTIMPLEMENTED;
 
-					}
+		}
 
+		inline e evalDecimal(unsigned device & i, unsigned device & result){
+			e error = PARSERROR;
+			integer r;
+			integer value;
+			symbol::decimal decimal;
+			symbol::opcode opcode;
+			symbol::space space;
 
-				}
+			unsigned device start = i;
+			while (decimal.is(store[i]))i++;
+			{
+				temporary set(&store[i], 0);
+				if (error = value.set(decimal, &store[start])) return error;
+			}
+			if (isEndOfLine(i)){ result = value.data; return SUCCESS; }
 
-				return NOTFOUND;
+			while (space.is(store[i]))i++;
+			if (opcode.is(store[i])){
+
+				if (error = evalOpcode(value, i, r.data)) return error;
+				result = r.data;
+				return SUCCESS;
+			}
+
+			return NOTIMPLEMENTED;
+
+		}
+
+		inline e eval(unsigned device & i, unsigned device & result){
+			e error = PARSERROR;
+			integer value;
+
+			symbol::container container('(', ')');
+			symbol::name name;
+			symbol::decimal decimal;
+			symbol::opcode opcode;
+			symbol::space space;
+
+			while (space.is(store[i]))i++;
+
+			if (store[i] == container.open()){
+				if (error = evalContainer(container, i, value.data))return error;
+			}
+
+			else if (name.is(store[i])){
+				if (error = evalName(i, value.data)) return error;
+			}
+
+			else if (decimal.is(store[i])){
+				if (error = evalDecimal(i, value.data)) return error;
+			}
+			
+			if (isEndOfLine(i)){ result = value.data; return SUCCESS; }
+
+			while (space.is(store[i]))i++;
+			
+			if (opcode.is(store[i])){
+				unsigned device r;
+				if (error = evalOpcode(value, i, r)) return error;
+				result = r;
+				return SUCCESS;
 			}
 
 			return NOTFOUND;
@@ -1159,8 +1276,9 @@ public:
 				return out->jNull();
 			}
 			default:{
+				unsigned device parserindex = 0;
 				unsigned device result = 0;
-				if (error = eval(str,result))
+				if (error = eval(parserindex, result))
 					return out->jError(error);
 
 				symbol::decimal number;
