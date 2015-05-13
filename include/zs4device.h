@@ -940,8 +940,61 @@ public:
 		}item;
 		inline unsigned device itemSize(){ return 3; }
 		inline unsigned device itemSpace(){ return ((limit()/itemSize())-itemCount()); }
-		void stackPush() { (*stackReserved())++; }
-		void stackPop() { (*stackReserved())--; }
+		inline e itemAdd(unsigned device * str) {
+			if (!itemSpace())return NOMEMORY;
+			
+			symbol::name name; integer i;
+			if (SUCCESS != i.set(name, str))
+				return BADNAME;
+
+			(*stackReserved())++;
+
+			itemArray()->flag = 0;
+			itemArray()->nam = i.data;
+			itemArray()->val = 0;
+			return SUCCESS;
+		}
+		inline e itemDelete(unsigned device * str) {
+			item var; var.flag = var.nam = var.val = 0;
+			if (SUCCESS != itemNameSet(var, str)){ return BADNAME; }
+
+			item * arr = itemArray();
+			bool found = false;
+			unsigned device index;
+			unsigned device c = itemCount();
+			for (unsigned device i = 0; i < c; i++){ if (arr[i].nam == var.nam){ found = true; index = i; break; } }
+			if (!found)
+				return NOTFOUND;
+
+			for (unsigned device i = index; i > 0; i--){
+				arr[i] = arr[i - 1];
+			}
+
+			(*stackReserved())--; 
+			return SUCCESS;
+		}
+		inline e itemNameSet(item & i, unsigned device * n){
+			symbol::name set;
+			e error = SUCCESS;
+			integer w;
+			if ((error = w.set((symbol::set&)set, n)))
+				return error;
+			i.nam = w.data;
+			return SUCCESS;
+		}
+		inline item * itemArray(void){ return (item*)&store[storesize - workingSize() - (itemCount()*itemSize())]; }
+		inline unsigned device itemCount(void){ return ((*stackReserved())); }
+		inline item *  itemFind(unsigned device * str){
+			item * arr = itemArray();
+			unsigned device c = itemCount();
+			item var; var.flag = var.nam = var.val = 0;
+			if (SUCCESS != itemNameSet(var, str)){ return NULL; }
+
+			for (unsigned device i = 0; i < c; i++){ if (arr[i].nam == var.nam){ return &arr[i]; } }
+			return NULL;
+		}
+
+
 		inline stream ** inReserved(){
 			return  (stream**)&store[(storesize - pointerSize())];
 		}
@@ -966,26 +1019,6 @@ public:
 				{ if (!symbol.is<symbol::space>(store[x])) return false; }
             return true;
         }
-
-		inline e itemNameSet(item & i, unsigned device * n){
-			symbol::name set;
-			e error = SUCCESS;
-			integer w;
-			if ((error = w.set((symbol::set&)set, n)))
-				return error;
-			i.nam = w.data;
-			return SUCCESS;
-		}
-		inline item * itemArray(void){ return (item*)&store[storesize - workingSize() - (itemCount()*itemSize())]; }
-		inline unsigned device itemCount(void){ return ((*stackReserved())); }
-		inline e itemFind(unsigned device & d, unsigned device * str){
-			item * arr = itemArray();
-			unsigned device c = itemCount();
-			item var; var.flag = var.nam = var.val = 0;
-			if (SUCCESS != itemNameSet(var, str)){ return BADNAME; }
-			for (unsigned device i = 0; i < c; i++){if (arr[i].nam == var.nam){d = i;return SUCCESS;}}
-			return NOTFOUND;
-		}
 
 		inline e onc(){
 			out()->jStart("zs4");
@@ -1082,17 +1115,18 @@ public:
 			if (name.is(store[i])){
                 unsigned device start = i;
 				while (name.is(store[i])){ i++; }
+				item * n = NULL;
                 unsigned device name_index = 0;
                 {
 					temporary set(&store[i], 0);
-					if (SUCCESS != itemFind(name_index, &store[start]))
+					if (NULL == (n = itemFind(&store[start])))
                         return BADNAME;
                 }
-                operand.data = itemArray()[name_index].val;
+                operand.data = n->val;
 				if (error = operand.write(&_buf[counter], (256 - counter), decimal))return error;
 
 				if (error = value.io(_buf, r.data))return error;
-				itemArray()[name_index].val = operand.data;
+				//itemArray()[name_index].val = operand.data;
 				result = value.data = r.data;
 				return SUCCESS;
 
@@ -1148,7 +1182,6 @@ public:
 					if (stash[c] == container.open()){ count++; }
 					store[i + c] = stash[c]; store[i + c + 1] = 0;
 				}
-				unsigned device r;
 				unsigned device save_i = i;
 				if (error = eval(i, value.data))return error;
 				i = save_i;
@@ -1176,13 +1209,13 @@ public:
 
 			unsigned device start = i;
 			while (name.is(store[i]))i++;
-			unsigned device name_index = 0;
+			item * n;
 			{
 				temporary set(&store[i], 0);
-				if (SUCCESS != itemFind(name_index, &store[start]))
+				if (NULL == (n = itemFind(&store[start])))
 					return BADNAME;
 			}
-			value.data = itemArray()[name_index].val;
+			value.data = n->val;
 			if (isEndOfLine(i)){ result = value.data; return SUCCESS; }
 
 			while (space.is(store[i]))i++;
@@ -1190,7 +1223,7 @@ public:
 			if (opcode.is(store[i])){
 				unsigned device opc = i;
 				if (error = evalOpcode(value, i, r.data)) return error;
-				itemArray()[name_index].val = value.data;
+				n->val = value.data;
 				result = r.data;
 				return SUCCESS;
 			}
@@ -1263,50 +1296,25 @@ public:
 			return NOTFOUND;
 		}
 
- #		define INLINE_ONSCAN_FUNCTION() inline virtual e onScan(unsigned device * str)
+#		define INLINE_ONSCAN_FUNCTION() inline virtual e onScan(unsigned device * str)
 		INLINE_ONSCAN_FUNCTION(){
-			unsigned device wk;
 			e error = FAILURE;
 			symbol symbol;
-			item var; var.flag = var.nam = var.val = 0;
 			// cut leading space;
 			while (symbol.is<symbol::space>(*str))str++;
 			switch (*str){
 			case '+':{
-				if (itemSpace() < itemSize()){
-					return out()->jError(NOMEMORY);
-				}
-
 				str++;
-				if ((error = itemNameSet(var, str))){
-					return out()->jError(BADNAME);
-				}
-
-				var.val = 0;
-				if (SUCCESS == itemFind(wk, str)){
-					return out()->jError(ALREADYEXISTS);
-				}
-
-				stackPush();
-				item * a = itemArray();
-				a[0] = var;
+				if (e error = itemAdd(str))
+					return out()->jError(error);
 
 				out()->write('0');
 				return out()->jDone();
 			}
 			case '-':{
 				str++;
-				unsigned device iRemove = 0;
-				if (SUCCESS != itemFind(iRemove, str)){
-					return out()->jError(NOTFOUND);
-				}
-
-				item * arr = itemArray();
-
-				for (unsigned device i = iRemove; i > 0; i--){
-					arr[i] = arr[i - 1];
-				}
-				stackPop();
+				if ( e error = itemDelete(str))
+					return out()->jError(error);
 
 				return out()->jNull();
 			}
@@ -1363,7 +1371,6 @@ public:
 
 			*inReserved() = i;
 			*outReserved() = o;
-			(*useReserved()) = 0;
 		}
 		inline object(){
 			store = NULL;
