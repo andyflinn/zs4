@@ -283,6 +283,11 @@ public:
 		public:
 			inline virtual const unsigned device count(void){ return 16; }
 		}hexadecimal;
+		typedef class error : public set
+		{
+		public:
+			inline virtual const unsigned device count(void){ return (unsigned device)FAILURE; }
+		};
 
 		typedef class opcode : public set
 		{
@@ -485,7 +490,32 @@ public:
 			}
 			return SUCCESS;
 		}
+		inline e writeErrorText(e error){
+#define eText(err) if (error==err){return translate(#err);}
+			eText(WAITING);
+			eText(BUFFEROVERFLOW);
+			eText(STACKOVERFLOW);
+			eText(NODATA);
+			eText(NOMEMORY);
+			eText(NOTFOUND);
+			eText(ALREADYEXISTS);
+			eText(BADNAME);
+			eText(BADOPERATOR);
+			eText(BADVALUE);
+			eText(NOFRAMEND);
+			eText(FILEINFOERROR);
+			eText(FILEOPENERROR);
+			eText(DIVIDEBYZERO);
+			eText(PARSERROR);
+			eText(NOTIMPLEMENTED);
+			eText(FAILURE);
 
+			if (error == SUCCESS)return SUCCESS;
+
+			eText(FAILURE);
+			symbol::decimal decimal;
+			return writeInteger(decimal, (unsigned device)error);
+		}
 		inline virtual e jInteger(const unsigned device n, unsigned device v){
 			symbol::decimal num;
 			jNameColon(n);
@@ -526,17 +556,8 @@ public:
 		inline virtual e jEnd(){ return write('}'); }
 		inline virtual e jDone(){ return write('\n'); }
 		inline virtual e jError(e error){
-			write('e');
-			write('r');
-			write('r');
-			write('o');
-			write('r');
-			write('=');
-			write('t');
-			write('r');
-			write('u');
-			write('e');
-			write(';');
+			translate("error:");
+			writeErrorText(error);
 			write('\n');
 			return error;
 		}
@@ -907,7 +928,6 @@ public:
 		zs4::driver * driver;
 		unsigned device * store;
 		unsigned device storesize;
-		unsigned device use;
 		inline unsigned device ulim(){ return (buffer() - 2); }
 		inline unsigned device pointerSize(){ return (sizeof(void*) / sizeof(unsigned device)); }
 		inline virtual unsigned device buffer(){ return(workingSize() >> 2); }
@@ -956,12 +976,12 @@ public:
 			i.nam = w.data;
 			return SUCCESS;
 		}
-		inline item * itemArray(void){ return (item*)&store[storesize - workingSize() - ((*stackReserved()))]; }
+		inline item * itemArray(void){ return (item*)&store[storesize - workingSize() - (itemCount()*itemSize())]; }
 		inline unsigned device itemCount(void){ return ((*stackReserved())); }
 		inline e itemFind(unsigned device & d, unsigned device * str){
 			item * arr = itemArray();
 			unsigned device c = itemCount();
-			item var; var.nam = var.val = 0;
+			item var; var.flag = var.nam = var.val = 0;
 			if (SUCCESS != itemNameSet(var, str)){ return BADNAME; }
 			for (unsigned device i = 0; i < c; i++){if (arr[i].nam == var.nam){d = i;return SUCCESS;}}
 			return NOTFOUND;
@@ -971,23 +991,34 @@ public:
 			out()->jStart("zs4");
 			{
 				symbol::name name;
-				out()->jStart("i"); //info
+				out()->jStart("v"); //info
 				{
-					out()->jStart("m"); // memory
-					{
-						out()->jInteger("s", storesize);
-						out()->jComma();
+					out()->jInteger("c", itemCount());
+					out()->jComma();
 
-						out()->jInteger("b", buffer());
-						out()->jComma();
+					out()->jInteger("a", itemSpace());
+				}
+				out()->jEnd();  //info
 
-						out()->jInteger("l", limit());
-						out()->jComma();
+				out()->jComma();
 
-						out()->jInteger("u", (storesize - workingSize()));
-					}
-					out()->jEnd(); // memory
+				out()->jStart("l"); //info
+				{
+					out()->jInteger("s", limit());
+					out()->jComma();
 
+					out()->jInteger("b", buffer());
+				}
+				out()->jEnd();  //info
+
+				out()->jComma();
+
+				out()->jStart("a"); //info
+				{
+					out()->jInteger("c", 0);
+					out()->jComma();
+
+					out()->jInteger("a", storesize - limit() - buffer());
 				}
 				out()->jEnd();  //info
 			}
@@ -1005,7 +1036,8 @@ public:
 				if (c){
 					for (device i = 0; i < c; i++)
 					{
-						out()->jComma();
+						//if (i)
+							out()->jComma();
 						out()->jInteger(p[i].nam, p[i].val);
 					}
 
@@ -1122,7 +1154,7 @@ public:
 				i = save_i;
 
 				symbol::decimal decimal;
-				if (error = value.write(&store[i], use - i, decimal)) return error;
+				if (error = value.write(&store[i], (*useReserved()) - i, decimal)) return error;
 				count = len(&store[i]);
 				cpy(&store[i + count],&stash[c+1]);
 
@@ -1297,7 +1329,7 @@ public:
 		INLINE_ONINTEGER_FUNCTION(){
 			if (in() == NULL || out() == NULL) return FAILURE;
 
-			if (use < 1)
+			if ((*useReserved()) < 1)
 				return FAILURE;
 
 			if (0 == ecmp(store,NEWLINE()))
@@ -1307,7 +1339,7 @@ public:
 				else { return onScan(store); }
 			}
 
-			if (use >= (ulim()))
+			if ((*useReserved()) >= (ulim()))
 			{
 				unsigned device c;
 				while (in()->readable()){
@@ -1331,7 +1363,7 @@ public:
 
 			*inReserved() = i;
 			*outReserved() = o;
-			use = 0;
+			(*useReserved()) = 0;
 		}
 		inline object(){
 			store = NULL;
@@ -1368,36 +1400,36 @@ public:
 		}
 
 		INLINE_READABLE_FUNCTION(){
-			return (use);
+			return ((*useReserved()));
 		}
 		INLINE_WRITEABLE_FUNCTION(){
-			return (ulim() - use);
+			return (ulim() - (*useReserved()));
 		}
 
 		INLINE_READ_FUNCTION(){
-			if (use >= ulim())
+			if ((*useReserved()) >= ulim())
 				return WAITING;
 
-			c = store[use];
-			store[use] = 0;
-			use++;
+			c = store[(*useReserved())];
+			store[(*useReserved())] = 0;
+			(*useReserved())++;
 
 			return SUCCESS;
 		}
 		INLINE_WRITE_FUNCTION(){
-			if (use >= ulim())
+			if ((*useReserved()) >= ulim())
 				return WAITING;
 
-			store[use++] = c;
-			store[use] = 0;
+			store[(*useReserved())++] = c;
+			store[(*useReserved())] = 0;
 
 			return SUCCESS;
 		}
 		INLINE_SIZE_FUNCTION(){
-			s = use;
+			s = (*useReserved());
 			return SUCCESS;
 		}
-		INLINE_REWIND_FUNCTION(){use = 0;return SUCCESS;}
+		INLINE_REWIND_FUNCTION(){ (*useReserved()) = 0; return SUCCESS; }
 	}object;
 
 }intclass;
