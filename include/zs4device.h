@@ -907,15 +907,36 @@ public:
 		zs4::driver * driver;
 		unsigned device * store;
 		unsigned device storesize;
-		unsigned device stacktop;
-		unsigned device limit;
-		unsigned device children;
-		unsigned device buffer;
 		unsigned device use;
-		stream * in;
-		stream * out;
-		inline unsigned device ulim(){ return (buffer - 2); }
+		inline unsigned device ulim(){ return (buffer() - 2); }
+		inline unsigned device pointerSize(){ return (sizeof(void*) / sizeof(unsigned device)); }
+		inline virtual unsigned device buffer(){ return(workingSize() >> 2); }
+		inline virtual unsigned device limit(){return buffer();}
+
+		typedef struct item { 
+			unsigned device flag; 
+			unsigned device nam; 
+			unsigned device val; 
+		}item;
+		inline unsigned device itemSize(){ return 3; }
+		inline unsigned device itemSpace(){ return ((limit()/itemSize())-itemCount()); }
+		void stackPush() { (*stackReserved())++; }
+		void stackPop() { (*stackReserved())--; }
+		inline stream ** inReserved(){
+			return  (stream**)&store[(storesize - pointerSize())];
+		}
+		inline stream ** outReserved(){
+			return (stream**)&store[storesize - (pointerSize() * 2)];
+		}
+		inline unsigned device * useReserved(){ return &store[((storesize - (pointerSize() * 2)) - 1)]; }
+		inline unsigned device * stackReserved(){ return &store[((storesize - (pointerSize() * 2)) - 2)]; }
+		inline unsigned device workingSize(){ return ((storesize - (pointerSize() * 2)) - 2); }
+		inline unsigned device systemSize(){ return (storesize - workingSize()); }
+		inline stream*in(){ return *inReserved(); }
+		inline stream*out(){ return *outReserved(); }
+
 	protected:
+
 		INLINE_BITS_FUNCTION(){	return (ZS4LARGE)(storesize << 3);}
 		INLINE_RESET_FUNCTION(){unsigned device * p = store;for (unsigned device i = 0; i < storesize; i++){ p[i] = 0; }}
 
@@ -926,9 +947,6 @@ public:
             return true;
         }
 
-		inline unsigned device itemSpace(){return stacktop - limit;}
-		inline unsigned device itemSize(){ return 2; }
-		typedef struct item {unsigned device nam;unsigned device val;}item;
 		inline e itemNameSet(item & i, unsigned device * n){
 			symbol::name set;
 			e error = SUCCESS;
@@ -938,8 +956,8 @@ public:
 			i.nam = w.data;
 			return SUCCESS;
 		}
-		inline item * itemArray(void){ return (item*)&store[stacktop]; }
-		inline unsigned device itemCount(void){ return ((storesize - stacktop) / 2); }
+		inline item * itemArray(void){ return (item*)&store[storesize - workingSize() - ((*stackReserved()))]; }
+		inline unsigned device itemCount(void){ return ((*stackReserved())); }
 		inline e itemFind(unsigned device & d, unsigned device * str){
 			item * arr = itemArray();
 			unsigned device c = itemCount();
@@ -950,43 +968,34 @@ public:
 		}
 
 		inline e onc(){
-			out->jStart("zs4");
+			out()->jStart("zs4");
 			{
 				symbol::name name;
-				out->jStart("i"); //info
+				out()->jStart("i"); //info
 				{
-					out->jStart("m"); // memory
+					out()->jStart("m"); // memory
 					{
-						out->jInteger("s", storesize);
-						out->jComma();
+						out()->jInteger("s", storesize);
+						out()->jComma();
 
-						out->jInteger("b", buffer);
-						out->jComma();
+						out()->jInteger("b", buffer());
+						out()->jComma();
 
-						out->jInteger("l", limit);
-						out->jComma();
+						out()->jInteger("l", limit());
+						out()->jComma();
 
-						out->jInteger("u", (storesize - stacktop));
+						out()->jInteger("u", (storesize - workingSize()));
 					}
-					out->jEnd(); // memory
+					out()->jEnd(); // memory
 
-					out->jComma();
-
-					out->jStart("c"); // memory
-					{
-						out->jInteger("c", children);
-						//jComma();
-
-					}
-					out->jEnd(); // memory
 				}
-				out->jEnd();  //info
+				out()->jEnd();  //info
 			}
-			return out->jEnd(); // zs4
+			return out()->jEnd(); // zs4
 		}
 		inline virtual e onv(void){
 
-			out->jStart();
+			out()->jStart();
 			{
 				onc();
 				// and now the actual content....
@@ -996,22 +1005,22 @@ public:
 				if (c){
 					for (device i = 0; i < c; i++)
 					{
-						out->jComma();
-						out->jInteger(p[i].nam, p[i].val);
+						out()->jComma();
+						out()->jInteger(p[i].nam, p[i].val);
 					}
 
 				}
 			}
-			out->jEnd();
+			out()->jEnd();
 
-			return out->jDone();
+			return out()->jDone();
 		}
 
 		inline e evalOpcode(integer & value, unsigned device & i, unsigned device & result){
 			e error = FAILURE;
             integer r;
 			integer operand;
-			unsigned device buffer[EVAL_BUFSIZE];
+			unsigned device _buf[EVAL_BUFSIZE];
 			unsigned device counter = 0;
 
 			symbol::container container('(', ')');
@@ -1024,8 +1033,8 @@ public:
 			unsigned device opc = i;
 			while (opcode.is(store[i])){
 				if (counter > EVAL_BUFLIMIT) return BUFFEROVERFLOW;
-				buffer[counter++] = store[i++];
-				buffer[counter] = 0;
+				_buf[counter++] = store[i++];
+				_buf[counter] = 0;
 			};
 			unsigned device arg = counter;
 
@@ -1048,9 +1057,9 @@ public:
                         return BADNAME;
                 }
                 operand.data = itemArray()[name_index].val;
-                if (error = operand.write(&buffer[counter],(256-counter),decimal))return error;
+				if (error = operand.write(&_buf[counter], (256 - counter), decimal))return error;
 
-				if (error = value.io(buffer, r.data))return error;
+				if (error = value.io(_buf, r.data))return error;
 				itemArray()[name_index].val = operand.data;
 				result = value.data = r.data;
 				return SUCCESS;
@@ -1060,11 +1069,11 @@ public:
 				while (decimal.is(store[i]))
                 {
 					if (counter > EVAL_BUFLIMIT) return BUFFEROVERFLOW;
-					buffer[counter++] = store[i++];
-                    buffer[counter]=0;
+					_buf[counter++] = store[i++];
+					_buf[counter] = 0;
                 }
 				
-				if (error = value.io(buffer, r.data))return error;
+				if (error = value.io(_buf, r.data))return error;
 
 
 				result = r.data;
@@ -1072,8 +1081,8 @@ public:
 			}
 			else if (store[i] == container.open()){
 				if (error = evalContainer(container, i, r.data))return error;
-				if (error = r.write(&buffer[counter], (EVAL_BUFSIZE - counter), decimal))return error;
-				if (error = value.io(buffer, r.data))return error;
+				if (error = r.write(&_buf[counter], (EVAL_BUFSIZE - counter), decimal))return error;
+				if (error = value.io(_buf, r.data))return error;
 
 
 				result = r.data;
@@ -1083,13 +1092,11 @@ public:
 				return NOTIMPLEMENTED;
             }
 
-            if (error = value.io(buffer,r.data))return error;
+			if (error = value.io(_buf, r.data))return error;
             result = r.data;
             return SUCCESS;
 		}
-
 		inline e evalContainer(symbol::container&container, unsigned device & i, unsigned device & result){
-			// ((5*5)+10)
 			e error = PARSERROR;
 			integer value;
 
@@ -1126,7 +1133,6 @@ public:
 
 			return NOFRAMEND;
 		}
-
 		inline e evalName(unsigned device & i, unsigned device & result){
 			e error = PARSERROR;
 			integer r;
@@ -1160,7 +1166,6 @@ public:
 			return NOTIMPLEMENTED;
 
 		}
-
 		inline e evalDecimal(unsigned device & i, unsigned device & result){
 			e error = PARSERROR;
 			integer r;
@@ -1188,7 +1193,6 @@ public:
 			return NOTIMPLEMENTED;
 
 		}
-
 		inline e eval(unsigned device & i, unsigned device & result){
 			e error = PARSERROR;
 			integer value;
@@ -1232,38 +1236,37 @@ public:
 			unsigned device wk;
 			e error = FAILURE;
 			symbol symbol;
-			item var; var.nam = var.val = 0;
+			item var; var.flag = var.nam = var.val = 0;
 			// cut leading space;
 			while (symbol.is<symbol::space>(*str))str++;
 			switch (*str){
 			case '+':{
-				if (itemSpace() < 2){
-					return out->jError(NOMEMORY);
+				if (itemSpace() < itemSize()){
+					return out()->jError(NOMEMORY);
 				}
 
 				str++;
 				if ((error = itemNameSet(var, str))){
-					return out->jError(BADNAME);
+					return out()->jError(BADNAME);
 				}
 
 				var.val = 0;
 				if (SUCCESS == itemFind(wk, str)){
-					return out->jError(ALREADYEXISTS);
+					return out()->jError(ALREADYEXISTS);
 				}
 
-
-				stacktop -= itemSize();
+				stackPush();
 				item * a = itemArray();
 				a[0] = var;
 
-				out->write('0');
-				return out->jDone();
+				out()->write('0');
+				return out()->jDone();
 			}
 			case '-':{
 				str++;
 				unsigned device iRemove = 0;
 				if (SUCCESS != itemFind(iRemove, str)){
-					return out->jError(NOTFOUND);
+					return out()->jError(NOTFOUND);
 				}
 
 				item * arr = itemArray();
@@ -1271,28 +1274,28 @@ public:
 				for (unsigned device i = iRemove; i > 0; i--){
 					arr[i] = arr[i - 1];
 				}
-				stacktop += itemSize();
+				stackPop();
 
-				return out->jNull();
+				return out()->jNull();
 			}
 			default:{
 				unsigned device parserindex = 0;
 				unsigned device result = 0;
 				if (error = eval(parserindex, result))
-					return out->jError(error);
+					return out()->jError(error);
 
 				symbol::decimal number;
-				out->writeInteger(number, result);
-				return out->jDone();
+				out()->writeInteger(number, result);
+				return out()->jDone();
 
 			}}//switch()
 
 
-			return out->jDone();
+			return out()->jDone();
 		}
 #		define INLINE_ONINTEGER_FUNCTION() inline virtual e onInteger(unsigned device & c)
 		INLINE_ONINTEGER_FUNCTION(){
-			if (in == NULL || out == NULL) return FAILURE;
+			if (in() == NULL || out() == NULL) return FAILURE;
 
 			if (use < 1)
 				return FAILURE;
@@ -1307,56 +1310,45 @@ public:
 			if (use >= (ulim()))
 			{
 				unsigned device c;
-				while (in->readable()){
-					in->read(c);
+				while (in()->readable()){
+					in()->read(c);
 					if (c == '\n')
 						break;
 				}
 				rewind();
-				return out->jError(BUFFEROVERFLOW);
+				return out()->jError(BUFFEROVERFLOW);
 			}
 
 			return WAITING;
 		}
+
 	public:
 #		define INLINE_CONSTRUCT() inline virtual void construct(zs4::driver * driver, unsigned device * m, unsigned device s, stream * i, stream * o)
 		INLINE_CONSTRUCT(){
 			store = m;
-			if (s <= MAX) { storesize = (unsigned device)s; }
-			else { storesize = MAX; }
+			storesize = s;
 			reset();
-			stacktop = storesize;
-			buffer = (storesize / 4);
-			if (buffer > 255){ buffer = (unsigned device)255; }
-			limit = (storesize - buffer);
-			children = 0;
+
+			*inReserved() = i;
+			*outReserved() = o;
 			use = 0;
-			in = i;
-			out = o;
 		}
 		inline object(){
 			store = NULL;
 			storesize = 0;
-			stacktop = 0;
-			limit = 0;
-			children = 0;
-			buffer = 0;
-			use = 0;
-			stream * in = NULL;
-			stream * out = NULL;
 		}
 #		define INLINE_INSTANCE() inline object(zs4::driver * driver, unsigned device * m, unsigned device s, stream * i, stream * o)
 		INLINE_INSTANCE(){
 			construct(driver, m, s, i, o);
 		}
 		inline virtual e tickle(void){
-			if (in == NULL || out == NULL) return FAILURE;
+			if (in() == NULL || out() == NULL) return FAILURE;
 
 			unsigned device c = 0;
 			e error = SUCCESS;
 
-			while (in->readable()){
-				if ((error = in->read(c)))
+			while (in()->readable()){
+				if ((error = in()->read(c)))
 					return error;
 
 				if ((error = write(c)))
