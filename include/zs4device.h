@@ -3,8 +3,8 @@
 
 #ifndef device
 #define device char
-#define intclass byte
-typedef char byte_t;
+#define intclass bpi8
+typedef char bpi8_t;
 #endif
 
 #ifndef ZS4LARGE
@@ -32,7 +32,7 @@ typedef class intclass
 		}
 	}temporary;
 public:
-	static const ZS4LARGE PRECISION = (ZS4LARGE)(unsigned device)(sizeof(device) << 3);
+	static const ZS4LARGE PRECISION = (ZS4LARGE)(sizeof(device) << 3);
 	static const ZS4LARGE MASK = (ZS4LARGE)(unsigned device)(~0);
 	static const ZS4LARGE MAX = MASK;
 	static const ZS4LARGE MIN = (ZS4LARGE)((device)0);
@@ -142,7 +142,6 @@ public:
 		*to = 0;
 		return ret;
 	}
-
 
 	inline static unsigned device strcmp(const unsigned device * str1, const unsigned device * str2){
 		for (;;)
@@ -268,11 +267,11 @@ public:
 		public:
 			inline virtual const unsigned device count(void){ return 2; }
 		}binary;
-		typedef class octal : public numeric
+		typedef class bpi64al : public numeric
 		{
 		public:
 			inline virtual const unsigned device count(void){ return 8; }
-		}octal;
+		}bpi64al;
 		typedef class decimal : public numeric
 		{
 		public:
@@ -345,10 +344,10 @@ public:
 	typedef class storage{
 	public:
 
-#define	INLINE_BITS_FUNCTION() inline virtual ZS4LARGE bits(void)const
+#		define	INLINE_BITS_FUNCTION() inline virtual ZS4LARGE bits(void)const
 		INLINE_BITS_FUNCTION(){ return (sizeof(*this) << 3); }
 
-#define INLINE_CONNECT_FUNCTION() inline virtual e connect(stream * in, stream * out)
+#		define INLINE_CONNECT_FUNCTION() inline virtual e connect(stream * in, stream * out)
 
 		inline ZS4LARGE addressBits(void)const{ ZS4LARGE w = 1; while (((ZS4LARGE)1 << w)<bits())w++; return w; }
 		inline ZS4LARGE messageBits(void)const{ return (bits() - addressBits()); }
@@ -361,27 +360,27 @@ public:
 		static const unsigned device seek_end = 2;
 		static const unsigned device seek_set = 0;
 
-#define	INLINE_READ_FUNCTION() inline virtual e read(unsigned device & c)
+#		define	INLINE_READ_FUNCTION() inline virtual e read(unsigned device & c)
 		INLINE_READ_FUNCTION(){return FAILURE;}
-#define	INLINE_WRITE_FUNCTION() inline virtual e write(unsigned device c)
+#		define	INLINE_WRITE_FUNCTION() inline virtual e write(unsigned device c)
 		INLINE_WRITE_FUNCTION(){return FAILURE;	}
-#define	INLINE_READABLE_FUNCTION() inline virtual unsigned device readable(void)
+#		define	INLINE_READABLE_FUNCTION() inline virtual unsigned device readable(void)
 		INLINE_READABLE_FUNCTION(){	return 0; }
-#define	INLINE_WRITEABLE_FUNCTION() inline virtual unsigned device writeable(void)
+#		define	INLINE_WRITEABLE_FUNCTION() inline virtual unsigned device writeable(void)
 		INLINE_WRITEABLE_FUNCTION(){return 0;}
-#define	INLINE_FLUSH_FUNCTION() inline virtual e flush(void)
+#		define	INLINE_FLUSH_FUNCTION() inline virtual e flush(void)
 		INLINE_FLUSH_FUNCTION(){ return SUCCESS; }
-#define	INLINE_CLOSE_FUNCTION() inline virtual e close(void)
+#		define	INLINE_CLOSE_FUNCTION() inline virtual e close(void)
 		INLINE_CLOSE_FUNCTION(){return SUCCESS;}
-#define	INLINE_REWIND_FUNCTION() inline virtual e rewind(void)
+#		define	INLINE_REWIND_FUNCTION() inline virtual e rewind(void)
 		INLINE_REWIND_FUNCTION(){return seek(0, SEEK_SET);}
-#define	INLINE_SEEKEND_FUNCTION() inline virtual e seekEnd(void)
+#		define	INLINE_SEEKEND_FUNCTION() inline virtual e seekEnd(void)
 		INLINE_SEEKEND_FUNCTION(){return seek(0, seek_end);}
-#define	INLINE_SEEK_FUNCTION() inline virtual e seek(ZS4LARGE offset, int origin)
+#		define	INLINE_SEEK_FUNCTION() inline virtual e seek(ZS4LARGE offset, int origin)
 		INLINE_SEEK_FUNCTION(){return FAILURE;}
-#define	INLINE_TELL_FUNCTION() inline virtual e tell(ZS4LARGE & pPos)
+#		define	INLINE_TELL_FUNCTION() inline virtual e tell(ZS4LARGE & pPos)
 		INLINE_TELL_FUNCTION(){return FAILURE;}
-#define	INLINE_SIZE_FUNCTION() inline virtual e size(ZS4LARGE & s)
+#		define	INLINE_SIZE_FUNCTION() inline virtual e size(ZS4LARGE & s)
 		INLINE_SIZE_FUNCTION(){
 			e err;
 			ZS4LARGE pos = 0;
@@ -404,21 +403,21 @@ public:
 			return SUCCESS;
 		}
 
-#define	INLINE_WRITESTRING_FUNCTION() inline virtual e write(const unsigned device * str)
+#		define	INLINE_WRITESTRING_FUNCTION() inline virtual e write(const unsigned device * str)
 		INLINE_WRITESTRING_FUNCTION(){
 			if (str == NULL || (*str) == 0)
 				return NODATA;
 
 			unsigned device l = len(str);
-			for (unsigned char i = 0; i < l; i++){
+			for (unsigned device i = 0; i < l; i++){
 				if (SUCCESS != write(str[i]))
 					return FAILURE;
 			}
 			return SUCCESS;
 		}
 
-#define	INLINE_TRANSLATECHARPTR_FUNCTION() inline virtual e translate(const char * cp)
-		INLINE_TRANSLATECHARPTR_FUNCTION(){
+#		define	INLINE_BYTEWRITESTRING_FUNCTION() inline virtual e byteWrite(const char * cp)
+		INLINE_BYTEWRITESTRING_FUNCTION(){
 			if (cp == NULL)
 				return NODATA;
 
@@ -491,7 +490,7 @@ public:
 			return SUCCESS;
 		}
 		inline e writeErrorText(e error){
-#define eText(err) if (error==err){return translate(#err);}
+#define eText(err) if (error==err){return byteWrite(#err);}
 			eText(WAITING);
 			eText(BUFFEROVERFLOW);
 			eText(STACKOVERFLOW);
@@ -516,78 +515,38 @@ public:
 			symbol::decimal decimal;
 			return writeInteger(decimal, (unsigned device)error);
 		}
-		inline virtual e jInteger(const unsigned device n, unsigned device v){
-			symbol::decimal num;
-			jNameColon(n);
-			return writeInteger(num, v);
-		}
-		inline virtual e jInteger(const char * n, unsigned device v){
-			symbol::decimal num;
-			jNameColon(n);
-			return writeInteger(num, v);
-		}
-		inline virtual e jNameColon(const unsigned device n){
-			symbol::name name;
-			write('"');
-			writeInteger(name, n);
-			write('"');
-			return write(':');
-		}
-		inline virtual e jNameColon(const char * n){
-			write('"');
-			translate(n);
-			write('"');
-			return write(':');
-		}
-		inline virtual e jStart(const unsigned device n){
-			jNameColon(n);
-			return write('{');
-		}
-		inline virtual e jStart(const char * n){
-			write('"');
-			translate(n);
-			write('"');
-			write(':');
-			return write('{');
-		}
-		inline virtual e jStart(){
-			return write('{');
-		}
+
+		inline virtual e jInteger(const unsigned device n, unsigned device v){symbol::decimal num;jNameColon(n);return writeInteger(num, v);}
+		inline virtual e jInteger(const char * n, unsigned device v){symbol::decimal num;jNameColon(n);return writeInteger(num, v);}
+		inline virtual e jNameColon(const unsigned device n){symbol::name name;write('"');writeInteger(name, n);write('"');return write(':');}
+		inline virtual e jNameColon(const char * n){write('"');byteWrite(n);write('"');return write(':');}
+		inline virtual e jStart(const unsigned device n){jNameColon(n);return write('{');}
+		inline virtual e jStart(const char * n){write('"');byteWrite(n);write('"');write(':');return write('{');}
+		inline virtual e jStart(){return write('{');}
 		inline virtual e jEnd(){ return write('}'); }
 		inline virtual e jDone(){ return write('\n'); }
-		inline virtual e jError(e error){
-			translate("error:");
-			writeErrorText(error);
-			write('\n');
-			return error;
-		}
-		inline virtual e jNull(){
-			write('n');
-			write('u');
-			write('l');
-			write('l');
-			return write('\n');
-		}
+		inline virtual e jError(e error){byteWrite("error:");writeErrorText(error);write('\n');return error;}
+		inline virtual e jNull(){return byteWrite("null'\n");}
 		inline virtual e jComma(){return write(',');}
 
 	}stream;
 
 	typedef class bytestream : public stream{
-		zs4::byte::stream * stream = NULL;
+		zs4::bpi8::stream * stream = NULL;
 	public:
-		inline bytestream(zs4::byte::stream * bs){
+		inline bytestream(zs4::bpi8::stream * bs){
 			stream = bs;
 		}
 
 		INLINE_READ_FUNCTION(){
-			zs4::byte::integer b;
+			zs4::bpi8::integer b;
 			e error = stream->read(b.data);
 			if (error)return error;
 			c = (unsigned device)b.data;
 			return SUCCESS;
 		}
 		INLINE_WRITE_FUNCTION(){
-			zs4::byte::integer b;
+			zs4::bpi8::integer b;
 			b.data = (unsigned char)c;
 			return stream->write(b.data);
 		}
@@ -925,7 +884,6 @@ public:
 	}integer;
 
 	typedef class object : public stream{
-		zs4::driver * driver;
 		unsigned device * store;
 		unsigned device storesize;
 		inline unsigned device ulim(){ return (buffer() - 2); }
@@ -934,9 +892,30 @@ public:
 		inline virtual unsigned device limit(){return buffer();}
 
 		typedef struct item { 
+		public:
+			typedef enum {
+				DEVICE,
+			flagbits}flagbit;
+
 			unsigned device flag; 
 			unsigned device nam; 
 			unsigned device val; 
+			inline unsigned device name(unsigned device * d = NULL){
+				if (d == NULL)return nam;
+				symbol::name name;
+				integer w;
+				if ((SUCCESS != w.set(name, d))){ return val; }
+				nam = w.data;
+				return val;
+			}
+			inline unsigned device & operator =(unsigned device * d){
+				symbol::decimal decimal;
+				integer w;
+				if ((SUCCESS != w.set(decimal, d))){ return val; }
+				val = w.data;
+				return val;
+			}
+
 		}item;
 		inline unsigned device itemSize(){ return 3; }
 		inline unsigned device itemSpace(){ return ((limit()/itemSize())-itemCount()); }
@@ -955,14 +934,16 @@ public:
 			return SUCCESS;
 		}
 		inline e itemDelete(unsigned device * str) {
-			item var; var.flag = var.nam = var.val = 0;
-			if (SUCCESS != itemNameSet(var, str)){ return BADNAME; }
+			symbol::name name; integer nam;
+			if (SUCCESS != nam.set(name, str))
+				return BADNAME;
+
 
 			item * arr = itemArray();
 			bool found = false;
 			unsigned device index;
 			unsigned device c = itemCount();
-			for (unsigned device i = 0; i < c; i++){ if (arr[i].nam == var.nam){ found = true; index = i; break; } }
+			for (unsigned device i = 0; i < c; i++){ if (arr[i].nam == nam.data){ found = true; index = i; break; } }
 			if (!found)
 				return NOTFOUND;
 
@@ -982,29 +963,31 @@ public:
 			i.nam = w.data;
 			return SUCCESS;
 		}
-		inline item * itemArray(void){ return (item*)&store[storesize - workingSize() - (itemCount()*itemSize())]; }
+		inline item * itemArray(void){ return (item*)&store[workingSize() - (itemCount()*itemSize())]; }
 		inline unsigned device itemCount(void){ return ((*stackReserved())); }
 		inline item *  itemFind(unsigned device * str){
 			item * arr = itemArray();
 			unsigned device c = itemCount();
-			item var; var.flag = var.nam = var.val = 0;
-			if (SUCCESS != itemNameSet(var, str)){ return NULL; }
+			symbol::name name; integer nam;
+			if (SUCCESS != nam.set(name, str))
+				return NULL;
 
-			for (unsigned device i = 0; i < c; i++){ if (arr[i].nam == var.nam){ return &arr[i]; } }
+			for (unsigned device i = 0; i < c; i++){ if (arr[i].nam == nam.data){ return &arr[i]; } }
 			return NULL;
 		}
 
+		inline zs4::driver *** driverReserved(){ return (zs4::driver***)&store[storesize - (pointerSize() * 1)]; }
+		inline stream ** inReserved(){ return  (stream**)&store[(storesize - pointerSize()) * 2]; }
+		inline stream ** outReserved(){return (stream**)&store[storesize - (pointerSize() * 3)];}
 
-		inline stream ** inReserved(){
-			return  (stream**)&store[(storesize - pointerSize())];
-		}
-		inline stream ** outReserved(){
-			return (stream**)&store[storesize - (pointerSize() * 2)];
-		}
-		inline unsigned device * useReserved(){ return &store[((storesize - (pointerSize() * 2)) - 1)]; }
-		inline unsigned device * stackReserved(){ return &store[((storesize - (pointerSize() * 2)) - 2)]; }
-		inline unsigned device workingSize(){ return ((storesize - (pointerSize() * 2)) - 2); }
+		inline unsigned device * useReserved(){ return &store[((storesize - (pointerSize() * 3)) - 1)]; }
+		inline unsigned device * stackReserved(){ return &store[((storesize - (pointerSize() * 3)) - 2)]; }
+		inline unsigned device * heapReserved(){ return &store[((storesize - (pointerSize() * 3)) - 3)]; }
+		
+		inline unsigned device workingSize(){ return ((storesize - (pointerSize() * 3)) - 3); }
 		inline unsigned device systemSize(){ return (storesize - workingSize()); }
+
+		inline zs4::driver ** driver(){ return *driverReserved(); }
 		inline stream*in(){ return *inReserved(); }
 		inline stream*out(){ return *outReserved(); }
 
@@ -1337,6 +1320,8 @@ public:
 		INLINE_ONINTEGER_FUNCTION(){
 			if (in() == NULL || out() == NULL) return FAILURE;
 
+			item * test = itemArray();
+
 			if ((*useReserved()) < 1)
 				return FAILURE;
 
@@ -1351,6 +1336,7 @@ public:
 			{
 				unsigned device c;
 				while (in()->readable()){
+					rewind();
 					in()->read(c);
 					if (c == '\n')
 						break;
@@ -1362,21 +1348,23 @@ public:
 			return WAITING;
 		}
 
-	public:
-#		define INLINE_CONSTRUCT() inline virtual void construct(zs4::driver * driver, unsigned device * m, unsigned device s, stream * i, stream * o)
+#		define INLINE_CONSTRUCT() inline virtual void construct(zs4::driver ** d, unsigned device * m, unsigned device s, stream * i, stream * o)
 		INLINE_CONSTRUCT(){
 			store = m;
 			storesize = s;
+
 			reset();
 
+			*driverReserved() = d;
 			*inReserved() = i;
 			*outReserved() = o;
 		}
+	public:
 		inline object(){
 			store = NULL;
 			storesize = 0;
 		}
-#		define INLINE_INSTANCE() inline object(zs4::driver * driver, unsigned device * m, unsigned device s, stream * i, stream * o)
+#		define INLINE_INSTANCE() inline object(zs4::driver ** driver, unsigned device * m, unsigned device s, stream * i, stream * o)
 		INLINE_INSTANCE(){
 			construct(driver, m, s, i, o);
 		}

@@ -4,9 +4,9 @@
 #include <zs4.h>
 #include <zs4config.h>
 
-#define byte_t char 
+#define bpi8_t char 
 
-typedef class util : public zs4::byte
+typedef class util : public zs4::bpi8
 {
 public:
 	typedef class json{
@@ -881,7 +881,7 @@ do { if (!state.first_pass) string[string_length] = b;  ++string_length; } while
 		time_t modified;
 		bool readonly, hidden, isdir;
 	}fileinfo;
-	typedef class file : public zs4::byte::stream
+	typedef class file : public zs4::bpi8::stream
 	{
 	protected:
 		ZS4LARGE read_able;
@@ -897,7 +897,7 @@ do { if (!state.first_pass) string[string_length] = b;  ++string_length; } while
 			close();
 		};
 
-		inline e openRead(byte_t * name){
+		inline e openRead(bpi8_t * name){
 			close();
 
 			if (SUCCESS != info.info(name))
@@ -911,7 +911,7 @@ do { if (!state.first_pass) string[string_length] = b;  ++string_length; } while
 			open_for_write = false;
 			return SUCCESS;
 		}
-		inline e openWrite(byte_t * name){
+		inline e openWrite(bpi8_t * name){
 			close();
 			handle = fopen(name, "w+");
 			if (handle == NULL)
@@ -933,16 +933,16 @@ do { if (!state.first_pass) string[string_length] = b;  ++string_length; } while
 			return SUCCESS;
 		}
 
-		inline virtual unsigned byte_t readable(){
+		inline virtual unsigned bpi8_t readable(){
 			if (handle == NULL) return 0;
 			return read_able;
 		}
-		inline virtual unsigned byte_t writeable(void){
+		inline virtual unsigned bpi8_t writeable(void){
 			if (handle == NULL) return 0;
 			return (~0);
 		}
 
-		inline virtual e read(unsigned byte_t & c){
+		inline virtual e read(unsigned bpi8_t & c){
 			if (!readable())
 				return FAILURE;
 
@@ -952,7 +952,7 @@ do { if (!state.first_pass) string[string_length] = b;  ++string_length; } while
 
 			return SUCCESS;
 		}
-		inline virtual e write(unsigned byte_t c){
+		inline virtual e write(unsigned bpi8_t c){
 			if (!writeable())
 				return FAILURE;
 
@@ -1000,7 +1000,7 @@ do { if (!state.first_pass) string[string_length] = b;  ++string_length; } while
 	{
 	public:
 
-		inline virtual unsigned byte_t readable(){ return 1; }
+		inline virtual unsigned bpi8_t readable(){ return 1; }
 		inline in(void){
 			handle = stdin;
 		};
@@ -1011,7 +1011,7 @@ do { if (!state.first_pass) string[string_length] = b;  ++string_length; } while
 	typedef  class out : public file
 	{
 	public:
-		inline virtual unsigned byte_t writeable(void){ return 1; }
+		inline virtual unsigned bpi8_t writeable(void){ return 1; }
 		inline out(void){
 			handle = stdout;
 		};
@@ -1084,22 +1084,22 @@ do { if (!state.first_pass) string[string_length] = b;  ++string_length; } while
 
 			return SUCCESS;
 		}
-		inline static e rmFile(byte_t * name){
+		inline static e rmFile(bpi8_t * name){
 			if (!unlink((const char *)name)) return SUCCESS;
 			return FAILURE;
 		}
-		inline static e rmDir(byte_t * name){
+		inline static e rmDir(bpi8_t * name){
 			if (!rmdir((const char *)name)) return SUCCESS;
 			return FAILURE;
 		}
-		inline static e info(byte_t * objectname, fileinfo * info){
+		inline static e info(bpi8_t * objectname, fileinfo * info){
 			if (objectname == NULL || objectname[0] == 0 || info == NULL)
 				return FAILURE;
 
 			return info->info(objectname);
 		}
 
-		inline static time_t created(byte_t * fnam){
+		inline static time_t created(bpi8_t * fnam){
 			fileinfo info;
 
 			if ((!isFile(fnam))
@@ -1109,7 +1109,7 @@ do { if (!state.first_pass) string[string_length] = b;  ++string_length; } while
 
 			return info.created;
 		}
-		inline static time_t modified(byte_t * fnam){
+		inline static time_t modified(bpi8_t * fnam){
 			fileinfo info;
 
 			if ((!fs::isFile(fnam))
@@ -1119,7 +1119,7 @@ do { if (!state.first_pass) string[string_length] = b;  ++string_length; } while
 
 			return info.modified;
 		}
-		inline size_t list(byte_t * name, bool hidden_files){
+		inline size_t list(bpi8_t * name, bool hidden_files){
 
 			count = 0;
 
@@ -1141,9 +1141,9 @@ do { if (!state.first_pass) string[string_length] = b;  ++string_length; } while
 				if (tinydir_readfile(&dir, &file) == -1)
 					break;
 
-				if (strcmp((const unsigned byte_t*)file.name, (const unsigned byte_t*)".")
-					&& strcmp((const unsigned byte_t*)file.name, (const unsigned byte_t*)"..")
-					&& strcmp((const unsigned byte_t*)file.name, (const unsigned byte_t*)".zs4")
+				if (strcmp((const unsigned bpi8_t*)file.name, (const unsigned bpi8_t*)".")
+					&& strcmp((const unsigned bpi8_t*)file.name, (const unsigned bpi8_t*)"..")
+					&& strcmp((const unsigned bpi8_t*)file.name, (const unsigned bpi8_t*)".zs4")
 					)
 				{
 

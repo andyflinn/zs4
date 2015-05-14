@@ -42,11 +42,11 @@ public:
 	inline void setMask(inttype v){
 		dta |= v;
 	}
-	inline const size_t bytes(void) const {
+	inline const size_t bpi8s(void) const {
 		return (sizeof(inttype));
 	}
 	inline const size_t bits(void) const {
-		return (bytes() * 8);
+		return (bpi8s() * 8);
 	}
 	inline static const inttype mask(enumtype idx){
 		return (inttype)((inttype)1 << idx);
