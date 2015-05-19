@@ -267,11 +267,11 @@ public:
 		public:
 			inline virtual const unsigned device count(void){ return 2; }
 		}binary;
-		typedef class bpi64al : public numeric
+		typedef class octal : public numeric
 		{
 		public:
 			inline virtual const unsigned device count(void){ return 8; }
-		}bpi64al;
+		}octal;
 		typedef class decimal : public numeric
 		{
 		public:
