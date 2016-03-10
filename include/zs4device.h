@@ -11,8 +11,13 @@ typedef char bpi8_t;
 #	define ZS4LARGE unsigned long long
 #endif
 
-#define EVAL_BUFSIZE (256)
-#define EVAL_BUFLIMIT (EVAL_BUFSIZE-2)
+#ifndef EVAL_BUFSIZE
+#	define EVAL_BUFSIZE (256)
+#endif
+
+#ifndef EVAL_BUFLIMIT
+#	define EVAL_BUFLIMIT (EVAL_BUFSIZE-2)
+#endif
 
 
 typedef class intclass
@@ -1040,6 +1045,9 @@ public:
 			}
 			return out()->jEnd(); // zs4
 		}
+		inline virtual e ons(void){
+			return out()->jDone();
+		}
 		inline virtual e onv(void){
 
 			out()->jStart();
@@ -1059,7 +1067,16 @@ public:
 
 				}
 			}
-			out()->jEnd();
+			out()->jEnd();	out()->jDone();
+
+			out()->jDone();
+			out()->byteWrite("available commands:\n");
+			out()->byteWrite("\"+ varname\" to add var\n");
+			out()->byteWrite("\"- varname\" to delete var\n");
+			out()->byteWrite("\"< filename\" to read a file\n");
+			out()->byteWrite("\"> filename bytecount\" to write a file\n");
+			out()->byteWrite("\"! shell command string\"\n");
+			out()->jDone();
 
 			return out()->jDone();
 		}
@@ -1313,7 +1330,6 @@ public:
 
 			}}//switch()
 
-
 			return out()->jDone();
 		}
 #		define INLINE_ONINTEGER_FUNCTION() inline virtual e onInteger(unsigned device & c)
@@ -1329,6 +1345,7 @@ public:
 			{
 				rewind();
 				if (store[0] == '?'){ return onv(); }
+				if (store[0] == '!'){ return ons(); }
 				else { return onScan(store); }
 			}
 
