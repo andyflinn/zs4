@@ -1,0 +1,133 @@
+zs4{
+	color:black;
+	border-radius: 1em;
+	background-color: lightgreen;
+	margin-top:2em;
+	padding-bottom:0.2em;
+	
+}
+
+zs4-event:hover{
+	background-color: rgb(180,250,180);
+}
+
+.zs4current{
+	background-color:white;
+}
+
+.zs4current:hover{
+	background-color: rgb(250,250,100);
+}
+
+
+zs4-titlebar{
+	font-weight:bolder;
+	border: 0.2em solid green;
+	background-color:lightgray;
+	padding:0.4em;
+	border-radius: 1em;
+}
+
+zs4-workarea{
+	margin-left:1em;
+	border-radius: 1em;
+}
+
+zs4-tool-bar,
+zs4-tool-beat,
+zs4-tool-bpc,
+zs4-tool-bpm,
+zs4-tool-chord,
+zs4-tool-midi,
+zs4-tool-audio,
+zs4-tool-transpose{
+	background-color:white;
+	border: 0.2em solid green;
+	padding:0.2em;
+	margin:0.2em;
+	border-radius: 1em;
+}
+
+zs4-titlebar-logo{
+	Color:green;
+	background-color:white;
+	margin-top:2em;
+	margin-right:0.2em;
+	padding:0.2em;
+	border: 0.13em solid green;
+	border-radius: 1em;
+}
+
+zs4-error{
+	color:red;
+
+}
+
+.zs4error{
+	color:red;
+
+}
+
+.jumpToEvent{
+	background-color:red;
+}
+
+.zs4bar{
+	border-left: 0.2em solid green;
+	padding-left:0.2em;
+}
+
+.zs4beat{
+	border-left: 0.13em dashed green;
+	padding-left:0.2em;
+}
+
+zs4-chord-base{
+	font-weight:bolder;
+}
+
+zs4-chord-type{
+	font-size:90%;
+	vertical-align: text-top;
+}
+
+zs4-player{
+	background-color: yellow;
+	border: 0.13em solid green;
+	border-radius: 1em;
+	padding:0.2em;
+}
+
+zs4-event-chord-delete{
+	Color:black;
+	background-color: red;
+	border: 0.13em solid black;
+	margin-left: 3em;
+	border-radius: 1em;
+	padding:0.2em;
+}
+
+zs4-statusbar{
+	font-size:85%;
+	background-color:lightgray;
+	border: 0.1em solid green;
+	padding:0.2em;
+	margin-top:1em;
+	margin-left:2em;
+	margin-bottom:0.2em;
+	margin-right:0.5em;
+	border-radius: 1em;
+}
+
+zs4-count-chords{
+	margin-left:0.2em;
+	margin-right:0.2em;
+}
+zs4-count-bars{
+	margin-left:0.2em;
+	margin-right:0.2em;
+}
+zs4-count-beats{
+	margin-left:0.2em;
+	margin-right:0.2em;
+}
