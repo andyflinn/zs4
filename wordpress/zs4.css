@@ -33,6 +33,7 @@ zs4-workarea{
 	border-radius: 1em;
 }
 
+.instrument,
 zs4-tool-bar,
 zs4-tool-beat,
 zs4-tool-bpc,
@@ -46,6 +47,45 @@ zs4-tool-transpose{
 	padding:0.2em;
 	margin:0.2em;
 	border-radius: 1em;
+}
+
+zs4-keyboard{
+	padding-top:1em;
+}
+
+zs4-piano-note{
+	margin-top:1em;
+	border-top:1em solid lightgray;
+	border-bottom:0.1em solid gray;
+}
+
+zs4-piano-note.chordnote{
+	margin-top:1em;
+	border-top:1em solid green;
+	border-bottom:0.1em solid gray;
+}
+
+zs4-piano-note.chordroot{
+	margin-top:1em;
+	border-top:1em solid lightgreen;
+	border-bottom:0.1em solid gray;
+}
+
+zs4-piano-note.eventnote{
+	margin-top:1em;
+	border-top:1em solid red;
+	border-bottom:0.1em solid gray;
+}
+
+zs4-instrument-hovernote,zs4-instrument-curchord{
+	text-align:center;
+	margin-left:1em;
+}
+
+zs4-instrument-hovernote{
+	width:3em;
+	text-align:center;
+	margin-left:1em;
 }
 
 zs4-titlebar-logo{
@@ -82,11 +122,11 @@ zs4-error{
 	padding-left:0.2em;
 }
 
-zs4-chord-base{
+zs4-chord-base,zs4-instrument-chord-root{
 	font-weight:bolder;
 }
 
-zs4-chord-type{
+zs4-chord-type,zs4-instrument-chord-type{
 	font-size:90%;
 	vertical-align: text-top;
 }
